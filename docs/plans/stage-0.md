@@ -278,16 +278,17 @@ with `jq`). `tests/smoke/` and `tests/static/` are subfolders of the existing `t
 - [x] Scripts: `lint`, `format`, `format:check`, `knip`, `depcruise`, and `check` (format check, lint,
       typecheck, knip, depcruise, unit tests with coverage, build). `test:e2e` arrives with Playwright in PR 4.
 
-### Task 4: CI pipeline (PR 4)
+### Task 4: CI pipeline (PR 4) — issues #8, #9, #10 (CodeQL part)
 
-- [ ] `playwright.config.ts`: projects = Chromium/Firefox/WebKit at 1280×800 and 1920×1080; iPhone SE (320 via
+- [x] `playwright.config.ts`: projects = Chromium/Firefox/WebKit at 1280×800 and 1920×1080; iPhone SE (320 via
       custom viewport, 375), iPhone 15, Pixel 7, iPad (portrait) + iPhone 15 landscape; `retries: CI ? 2 : 0`;
       `webServer` = `pnpm preview`; reduced motion; frozen time via fixture.
-- [ ] `tests/support/fixtures.ts`: extends `test` to fail on `pageerror` and `console.error`.
-- [ ] `tests/e2e/placeholder.spec.ts`: shows name and `v\d+\.\d+\.\d+`; no horizontal overflow
+- [x] `tests/support/fixtures.ts`: extends `test` to fail on `pageerror` and `console.error`.
+- [x] `tests/e2e/placeholder.spec.ts`: shows name and `v\d+\.\d+\.\d+`; no horizontal overflow
       (`scrollWidth <= innerWidth`); axe zero serious/critical.
-- [ ] `lighthouserc.json`: `staticDistDir: dist`, mobile preset, perf ≥ 0.9, a11y/best-practices/SEO ≥ 0.95.
-- [ ] Workflows `ci.yml`, `pr-title.yml`, `codeql.yml`, `labels.yml` per the table; `labels.yml`/`labeler.yml` data.
+- [x] `lighthouserc.json`: `staticDistDir: dist`, mobile preset, perf ≥ 0.9, a11y/best-practices/SEO ≥ 0.95.
+- [x] Workflows `ci.yml`, `pr-title.yml`, `codeql.yml`, `labels.yml` per the table; `labels.yml`/`labeler.yml` data.
+      Shared setup lives in the composite action `.github/actions/setup` (pnpm, Node, frozen install).
 - [ ] Verify: PR 4's own run is green; then you add required checks (M6).
 
 ### Task 5: Previews and release (PR 5)
