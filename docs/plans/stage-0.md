@@ -292,7 +292,7 @@ with `jq`). `tests/smoke/` and `tests/static/` are subfolders of the existing `t
 - [x] `lighthouserc.json`: `staticDistDir: dist`, mobile preset, perf ≥ 0.9, a11y/best-practices/SEO ≥ 0.95.
 - [x] Workflows `ci.yml`, `pr-title.yml`, `codeql.yml`, `labels.yml` per the table; `labels.yml`/`labeler.yml` data.
       Shared setup lives in the composite action `.github/actions/setup` (pnpm, Node, frozen install).
-- [ ] Verify: PR 4's own run is green; then you add required checks (M6).
+- [x] Verify: PR 4's own run is green; then you add required checks (M6). (#21, #22)
 
 ### Task 5: Previews and release (PR 5) — issues #11, #12
 
@@ -317,7 +317,7 @@ with `jq`). `tests/smoke/` and `tests/static/` are subfolders of the existing `t
       weekly schedule, grouped non-major updates, automerge devDependency patches only, `dependencies` label,
       semantic commits `chore(deps)`/`ci(deps)`. Node majors disabled (tracked as issues).
 - [x] `scorecard.yml` + README badge (D3).
-- [ ] Verify after merge (`workflow_dispatch` only runs from `main`): `ops` before v0.1.0 should fail and open the
+- [x] Verify after merge (`workflow_dispatch` only runs from `main`): `ops` before v0.1.0 should fail and open the
       ops issue (production root is 404), then pass and close it after the release; `content-review` opens one
       issue. Renovate onboarding validates `renovate.json` (M8).
 
@@ -326,7 +326,8 @@ with `jq`). `tests/smoke/` and `tests/static/` are subfolders of the existing `t
 - [x] `CONTRIBUTING.md`, `SECURITY.md` (private vulnerability reporting), runbooks, postmortem template,
       content-guide stub, README complete (Mermaid architecture + CI/CD flow, manual setup list, license note).
 - [x] `docs/STATUS.md` sign-off + retrospective; tick this plan.
-- [ ] After merge: you merge the release PR → verify `https://roarceus.github.io/` shows `v0.1.0`.
+- [x] After merge: you merge the release PR → verify `https://roarceus.github.io/` shows `v0.1.0`.
+      (Live: `v0.1.0 (d7cb6fa)`; release, deploy, and smoke jobs green.)
 
 ---
 
