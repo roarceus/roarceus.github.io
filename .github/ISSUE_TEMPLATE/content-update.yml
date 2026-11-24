@@ -1,0 +1,34 @@
+name: Content update
+description: Add or change an update, project, role, skill, certification, or achievement.
+title: "feat(content): <short description>"
+labels: ["type: feat", "area: content"]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of content?
+      options: [update post, project, experience / role, education, skills, certification, achievement, profile, resume]
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: The facts to add or change (dates, links, metrics). No placeholders in the final content.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      value: |
+        - [ ] Content validates against the schema (build passes)
+        - [ ] Shows correctly in the plain view and the cluster view
+        - [ ] Links resolve (link check passes)
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Source
+      description: Where the facts come from (resume, LinkedIn, project README, Sohan).

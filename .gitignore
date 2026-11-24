@@ -1,0 +1,36 @@
+# build output
+dist/
+
+# generated types
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# environment variables (keep the example)
+.env*
+!.env.example
+
+# test, coverage, and Lighthouse output
+coverage/
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+.lighthouseci/
+.lycheecache
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+
+# personal Claude Code files (never commit)
+CLAUDE.local.md
+.claude/settings.local.json

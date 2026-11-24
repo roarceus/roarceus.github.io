@@ -1,0 +1,56 @@
+name: Feature
+description: Propose new functionality or a change in behavior.
+title: "feat(<scope>): <short description>"
+labels: ["type: feat"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Fill in every section. An issue is **Ready** only when it has acceptance criteria,
+        scope, and a test approach (Definition of Ready, SPEC §10b).
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is missing or wrong today, and who does it affect?
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Checkboxes that must all be true for this to be done.
+      value: |
+        - [ ]
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope and out of scope
+      value: |
+        **In scope:**
+
+        **Out of scope:**
+    validations:
+      required: true
+  - type: dropdown
+    id: areas
+    attributes:
+      label: Affected areas
+      multiple: true
+      options: [content, plain, terminal, commands, cluster, ui, design, game, boot, seo, a11y, perf, ci, deps, release, docs, config]
+    validations:
+      required: true
+  - type: textarea
+    id: tests
+    attributes:
+      label: Test approach
+      description: Unit, component, e2e, visual, or manual checks that prove it works.
+    validations:
+      required: true
+  - type: textarea
+    id: design
+    attributes:
+      label: Design notes (UI work)
+      description: States and mobile / tablet / desktop behavior. Required before building UI.

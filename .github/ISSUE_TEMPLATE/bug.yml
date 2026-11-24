@@ -1,0 +1,60 @@
+name: Bug
+description: Something is broken or behaves differently than expected.
+title: "fix(<scope>): <short description>"
+labels: ["type: fix"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: Include the URL (production or preview) and any console errors.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      value: |
+        1.
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Browser, device, and viewport
+      placeholder: "e.g. Safari 19 on iPhone 15, 393×852"
+    validations:
+      required: true
+  - type: dropdown
+    id: areas
+    attributes:
+      label: Affected areas
+      multiple: true
+      options: [content, plain, terminal, commands, cluster, ui, design, game, boot, seo, a11y, perf, ci, deps, release, docs, config]
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Include the failing test that will be written first.
+      value: |
+        - [ ] A failing test reproduces the bug
+        - [ ]
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Production impact
+      options:
+        - "None (preview or local only)"
+        - "Minor (cosmetic, workaround exists)"
+        - "Major (feature broken)"
+        - "Outage (site down or unusable; rollback first)"
+    validations:
+      required: true
