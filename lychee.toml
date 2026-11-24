@@ -1,8 +1,8 @@
 # Link checker config (SPEC §10 Tests). CI runs it offline against the built site; the weekly
 # scheduled workflow runs it online against production to catch external link rot.
 
-# Fragment links (#section) must point at a real id.
-include_fragments = true
+# Fragment links (#section) must point at a real id (lychee >= 0.24 takes a mode, not a boolean).
+include_fragments = "full"
 
 # Retry flaky hosts instead of failing the build.
 max_retries = 3
