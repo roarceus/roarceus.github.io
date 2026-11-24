@@ -181,6 +181,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  minimatch@>=7.0.0 <11.0.1: 11.0.9
+
 importers:
 
   .:
@@ -3582,10 +3585,6 @@ packages:
   mimic-fn@2.1.0:
     resolution: {integrity: sha512-OqbOk5oEQeAZ8WXWydlu9HJjz9WVdEIvamMCcXmuqUYjTknH/sqsWvhQ3vgwKFRR1HpjvNBKQ37nbJgYzGqGcg==}
     engines: {node: '>=6'}
-
-  minimatch@10.2.6:
-    resolution: {integrity: sha512-vpLQEs+VLCr1nU0BXS07maYoFwlDAH0gngQuuttxIwutDFEMHq2blX+8vpgxDdK3J1PwjCJiep77OitTZ4Ll1A==}
-    engines: {node: 18 || 20 || >=22}
 
   minimatch@11.0.9:
     resolution: {integrity: sha512-KCFkfyjqerNlSstjlhIGNXIKZGA/6O4V4RlhZ+Dsr621SPPw0mzlypE9D9ZOoPiVefHID+j7/XuMMlqfD/F60Q==}
@@ -7266,7 +7265,7 @@ snapshots:
       eslint: 10.15.0(jiti@2.7.0)(supports-color@7.2.0)
       jsx-ast-utils-x: 0.1.0
       language-tags: 1.0.9
-      minimatch: 10.2.6
+      minimatch: 11.0.9
 
   eslint-plugin-react-dom@5.30.6(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3):
     dependencies:
@@ -8124,10 +8123,6 @@ snapshots:
   mime@1.6.0: {}
 
   mimic-fn@2.1.0: {}
-
-  minimatch@10.2.6:
-    dependencies:
-      brace-expansion: 5.1.0
 
   minimatch@11.0.9:
     dependencies:

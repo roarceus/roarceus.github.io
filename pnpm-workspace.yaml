@@ -1,0 +1,7 @@
+# Single-package repo; this file only carries pnpm settings.
+
+overrides:
+  # GHSA-g3hv-75wg-m249 (minimatch ReDoS via globparts amplification, fixed in 11.0.1).
+  # Pulled in by eslint-plugin-jsx-a11y-x@0.2.0 (^10.2.5), which has no fixed release yet.
+  # It only calls the stable minimatch(name, pattern) API. Remove once the plugin updates.
+  'minimatch@>=7.0.0 <11.0.1': 11.0.9
