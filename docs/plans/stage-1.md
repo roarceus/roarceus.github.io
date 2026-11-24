@@ -1,0 +1,232 @@
+# Stage 1 — Content and plain view Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or
+> superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** A complete, shippable, recruiter-friendly portfolio as pre-rendered HTML: schema-validated content,
+`/plain/`, project and update pages, RSS, contact form, resume link, SEO metadata, sitemap, and a themed 404,
+released as **v0.2.0** within every budget.
+
+**Architecture:** Content lives in `src/content/` as YAML + Markdown, validated by Zod schemas registered in
+`src/content.config.ts`. Pages and components read it only through `src/lib/content/` helpers. Everything is
+static Astro (no React islands this stage); the contact form is a plain HTML form that works without JS, with a
+small bundled script for inline validation and status messages.
+
+**Tech Stack:** Astro 7.4.13 content layer (`glob`/`file` loaders, `astro/zod`), @astrojs/rss, @astrojs/sitemap,
+Web3Forms (contact), Vitest, Playwright + axe, Lighthouse CI.
+
+**Spec:** `docs/SPEC.md` §2, §3 (structure), §4, §6, §10 Tests, §10b Secure, §11 Stage 1. Rules: `CLAUDE.md`.
+
+**Status:** Approved 2026-11-24 with Sohan's answers (see "Answers"). Issues #32–#40 on milestone Stage 1.
+
+## Global Constraints
+
+- Every internal URL through `url()`; canonical/OG/RSS/sitemap URLs are absolute production URLs built from
+  `site.url` (never the preview base).
+- Components never hardcode portfolio content; they read it only via `@/lib/content/*`.
+- `lib/` stays free of React and the DOM. `lib/content` may import `astro:content` (the only allowed
+  Astro import in `lib/`), so pure logic (sorting, date formatting, validation) lives in separate pure modules.
+- Facts come only from the old site, SPEC §6 "Current facts", or Sohan. Anything else is `TODO(sohan)`.
+  The current-facts list wins over the old site.
+- Dark only, tokens only. Stage 1 styling is deliberately plain (tokens, system font stacks, simple layout);
+  Stage 2 owns fonts, components, and the visual direction (see "Design note").
+- Mobile-first, 320–2560px, no horizontal scroll; inputs ≥ 16px; `dvh`; long words wrap.
+- CSP stays strict: Stage 1 adds only the Web3Forms endpoint (`connect-src` and `form-action`), after approval.
+- New deps: @astrojs/rss 4.0.19, @astrojs/sitemap 3.7.6 (verified on npm 2026-11-24), exact pins, reasons in PRs.
+- Coverage: `src/lib/**` ≥ 90% lines/branches, overall ≥ 80%.
+
+## Review Focus
+
+1. **Preview builds leak into search/SEO** — a preview's canonical, sitemap, and RSS must point at production,
+   and preview pages get `<meta name="robots" content="noindex">`. e2e asserts both under a `BASE_PATH` build.
+2. **Broken cross-references in content** — a project's `node` that names no experience entry, duplicate slugs,
+   `end` before `start`, a `featured` project with no description. Content integrity tests fail the build.
+3. **Contact form failure modes** — empty/invalid fields, Web3Forms 4xx/5xx, offline, double submit, and no JS
+   at all. Each has an e2e case with the network mocked; no-JS posts directly and redirects back.
+4. **Long and odd content** — 40-char tech names, long URLs, missing optional fields (no demo link, no
+   end date, no metric). Fixture entries exercise these at 320px with the overflow assertion.
+5. **TODO placeholders reaching production** — a `TODO(sohan)` must render as a visible "coming soon"-style
+   gap, never a broken link; a test lists remaining TODOs and the release checklist requires reviewing it.
+
+---
+
+## Decisions
+
+- **D1 Config path.** Astro 7 reads `src/content.config.ts`, not SPEC's `src/content/config.ts`.
+  Update the SPEC §6 wording in PR 1 (no ADR; it's a framework convention, not a choice).
+- **D2 File formats.** Collections with long prose are Markdown with frontmatter (profile, projects, updates)
+  so Astro renders the body natively and we add no Markdown dependency. The rest are YAML.
+- **D3 Nodes.** A node is declared by the `node` field of an `experience` or `education` entry:
+  `capgemini`, `mastercontrol` (work), `northeastern` (Master's, plus the TA role as its own `experience`
+  entry with `type: teaching`), and `mumbai` (Bachelor's, for the 2019–21 projects). `mumbai` is a fourth node
+  beyond SPEC §7's three; PR 1 updates §7. A project's `node` is optional: the portfolio itself runs on no
+  past org, so it's unscheduled for now and Stage 4 decides how the map shows it.
+- **D4 `/` in Stage 1.** Pre-rendered hero (name, title, tagline, links to every `/plain/` section, Resume,
+  Contact). This is the no-JS fallback Stage 2+ builds on.
+- **D5 Contact form.** Vanilla HTML form + small script, not a React island: works with JS off, keeps the plain
+  view near-zero JS. Validation rules live in `src/lib/contact/` (pure, unit-tested).
+- **D6 Canonical.** Always the production URL. Preview builds are `noindex`; the sitemap integration only
+  emits on production builds (`BASE_PATH` unset).
+- **D7 Analytics.** GoatCounter waits for Stage 6 (SPEC lists it there with command events); no analytics
+  endpoint in the CSP yet.
+
+## Design note
+
+Stage 1 is content and structure, not the look. The plain view gets a clean, readable single column with
+the §5 tokens and system font stacks, so Stage 2 can apply the chosen visual direction (Sohan wants real
+flair: 3D, gamey, fun) without rewriting markup. Section components take content props and expose semantic
+HTML only, which keeps a later reskin cheap. The plain view stays recruiter-first in every direction.
+
+---
+
+## PR split
+
+| #   | Branch                          | Title                                                     | Tasks | Issues   |
+| --- | ------------------------------- | --------------------------------------------------------- | ----- | -------- |
+| 1   | `feat/stage-1-content-schemas`  | `feat(content): add content schemas and query helpers`    | 1–2   | #32, #33 |
+| 2   | `feat/stage-1-content-data`     | `feat(content): add portfolio content and content review` | 3     | #34      |
+| 3   | `feat/stage-1-plain-view`       | `feat(plain): add plain portfolio page and home hero`     | 4–5   | #35, #36 |
+| 4   | `feat/stage-1-projects-updates` | `feat(plain): add project pages, updates, and rss feed`   | 6     | #37      |
+| 5   | `feat/stage-1-contact-form`     | `feat(plain): add contact form`                           | 7     | #38      |
+| 6   | `feat/stage-1-seo-404`          | `feat(seo): add metadata, sitemap, and themed 404 page`   | 8     | #39      |
+| 7   | `docs/stage-1-wrap-up`          | `docs(docs): close out stage 1 in status and plan`        | 9     | #40      |
+
+Each PR updates README/STATUS for what it changes and ticks this file.
+
+---
+
+### Task 1: Content schemas (PR 1) — done
+
+**Files:** `src/content.config.ts`; `src/lib/content/schemas/{common,collections}.ts` + tests; empty content
+dirs and lists in `src/content/`. SPEC §3/§6/§7 updated (D1, D3); ESLint and dependency-cruiser allow
+`astro/zod` in `lib/` (re-exported Zod) and `astro:content` only in `lib/content/queries.ts`.
+
+**Produces:** `profileSchema`, `experienceSchema`, `educationSchema`, `projectSchema`, `skillCategorySchema`,
+`certificationSchema`, `achievementSchema`, `updateSchema`; primitives `slug`, `nodeName`, `yearMonth`,
+`endDate`, `httpsUrl`, `linkUrl`. Ids come from file names / `id`, not the schemas.
+
+- [x] Failing schema tests first: valid entries pass; required fields, bad enums, `2025-13`, `25-01`,
+      non-kebab slugs, non-https URLs, `end < start`, issued certs without a date all fail.
+- [x] Implement schemas; register collections with `glob`/`file` loaders.
+- [x] `pnpm check` green. Deviation: no fixture seed in `src/content/` (fake entries could leak); the
+      collections are empty until PR 2 (Astro only warns).
+
+### Task 2: Content helpers and integrity check (PR 1) — done
+
+**Files:** `src/lib/content/{queries,integrity,sort}.ts`, `src/lib/utils/dates.ts`, tests next to each.
+
+**Produces:** `getProfile()`, `getExperience()`, `getEducation()` (newest first), `getProjects({ featured? })`
+(by `order`), `getProject(slug)`, `getProjectsByNode(node)`, `getSkills()`, `getCertifications()` (in-progress
+first), `getAchievements()`, `getUpdates()` (newest first, no drafts); `formatYearMonth('2025-06') → 'Jun 2025'`,
+`formatRange('2021-05', 'present') → 'May 2021 – Present'`, `compareEnd`.
+
+- [x] Failing tests first for sort order, id tie-breaks, `present` first, range formatting, invalid input.
+- [x] Integrity check (`checkIntegrity`/`assertIntegrity`): one profile, kebab-case ids, every project `node`
+      declared, featured projects have a body. Deviation: Vitest has no content data store, so instead of a
+      test over real content, `queries.ts` runs the check on every load and the build fails on bad content.
+      Duplicate ids can't be detected after loading (loaders key by id); `start ≤ end` is in the schemas.
+- [x] Coverage: `src/lib/content` 98% lines / 93% branches.
+- Deferred to Stage 3 (YAGNI until commands need them): `getTimeline()` and a kubectl-style `AGE` helper.
+
+### Task 3: Content extraction and review (PR 2)
+
+**Files:** Create `src/content/**` entries, `docs/content-review.md`. Modify `docs/content-guide.md`,
+`docs/runbooks/adding-content.md`.
+
+- [ ] Map `roarceus/portfolio` `public/data/sections/*.json` into collections, applying SPEC §6 current facts
+      (current facts win). Scope per answers A1, A2, A4, A5; add the portfolio itself as a project.
+- [ ] PromotionBot and BoringBot aren't on the old site: details from SPEC only, gaps as `TODO(sohan)`.
+- [ ] `docs/content-review.md`: every outdated, conflicting, missing, vague, or metric-less item (known so far:
+      Northeastern dates 2024-01–2025-12 on the old site vs. "graduated spring 2026"; old bio says "TypeScript,
+      Python and Go" vs. current "TypeScript, Python, some Java"; location Boston → Santa Clara; askTRACE
+      and AWS IaaS repo links point at org/profile pages; no dates for most projects; Northeastern TA has no entry).
+- [ ] Fill in `docs/content-guide.md` (fields, file locations, how to add each type) and the runbook.
+- [ ] Remove the PR 1 fixture seed. Closes #30 (A8).
+
+### Task 4: Plain view sections (PR 3)
+
+**Files:** Create `src/components/plain/{Hero,About,Experience,Education,Projects,Skills,Certifications,
+Achievements,Updates,Contact}Section.astro`, `src/components/layout/{SiteHeader,
+SiteFooter}.astro`, `src/pages/plain/index.astro`, `tests/e2e/plain.spec.ts`. Modify `BaseLayout.astro`.
+
+- [ ] Failing e2e: every section has a heading and landmark; in-page nav links reach each `id`; header shows
+      name, Resume, Contact on every width; no horizontal overflow at all 12 projects; axe clean; print
+      stylesheet hides nav.
+- [ ] Simple header/footer (name, Plain/Cluster links, Resume, Contact; footer with version via build-info).
+      Stage 2 replaces them with the real top bar.
+- [ ] Sections render from helpers only; project cards link to `/projects/<slug>/`; dates via `formatRange`.
+- [ ] Resume link → `url('resume.pdf')`; commit Sohan's `public/resume.pdf` (A7).
+
+### Task 5: Home hero (PR 3)
+
+**Files:** Modify `src/pages/index.astro`, replace `tests/e2e/placeholder.spec.ts` with `tests/e2e/home.spec.ts`.
+
+- [ ] Failing e2e: with JS disabled, `/` shows name, title, tagline, links to every `/plain/#section`, Resume,
+      Contact, and the version line (smoke still finds `data-testid="build-version"`).
+- [ ] Implement (D4).
+
+### Task 6: Project pages, updates, RSS (PR 4)
+
+**Files:** Create `src/pages/projects/[slug].astro`, `src/pages/updates/index.astro`,
+`src/pages/updates/[slug].astro`, `src/pages/rss.xml.ts`, `tests/e2e/projects-updates.spec.ts`.
+
+- [ ] Failing e2e: every project slug has a page with status, node, tech, links (external links
+      `rel="noopener noreferrer"`); updates list newest first; each update page renders; `/rss.xml` is valid RSS
+      with absolute production links and is linked via `<link rel="alternate">`.
+- [ ] Add @astrojs/rss; implement pages from helpers.
+
+### Task 7: Contact form (PR 5)
+
+**Files:** Create `src/lib/contact/{validate,submit}.ts` (+ tests), `src/components/plain/ContactForm.astro`,
+`src/scripts/contact-form.ts`, `tests/e2e/contact.spec.ts`. Modify `src/config/site.ts` (Web3Forms access key),
+CSP in `BaseLayout.astro`, `docs/runbooks/rotating-public-keys.md` if needed.
+
+- [ ] Failing unit tests: `validateContact({name,email,message})` → field errors (required, email format,
+      message 10–5000 chars, honeypot filled → silent drop); `toSubmitResult(response | error)` maps 200/4xx/
+      5xx/network to `'sent' | 'invalid' | 'server-error' | 'offline'`.
+- [ ] Failing e2e (network mocked with `page.route`): success, validation errors announced via `aria-live` and
+      focus moves to the first invalid field, server error, offline, double-submit blocked, JS-disabled post.
+- [ ] Implement; inputs labeled, ≥ 16px, keyboard-only flow works; CSP adds `https://api.web3forms.com`.
+
+### Task 8: SEO, sitemap, 404 (PR 6)
+
+**Files:** Create `src/components/layout/SeoHead.astro`, `src/pages/404.astro`, `tests/e2e/seo.spec.ts`.
+Modify `astro.config.mjs` (sitemap), `public/robots.txt` → `src/pages/robots.txt.ts`, `BaseLayout.astro`.
+
+- [ ] Failing e2e: every page has unique title/description, canonical to production, OG/Twitter tags, JSON-LD
+      `Person` on `/` and `/plain/`; preview build is `noindex` and has no sitemap (D6); `/sitemap-index.xml`
+      lists every page and nothing under `pr-preview/`; robots.txt points at it.
+- [ ] Failing e2e: unknown path shows `Error from server (NotFound): page "<path>" not found` with links home,
+      under the preview base too (Pages serves `404.html` only at the site root: document the preview limitation).
+- [ ] Add @astrojs/sitemap; implement.
+
+### Task 9: Stage wrap-up (PR 7)
+
+- [ ] Lighthouse budgets on `/`, `/plain/`, a project page, `/updates/` (add URLs to `lighthouserc.json`).
+- [ ] Preview checked at 320/375/768/1280/1920; README (features, structure, status), STATUS sign-off and
+      retrospective; release PR checklist → v0.2.0.
+
+---
+
+## Manual steps for Sohan (each done before the PR that needs it)
+
+| #   | When        | Step                                                                                                                                          | Status           |
+| --- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| M11 | before PR 3 | Put the current resume at `public/resume.pdf`.                                                                                                | Done 2026-11-24  |
+| M12 | before PR 3 | Answer `docs/content-review.md` (dates, metrics, links) so the plain view ships with real facts; answers land in PR 2 or a `fix(content)` PR. | After PR 2 opens |
+| M13 | before PR 5 | Create a Web3Forms access key for your email at web3forms.com and paste it in chat (public-safe; goes in `src/config/site.ts`).               | Pending          |
+
+## Answers (2026-11-24)
+
+- **A1 Projects:** featured = askTRACE, this portfolio (`roarceus-github-io`), SafeHaven (featured for now;
+  "maybe", flagged in content review). Everything else non-featured: AWS IaaS, PromotionBot, BoringBot,
+  Grade Calculator, HuskyHub, Book Review System, and the 2019–21 web projects (travel site, maps clone,
+  analog clock, both meeting-notes apps, credit management, Kounsellor).
+- **A2 Contact details:** email, GitHub, LinkedIn. No phone, no Instagram.
+- **A3 Testimonials:** none.
+- **A4 Certifications:** CKA and CKAD, both `in-progress` (2020 Coursera certs dropped). All four awards as
+  achievements. SPEC §6 current facts gain CKAD in PR 2.
+- **A5 Spoken languages and "fun facts":** dropped.
+- **A6 Contact provider:** Web3Forms; `api.web3forms.com` approved for the CSP.
+- **A7 Resume:** `public/resume.pdf` supplied; linked in PR 3.
+- **A8 Issue #30:** closed by PR 2.
