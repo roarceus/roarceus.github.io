@@ -13,8 +13,8 @@ switch to a plain, recruiter-friendly view.
 
 ## Status
 
-**Stage 0 — Foundation → v0.1.0.** The site is a placeholder page (name and version); the pipeline
-around it is complete. Stage 1 adds the content and the plain view. Progress:
+**Stage 1 — Content and plain view (in progress, → v0.2.0).** Live is still the v0.1.0 placeholder.
+Done so far: content schemas and query helpers. Next: the content itself, then `/plain/`. Progress:
 [`docs/STATUS.md`](docs/STATUS.md) · [project board](https://github.com/users/roarceus/projects/1) ·
 [changelog](CHANGELOG.md) (from v0.1.0).
 
@@ -57,12 +57,13 @@ flowchart LR
     pages --> config
     layouts --> config
   end
-  content[("content/<br/>YAML + Markdown<br/>(Stage 1)")] -.->|read only via lib/content| lib
+  content[("content/<br/>YAML + Markdown")] -.->|astro:content, read only via lib/content| lib
   src -->|astro build| dist["dist/<br/>static HTML, CSS, fonts"]
 ```
 
 `lib/` never imports React, Astro, or UI code (enforced by ESLint and dependency-cruiser), so all logic is
-unit-testable. Every internal URL goes through `url()` (`src/lib/utils/url.ts`), written without a
+unit-testable. The one exception is `lib/content/queries.ts`, the adapter that reads `astro:content`, sorts
+entries, and runs the content integrity check; everything it calls is pure. Every internal URL goes through `url()` (`src/lib/utils/url.ts`), written without a
 leading slash (`url('plain/')`), so the same build works at `/` and under `/pr-preview/pr-<N>/`; a test
 fails on hardcoded root paths.
 
@@ -107,8 +108,10 @@ docs/           SPEC, STATUS, plans, ADRs, runbooks, postmortems, content guide
 public/         served as-is: favicon, robots.txt, .nojekyll
 src/
   config/       site metadata, build info (version + commit), feature flags
+  content/      portfolio content (YAML + Markdown); schemas registered in content.config.ts
   layouts/      page layouts (BaseLayout sets meta tags and the CSP)
-  lib/utils/    framework-free helpers, e.g. url() for the base path
+  lib/content/  Zod schemas, query helpers, integrity check (how components read content)
+  lib/utils/    framework-free helpers: url() for the base path, date formatting
   pages/        routes
   styles/       tokens.css (design tokens) and global.css
 tests/

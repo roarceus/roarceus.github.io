@@ -4,9 +4,12 @@ _Last updated: 2026-11-24_
 
 ## Current stage
 
-**Stage 0 — Foundation: complete.** v0.1.0 is live at https://roarceus.github.io/. Next: Stage 1 planning. Plan:
-[`plans/stage-0.md`](plans/stage-0.md) · [milestone](https://github.com/roarceus/roarceus.github.io/milestone/1) ·
-[board](https://github.com/users/roarceus/projects/1)
+**Stage 1 — Content and plain view (in progress → v0.2.0).** Production still serves v0.1.0. Plan:
+[`plans/stage-1.md`](plans/stage-1.md) · [milestone](https://github.com/roarceus/roarceus.github.io/milestone/2)
+(#32–#40) · [board](https://github.com/users/roarceus/projects/1)
+
+- **In progress:** PR 1, content schemas and query helpers (#32, #33).
+- **Next:** PR 2 content extraction + `docs/content-review.md` (#34); then `/plain/` and the home hero.
 
 ## Stage 0 sign-off
 
@@ -38,10 +41,10 @@ _Last updated: 2026-11-24_
 
 ## Next steps
 
-1. Sohan: uptime monitor for https://roarceus.github.io/ (M10); close or keep content review #30 for Stage 1.
+1. Sohan: answer `docs/content-review.md` once PR 2 opens (before PR 3); Web3Forms access key before PR 5;
+   uptime monitor (M10).
 2. Decide on Renovate's queued TypeScript 7 PR (fails until `typescript-eslint` supports TS 7; a
    `packageRules` entry can hold TS majors until then).
-3. Stage 1 planning: `docs/plans/stage-1.md`, milestone issues, content extraction from `roarceus/portfolio`.
 
 ## Open questions
 
