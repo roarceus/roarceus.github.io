@@ -321,11 +321,11 @@ with `jq`). `tests/smoke/` and `tests/static/` are subfolders of the existing `t
       ops issue (production root is 404), then pass and close it after the release; `content-review` opens one
       issue. Renovate onboarding validates `renovate.json` (M8).
 
-### Task 7: Project docs and sign-off (PR 7)
+### Task 7: Project docs and sign-off (PR 7) — issue #15
 
-- [ ] `CONTRIBUTING.md`, `SECURITY.md` (private vulnerability reporting), runbooks, postmortem template,
+- [x] `CONTRIBUTING.md`, `SECURITY.md` (private vulnerability reporting), runbooks, postmortem template,
       content-guide stub, README complete (Mermaid architecture + CI/CD flow, manual setup list, license note).
-- [ ] `docs/STATUS.md` sign-off + retrospective; tick this plan.
+- [x] `docs/STATUS.md` sign-off + retrospective; tick this plan.
 - [ ] After merge: you merge the release PR → verify `https://roarceus.github.io/` shows `v0.1.0`.
 
 ---
