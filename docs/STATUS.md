@@ -20,19 +20,19 @@ Board: [Projects #1](https://github.com/users/roarceus/projects/1)
 - PR 3 merged (#19): ESLint, Prettier, knip, dependency-cruiser, commit hooks, root-path test.
 - Pages source switched from `main` (auto-enabled Jekyll build, failed on `.astro` front matter) to
   "GitHub Actions" on 2026-11-24. The README page from PR 1 stays live until our first deploy.
+- PR 4 merged (#21): CI (quality, build, Playwright + axe on 3 engines, Lighthouse, lychee, dependency
+  review, `ci-ok`), PR title check + labels, CodeQL.
+- M6: `protect-main` requires `ci-ok` and `validate` (export in `docs/github/rulesets/`).
 
 ## In progress
 
-- PR 4 `ci/stage-0-ci-pipeline` (#8, #9, #10): CI (quality, build, Playwright + axe on 3 engines, Lighthouse,
-  lychee, dependency review, `ci-ok`), PR title check + labels, CodeQL.
 - PR #20 `fix/deps-minimatch-advisory`: overrides minimatch (Dependabot alert #1, GHSA-g3hv-75wg-m249)
-  and pins the npm registry to https.
+  and pins the npm registry to https. Opened before CI existed; needs `main` merged in to get checks.
 
 ## Next steps
 
-1. After PR 4's first CI run, Sohan adds required checks `ci-ok` and `validate` (M6).
-2. PR 5 `ci/stage-0-preview-and-release` (#11, #12), then Sohan switches the Pages source to `gh-pages` (M7).
-3. PR 6 `ci/stage-0-ops-and-renovate` (#10, #13, #14), PR 7 `docs/stage-0-project-docs` (#15), then the v0.1.0 release PR.
+1. PR 5 `ci/stage-0-preview-and-release` (#11, #12), then Sohan switches the Pages source to `gh-pages` (M7).
+2. PR 6 `ci/stage-0-ops-and-renovate` (#10, #13, #14), PR 7 `docs/stage-0-project-docs` (#15), then the v0.1.0 release PR.
 
 ## Open questions
 
