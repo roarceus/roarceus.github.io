@@ -12,8 +12,12 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
     </h1>
     <p class="text-[length:var(--text-base-fluid)] text-text-muted">Site under construction.</p>
     <p class="flex items-center gap-2 font-mono text-[length:var(--text-sm-fluid)] text-text-muted">
-      <span aria-hidden="true" class="text-status-pending">●</span>
-      <span data-testid="build-version">v{buildInfo.version} ({buildInfo.shortCommit})</span>
+      <span aria-hidden="true" class="text-status-pending">
+        ●
+      </span>
+      <span data-testid="build-version">
+        v{buildInfo.version} ({buildInfo.shortCommit})
+      </span>
     </p>
   </main>
 </BaseLayout>

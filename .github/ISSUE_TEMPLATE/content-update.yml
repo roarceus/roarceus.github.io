@@ -1,13 +1,24 @@
 name: Content update
 description: Add or change an update, project, role, skill, certification, or achievement.
-title: "feat(content): <short description>"
-labels: ["type: feat", "area: content"]
+title: 'feat(content): <short description>'
+labels: ['type: feat', 'area: content']
 body:
   - type: dropdown
     id: kind
     attributes:
       label: What kind of content?
-      options: [update post, project, experience / role, education, skills, certification, achievement, profile, resume]
+      options:
+        [
+          update post,
+          project,
+          experience / role,
+          education,
+          skills,
+          certification,
+          achievement,
+          profile,
+          resume,
+        ]
     validations:
       required: true
   - type: textarea

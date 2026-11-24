@@ -31,12 +31,9 @@ describe('joinBase', () => {
     'mailto:a@b.c',
     'tel:+15550100',
     'javascript:alert(1)',
-  ])(
-    'rejects absolute URL %j',
-    (path) => {
-      expect(() => joinBase('/', path)).toThrow(TypeError);
-    },
-  );
+  ])('rejects absolute URL %j', (path) => {
+    expect(() => joinBase('/', path)).toThrow(TypeError);
+  });
 });
 
 describe('url', () => {

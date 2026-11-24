@@ -1,0 +1,23 @@
+{
+  "$comment": "Single source of commit types and scopes. Read by commitlint.config.mjs (commit messages) and .github/workflows/pr-title.yml (PR titles). Mirrors CLAUDE.md; add scopes deliberately.",
+  "types": ["feat", "fix", "perf", "refactor", "style", "test", "docs", "build", "ci", "chore", "revert"],
+  "scopes": [
+    "content",
+    "plain",
+    "terminal",
+    "commands",
+    "cluster",
+    "ui",
+    "design",
+    "game",
+    "boot",
+    "seo",
+    "a11y",
+    "perf",
+    "ci",
+    "deps",
+    "release",
+    "docs",
+    "config"
+  ]
+}

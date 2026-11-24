@@ -6,15 +6,18 @@ Personal portfolio of **Sohan Patil**, themed as an interactive Kubernetes clust
 **Live:** https://roarceus.github.io/ (coming with v0.1.0)
 
 ## Status
+
 Stage 0 — Foundation, in progress. Right now the site is a placeholder page (name and version).
 See [`docs/STATUS.md`](docs/STATUS.md) and the [project board](https://github.com/users/roarceus/projects/1).
 
 ## Tech stack
+
 Astro 7 (static output) · React 19 islands · TypeScript 6 (strict) · Tailwind CSS 4 with CSS-variable
 design tokens · Vitest 5 · self-hosted Inter and JetBrains Mono (Fontsource). Choices and version pins:
 [ADR-0001](docs/adr/0001-stack-and-tooling.md).
 
 ## Getting started
+
 Requires Node **26.13.1** (see `.nvmrc`) and pnpm **12.23.0**.
 
 ```sh
@@ -32,17 +35,33 @@ On Windows Git Bash, prefix the command with `MSYS2_ENV_CONV_EXCL=BASE_PATH`, or
 the value into a Windows path. PowerShell needs `$env:BASE_PATH='/pr-preview/pr-0/'; pnpm build`.
 
 ## Scripts
-| Script | What it does |
-|---|---|
-| `pnpm dev` | Start the dev server |
-| `pnpm build` | Build the static site into `dist/` |
-| `pnpm preview` | Serve `dist/` locally |
-| `pnpm typecheck` | `astro check` (TypeScript + Astro files) |
-| `pnpm test` / `pnpm test:watch` | Unit tests (Vitest) |
-| `pnpm test:coverage` | Unit tests with coverage thresholds (`src/lib` ≥ 90%, overall ≥ 80%) |
-| `pnpm check` | Typecheck, tests with coverage, and build. Run before every push |
+
+| Script                              | What it does                                                                    |
+| ----------------------------------- | ------------------------------------------------------------------------------- |
+| `pnpm dev`                          | Start the dev server                                                            |
+| `pnpm build`                        | Build the static site into `dist/`                                              |
+| `pnpm preview`                      | Serve `dist/` locally                                                           |
+| `pnpm typecheck`                    | `astro check` (TypeScript + Astro files)                                        |
+| `pnpm lint` / `pnpm lint:fix`       | ESLint (type-aware TypeScript, Astro, React, a11y, import order and cycles)     |
+| `pnpm format` / `pnpm format:check` | Prettier (with Astro and Tailwind class sorting)                                |
+| `pnpm knip`                         | Unused files, exports, and dependencies                                         |
+| `pnpm depcruise`                    | Dependency direction: `lib/` stays free of UI code, React, and Astro; no cycles |
+| `pnpm test` / `pnpm test:watch`     | Unit tests (Vitest), including the hardcoded root path check                    |
+| `pnpm test:coverage`                | Unit tests with coverage thresholds (`src/lib` ≥ 90%, overall ≥ 80%)            |
+| `pnpm check`                        | All of the above in order, then build. Run before every push                    |
+
+## Commits
+
+Commits follow [Conventional Commits](https://www.conventionalcommits.org/) with the types and scopes in
+[`.github/commit-convention.json`](.github/commit-convention.json) (the PR title check reads the same file).
+Git hooks (Husky) run on `pnpm install`:
+
+- **pre-commit:** lint-staged runs ESLint `--fix` and Prettier on staged files.
+- **commit-msg:** commitlint rejects messages with an unknown type or scope, an uppercase subject, or a
+  header over 72 characters. Example: `feat(terminal): add tab autocomplete for resource names`.
 
 ## Project structure
+
 ```
 src/
   config/    site metadata, build info (version + commit), feature flags
@@ -53,15 +72,19 @@ src/
 public/      served as-is (favicon, robots.txt, .nojekyll)
 docs/        spec, plans, ADRs, status
 ```
-Every internal link and asset goes through `url()` from `src/lib/utils/url.ts`, so the site works at
-`/` and under `/pr-preview/pr-<N>/`. Full layout and conventions: [SPEC §3](docs/SPEC.md).
+
+Every internal link and asset goes through `url()` from `src/lib/utils/url.ts`, written without a leading
+slash (`url('plain/')`), so the site works at `/` and under `/pr-preview/pr-<N>/`. A test fails the build on
+hardcoded root paths like `href="/plain/"`. Full layout and conventions: [SPEC §3](docs/SPEC.md).
 
 ## Docs
+
 - [`docs/SPEC.md`](docs/SPEC.md): product and engineering spec (source of truth)
 - [`docs/plans/`](docs/plans/): per-stage implementation plans
 - [`docs/adr/`](docs/adr/): architecture decision records
 - [`CLAUDE.md`](CLAUDE.md): working rules for this repo
 
 ## License
+
 Code is [MIT](LICENSE). Site content (text, images, and the resume) is copyright Sohan Patil,
 all rights reserved.

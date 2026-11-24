@@ -1,0 +1,14 @@
+dist/
+.astro/
+coverage/
+playwright-report/
+test-results/
+blob-report/
+.lighthouseci/
+pnpm-lock.yaml
+CHANGELOG.md
+# Spec and rules are authored by hand; don't reflow them.
+docs/SPEC.md
+CLAUDE.md
+# Verbatim exports from GitHub; keep byte-for-byte.
+docs/github/rulesets/

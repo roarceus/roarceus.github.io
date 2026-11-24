@@ -1,7 +1,7 @@
 name: Bug
 description: Something is broken or behaves differently than expected.
-title: "fix(<scope>): <short description>"
-labels: ["type: fix"]
+title: 'fix(<scope>): <short description>'
+labels: ['type: fix']
 body:
   - type: textarea
     id: what
@@ -28,7 +28,7 @@ body:
     id: env
     attributes:
       label: Browser, device, and viewport
-      placeholder: "e.g. Safari 19 on iPhone 15, 393×852"
+      placeholder: 'e.g. Safari 19 on iPhone 15, 393×852'
     validations:
       required: true
   - type: dropdown
@@ -36,7 +36,26 @@ body:
     attributes:
       label: Affected areas
       multiple: true
-      options: [content, plain, terminal, commands, cluster, ui, design, game, boot, seo, a11y, perf, ci, deps, release, docs, config]
+      options:
+        [
+          content,
+          plain,
+          terminal,
+          commands,
+          cluster,
+          ui,
+          design,
+          game,
+          boot,
+          seo,
+          a11y,
+          perf,
+          ci,
+          deps,
+          release,
+          docs,
+          config,
+        ]
   - type: textarea
     id: acceptance
     attributes:
@@ -52,9 +71,9 @@ body:
     attributes:
       label: Production impact
       options:
-        - "None (preview or local only)"
-        - "Minor (cosmetic, workaround exists)"
-        - "Major (feature broken)"
-        - "Outage (site down or unusable; rollback first)"
+        - 'None (preview or local only)'
+        - 'Minor (cosmetic, workaround exists)'
+        - 'Major (feature broken)'
+        - 'Outage (site down or unusable; rollback first)'
     validations:
       required: true
