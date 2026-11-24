@@ -4,7 +4,7 @@ _Last updated: 2026-11-24_
 
 ## Current stage
 
-**Stage 0 — Foundation → v0.1.0.** All PRs written; waiting on PR 7 and the release (M9). Plan:
+**Stage 0 — Foundation: complete.** v0.1.0 is live at https://roarceus.github.io/. Next: Stage 1 planning. Plan:
 [`plans/stage-0.md`](plans/stage-0.md) · [milestone](https://github.com/roarceus/roarceus.github.io/milestone/1) ·
 [board](https://github.com/users/roarceus/projects/1)
 
@@ -14,12 +14,14 @@ _Last updated: 2026-11-24_
   lint/format/knip/depcruise/commit hooks and root-path test (#19); CI with Playwright + axe on 3 engines,
   Lighthouse, links, dependency review, `ci-ok`, PR title check, CodeQL (#21); PR previews, release-please
   (App token), production deploy, rollback, smoke tests (#23); weekly ops checks, Renovate, Scorecard (#26);
-  docs and runbooks (PR 7).
+  docs and runbooks (#28); release **v0.1.0** (#24), deployed and smoke-tested in production.
 - **Fixes along the way:** minimatch advisory (#20), required-checks ruleset export (#22), first release
   0.1.0 not 1.0.0 (#25), Scorecard v2.6.0 image missing upstream, pinned v2.5.0 (#27).
-- **Manual setup done:** M1–M8 (Node/pnpm, `gh` scope, Actions + security settings, release App, required
+- **Manual setup done:** M1–M9 (Node/pnpm, `gh` scope, Actions + security settings, release App, required
   checks, Pages from `gh-pages`, Renovate app).
-- **Links:** first verified preview https://roarceus.github.io/pr-preview/pr-23/ (Lighthouse 100 ×4 mobile).
+- **Post-release checks:** manual `Scheduled → ops` run passed (smoke, external links, Lighthouse on
+  production; no ops issue); `content-review` opened #30; Renovate dashboard #29 has no config errors.
+- **Links:** https://roarceus.github.io/ · [v0.1.0 release](https://github.com/roarceus/roarceus.github.io/releases/tag/v0.1.0) · first verified preview https://roarceus.github.io/pr-preview/pr-23/ (Lighthouse 100 ×4 mobile).
 
 ## Retrospective
 
@@ -36,23 +38,22 @@ _Last updated: 2026-11-24_
 
 ## Next steps
 
-1. Merge PR 7, then merge release PR #24 (`chore(release): release 0.1.0`) → v0.1.0 deploys (M9).
-2. After the release: run **Scheduled → ops** manually (should pass and stay quiet) and **content-review**
-   once (then close the issue); set up an uptime monitor (M10).
-3. Stage 1 planning: `docs/plans/stage-1.md`, milestone issues, and a design-direction discussion (below).
+1. Sohan: uptime monitor for https://roarceus.github.io/ (M10); close or keep content review #30 for Stage 1.
+2. Decide on Renovate's queued TypeScript 7 PR (fails until `typescript-eslint` supports TS 7; a
+   `packageRules` entry can hold TS majors until then).
+3. Stage 1 planning: `docs/plans/stage-1.md`, milestone issues, content extraction from `roarceus/portfolio`.
 
 ## Open questions
 
 - Design direction: Sohan wants real flair (3D, gamey, fun, many components), not a generic terminal
   look. That conflicts with SPEC §5's "real tool look"; explore options at Stage 2 planning and update
   SPEC §5 via an ADR once a direction is chosen. Keep the mobile perf budget, plain view, and a11y.
-- Renovate hasn't created its Dependency Dashboard yet after install; check its repo access and logs
-  (developer.mend.io) if it still hasn't by the next session.
 - Global `~/.npmrc` uses `registry=http://`; switching it to `https://` is Sohan's call (repo is pinned).
 
 ## Known issues
 
-- Site root returns 404 until v0.1.0 deploys (only PR previews are on `gh-pages`).
+- Scorecard shows 8 findings (repo age, solo reviews, fuzzing, best-practices badge, early commits without
+  CI/SAST, security policy before #28). Several clear over time; the rest are expected for a solo static site.
 - Claude Code sessions must source `~/.ssh/agent.env` before git network commands (passphrase-protected
   `id_roarceus` key) and refresh PATH for fnm's Node 26.
 - Git Bash rewrites `BASE_PATH=/...`; use `MSYS2_ENV_CONV_EXCL=BASE_PATH` (runbook: local setup).
