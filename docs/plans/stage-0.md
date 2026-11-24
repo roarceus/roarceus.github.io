@@ -216,7 +216,7 @@ with `jq`). `tests/smoke/` and `tests/static/` are subfolders of the existing `t
 - [x] `CODEOWNERS`: `* @roarceus`. `LICENSE`: MIT (code); README notes content is all rights reserved.
 - [x] `docs/STATUS.md` (current stage, next steps, open questions). Open draft PR; mark ready.
 
-### Task 2: Astro scaffold and base-path helper (PR 2)
+### Task 2: Astro scaffold and base-path helper (PR 2) — issues #2, #3, #4
 **Interfaces — Produces:**
 - `src/lib/utils/url.ts`: `joinBase(base: string, path?: string): string` (pure) and `url(path?: string): string`
   (= `joinBase(import.meta.env.BASE_URL, path)`). Throws `TypeError` for absolute URLs (`https:`, `//`, `mailto:`).
@@ -226,21 +226,21 @@ with `jq`). `tests/smoke/` and `tests/static/` are subfolders of the existing `t
   `export type FeatureFlag = keyof typeof features;` `export function isEnabled(flag: FeatureFlag): boolean` (tagged `@public` for knip until used).
 - `src/config/site.ts`: `site = { name: "Sohan Patil", title: "TODO(sohan)", url: "https://roarceus.github.io" }`.
 
-- [ ] Write `url.test.ts` first (TDD), cases:
+- [x] Write `url.test.ts` first (TDD), cases:
   `joinBase('/', '') === '/'`; `joinBase('/', 'plain/') === '/plain/'`; `joinBase('/', '/plain/') === '/plain/'`;
   `joinBase('/pr-preview/pr-12/', 'resume.pdf') === '/pr-preview/pr-12/resume.pdf'`;
   `joinBase('/pr-preview/pr-12', '/plain/') === '/pr-preview/pr-12/plain/'`; `joinBase('/', '#about') === '/#about'`;
   `joinBase('/pr-preview/pr-12/', '?q=1') === '/pr-preview/pr-12/?q=1'`;
   `expect(() => joinBase('/', 'https://x.dev')).toThrow(TypeError)`; same for `//cdn.x` and `mailto:a@b.c`.
-- [ ] Run `pnpm test` → fails (module missing). Implement. Run → passes, `src/lib` coverage 100%.
-- [ ] `astro.config.mjs`: `output: 'static'`, `site: 'https://roarceus.github.io'`, `base: process.env.BASE_PATH ?? '/'`,
+- [x] Run `pnpm test` → fails (module missing). Implement. Run → passes, `src/lib` coverage 100%.
+- [x] `astro.config.mjs`: `output: 'static'`, `site: 'https://roarceus.github.io'`, `base: process.env.BASE_PATH ?? '/'`,
       `trailingSlash: 'always'`, `build.assets: 'assets'`, React integration, Tailwind Vite plugin.
-- [ ] `tsconfig.json` extends `astro/tsconfigs/strictest` + `noUncheckedIndexedAccess`; aliases `@/components/*`,
+- [x] `tsconfig.json` extends `astro/tsconfigs/strictest` + `noUncheckedIndexedAccess`; aliases `@/components/*`,
       `@/lib/*`, `@/config/*`, `@/layouts/*`, `@/styles/*`, `@/types/*`.
-- [ ] Placeholder `index.astro` via `BaseLayout`: name, "Site under construction", `v{version} ({commit short})`,
+- [x] Placeholder `index.astro` via `BaseLayout`: name, "Site under construction", `v{version} ({commit short})`,
       dark tokens, fluid type, Inter + JetBrains Mono self-hosted, `<meta>` CSP (self only for now), no JS shipped.
-- [ ] ADR-0001 (stack + TS 6 pin + ESLint-10 plugin choices); ADR template; README skeleton with status.
-- [ ] Verify: `pnpm build && pnpm preview` at 320/768/1280/2560, plus `BASE_PATH=/pr-preview/pr-0/ pnpm build`
+- [x] ADR-0001 (stack + TS 6 pin + ESLint-10 plugin choices); ADR template; README skeleton with status.
+- [x] Verify: `pnpm build && pnpm preview` at 320/768/1280/2560, plus `BASE_PATH=/pr-preview/pr-0/ pnpm build`
       and check that dist HTML references `/pr-preview/pr-0/assets/…`.
 
 ### Task 3: Quality tooling (PR 3)

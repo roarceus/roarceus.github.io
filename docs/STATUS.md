@@ -13,16 +13,17 @@ Board: [Projects #1](https://github.com/users/roarceus/projects/1)
   (read-only token, SHA pinning required), security settings, release-please GitHub App
   (`vars.RELEASE_APP_ID`, `secrets.RELEASE_APP_PRIVATE_KEY`).
 - GitHub: 8 stage milestones, 34 labels, Projects board, Stage 0 issues #1–#16 (#16 closed).
+- PR 1 merged (#17): spec, rules, plan, templates, Claude settings.
 
 ## In progress
-- PR 1 `docs/stage-0-plan-and-repo-templates` (#1): spec, rules, plan, templates, Claude settings.
+- PR 2 `feat/stage-0-astro-scaffold` (#2, #3, #4): Astro scaffold, `url()` helper, build info,
+  feature flags, placeholder page, ADR-0001.
 
 ## Next steps
-1. PR 2 `feat/stage-0-astro-scaffold` (#2, #3, #4).
-2. PR 3 `build/stage-0-quality-tooling` (#5, #6, #7).
-3. PR 4 `ci/stage-0-ci-pipeline` (#8, #9, #10), then Sohan adds required checks `ci-ok` and `validate` (M6).
-4. PR 5 `ci/stage-0-preview-and-release` (#11, #12), then Sohan sets the Pages source (M7).
-5. PR 6 `ci/stage-0-ops-and-renovate` (#10, #13, #14), PR 7 `docs/stage-0-project-docs` (#15), then the v0.1.0 release PR.
+1. PR 3 `build/stage-0-quality-tooling` (#5, #6, #7).
+2. PR 4 `ci/stage-0-ci-pipeline` (#8, #9, #10), then Sohan adds required checks `ci-ok` and `validate` (M6).
+3. PR 5 `ci/stage-0-preview-and-release` (#11, #12), then Sohan sets the Pages source (M7).
+4. PR 6 `ci/stage-0-ops-and-renovate` (#10, #13, #14), PR 7 `docs/stage-0-project-docs` (#15), then the v0.1.0 release PR.
 
 ## Open questions
 - None.
@@ -31,3 +32,4 @@ Board: [Projects #1](https://github.com/users/roarceus/projects/1)
 - PRs 2 and 3 merge before CI exists; they are verified with local `pnpm check` only.
 - Claude Code sessions on this machine must source `~/.ssh/agent.env` before git network commands
   (the `id_roarceus` key is passphrase-protected and loaded in the Git Bash ssh-agent).
+- Git Bash rewrites `BASE_PATH=/...` into a Windows path; use `MSYS2_ENV_CONV_EXCL=BASE_PATH` (README).

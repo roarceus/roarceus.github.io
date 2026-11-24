@@ -1,0 +1,39 @@
+/*
+ * Design tokens (SPEC §5). Dark only. Components use these variables (or the Tailwind theme
+ * mapped from them in global.css), never raw hex values. Stage 2 finalizes and documents them.
+ */
+:root {
+  color-scheme: dark;
+
+  /* Surfaces */
+  --bg: #0a0e14;
+  --surface-1: #111722;
+  --surface-2: #18202e;
+  --border: #243044;
+
+  /* Text */
+  --text: #e6edf3;
+  --text-muted: #8b98a9;
+
+  /* Accent */
+  --accent: #326ce5;
+  --accent-soft: #5b8def;
+
+  /* Status language */
+  --status-running: #3fb950;
+  --status-pending: #d29922;
+  --status-failed: #f85149;
+  --status-completed: #8b98a9;
+
+  /* Typography */
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  /* Fluid type scale */
+  --text-sm-fluid: clamp(0.875rem, 0.84rem + 0.15vw, 0.95rem);
+  --text-base-fluid: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+  --text-display-fluid: clamp(2rem, 1.4rem + 3vw, 3.75rem);
+
+  /* Motion */
+  --duration-ui: 200ms;
+}
