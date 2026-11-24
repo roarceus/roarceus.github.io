@@ -1,0 +1,147 @@
+name: Release
+
+# release-please keeps a release PR up to date on every push to main. Merging that PR creates the
+# tag and GitHub Release, and this same workflow then deploys production (a release made with a
+# token never triggers other workflows, so the deploy can't live in an on: release workflow).
+# Rollback: Run workflow → enter a previous tag → that tag is rebuilt and redeployed.
+# SPEC §10 workflow 4, §10b Incidents.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to (re)deploy to production, e.g. v0.1.0
+        required: true
+        type: string
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  release-please:
+    name: release-please
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions: {} # all writes use the GitHub App token
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      # A GitHub App token (not GITHUB_TOKEN) so the release PR triggers CI and can pass the
+      # required checks (ADR-0001).
+      - name: Get a GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@f418cff399f7aef4c2f0ad47e25ca7a6abbdd6fc # v3.4.0
+        with:
+          app-id: ${{ vars.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+          permission-issues: write
+
+      - name: Run release-please
+        id: release
+        uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  deploy:
+    name: deploy
+    needs: release-please
+    if: >-
+      always() && (
+        (github.event_name == 'push' && needs.release-please.outputs.release_created == 'true') ||
+        github.event_name == 'workflow_dispatch'
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write # push to gh-pages
+    environment:
+      name: github-pages
+      url: https://roarceus.github.io/
+    outputs:
+      tag: ${{ steps.ref.outputs.tag }}
+      commit: ${{ steps.ref.outputs.commit }}
+    steps:
+      - name: Resolve the tag to deploy
+        id: ref
+        env:
+          DISPATCH_TAG: ${{ inputs.tag }}
+          RELEASE_TAG: ${{ needs.release-please.outputs.tag_name }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="${DISPATCH_TAG:-$RELEASE_TAG}"
+          if ! [[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::'$tag' is not a release tag like v0.1.0"; exit 1
+          fi
+          commit=$(gh api "repos/$GITHUB_REPOSITORY/commits/$tag" --jq .sha) || {
+            echo "::error::Tag $tag does not exist"; exit 1; }
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "commit=$commit" >> "$GITHUB_OUTPUT"
+          echo "Deploying $tag ($commit)" >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ steps.ref.outputs.tag }}
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+
+      - name: Build production
+        env:
+          BASE_PATH: /
+          PUBLIC_VERSION: ${{ steps.ref.outputs.tag }}
+          PUBLIC_COMMIT_SHA: ${{ steps.ref.outputs.commit }}
+        run: pnpm build
+
+      - name: Deploy to gh-pages (root)
+        uses: JamesIves/github-pages-deploy-action@fa24774553152dd7873cd16ebd8d959b010c5445 # v4.9.0
+        with:
+          branch: gh-pages
+          folder: dist
+          clean: true
+          # Never wipe PR previews or Pages' marker file.
+          clean-exclude: |
+            pr-preview/
+            .nojekyll
+          # Rebase and retry if a preview deploy pushed at the same moment; never overwrite it.
+          force: false
+          attempt-limit: 5
+          commit-message: 'deploy: ${{ steps.ref.outputs.tag }} (${{ steps.ref.outputs.commit }})'
+
+  smoke:
+    name: smoke
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Smoke test production
+        env:
+          SMOKE_BASE_URL: https://roarceus.github.io/
+          SMOKE_EXPECT_VERSION: ${{ needs.deploy.outputs.tag }}
+          SMOKE_EXPECT_COMMIT: ${{ needs.deploy.outputs.commit }}
+        run: pnpm test:smoke
+      - name: Upload report
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: smoke-production
+          path: test-results/smoke/
+          retention-days: 14
+          if-no-files-found: ignore

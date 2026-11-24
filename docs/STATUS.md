@@ -22,20 +22,25 @@ Board: [Projects #1](https://github.com/users/roarceus/projects/1)
   "GitHub Actions" on 2026-11-24. The README page from PR 1 stays live until our first deploy.
 - PR 4 merged (#21): CI (quality, build, Playwright + axe on 3 engines, Lighthouse, lychee, dependency
   review, `ci-ok`), PR title check + labels, CodeQL.
-- M6: `protect-main` requires `ci-ok` and `validate` (export in `docs/github/rulesets/`).
+- M6: `protect-main` requires `ci-ok` and `validate` (export in `docs/github/rulesets/`, #22).
+- #20 merged: minimatch override (Dependabot alert #1 fixed) and https registry.
 
 ## In progress
 
-- PR #20 `fix/deps-minimatch-advisory`: overrides minimatch (Dependabot alert #1, GHSA-g3hv-75wg-m249)
-  and pins the npm registry to https. Opened before CI existed; needs `main` merged in to get checks.
+- PR 5 `ci/stage-0-preview-and-release` (#11, #12): PR previews, release-please (App token), production
+  deploy, rollback via `workflow_dispatch`, smoke tests.
 
 ## Next steps
 
-1. PR 5 `ci/stage-0-preview-and-release` (#11, #12), then Sohan switches the Pages source to `gh-pages` (M7).
+1. PR 5's first preview run creates `gh-pages`; Sohan switches the Pages source to `gh-pages` / root (M7),
+   then re-runs the preview smoke job.
 2. PR 6 `ci/stage-0-ops-and-renovate` (#10, #13, #14), PR 7 `docs/stage-0-project-docs` (#15), then the v0.1.0 release PR.
 
 ## Open questions
 
+- Design direction: Sohan wants real flair (3D, gamey, fun, many components), not a generic terminal
+  look. That conflicts with SPEC §5's "real tool look"; explore options at Stage 2 planning and update
+  SPEC §5 via an ADR once a direction is chosen. Keep the mobile perf budget, plain view, and a11y.
 - Global `~/.npmrc` uses `registry=http://`; switching it to `https://` is Sohan's call (repo is pinned).
 
 ## Known issues

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "packages": {
+    ".": {
+      "release-type": "node",
+      "package-name": "roarceus.github.io",
+      "include-component-in-tag": false,
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": false,
+      "changelog-sections": [
+        { "type": "feat", "section": "Features" },
+        { "type": "fix", "section": "Bug Fixes" },
+        { "type": "perf", "section": "Performance" },
+        { "type": "revert", "section": "Reverts" },
+        { "type": "refactor", "section": "Refactoring", "hidden": true },
+        { "type": "style", "section": "Styles", "hidden": true },
+        { "type": "test", "section": "Tests", "hidden": true },
+        { "type": "docs", "section": "Documentation", "hidden": true },
+        { "type": "build", "section": "Build", "hidden": true },
+        { "type": "ci", "section": "CI", "hidden": true },
+        { "type": "chore", "section": "Chores", "hidden": true }
+      ]
+    }
+  },
+  "pull-request-title-pattern": "chore(release): release${component} ${version}",
+  "pull-request-header": ":rocket: Merging this PR publishes the release and deploys production. Check the release checklist below first.",
+  "pull-request-footer": "### Release checklist\n\n- [ ] CI is green on `main`\n- [ ] The last feature PR's preview was verified at mobile, tablet, and desktop widths\n- [ ] Smoke tests passed on the latest preview\n- [ ] README and `docs/STATUS.md` are current\n- [ ] Manual steps for this release (if any) are listed here\n\nAfter merging: the `release` workflow deploys production and runs smoke tests against https://roarceus.github.io/. If it fails, roll back with `release.yml` → Run workflow → previous tag."
+}

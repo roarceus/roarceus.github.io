@@ -63,6 +63,16 @@ Every PR runs these workflows (all actions pinned to commit SHAs, least-privileg
 
 Required status checks on `main`: **`ci-ok`** and **`validate`**.
 
+### Releases and deploys
+
+1. Feature PRs merge to `main` (squash; the PR title becomes the commit and the changelog entry).
+2. release-please opens or updates a `chore(release): release x.y.z` PR with the version bump and
+   `CHANGELOG.md`. Pre-1.0, each stage is a minor release.
+3. Merging that PR creates the tag and GitHub Release and deploys production to the root of `gh-pages`
+   (PR previews under `pr-preview/` are kept). Smoke tests then check the live site.
+4. **Rollback:** Actions → Release → Run workflow → enter a previous tag (e.g. `v0.1.0`). That tag is rebuilt
+   and redeployed, then smoke-tested.
+
 ## Commits
 
 Commits follow [Conventional Commits](https://www.conventionalcommits.org/) with the types and scopes in
