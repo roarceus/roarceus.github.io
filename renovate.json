@@ -37,6 +37,11 @@
       "semanticCommitType": "ci"
     },
     {
+      "description": "ossf/scorecard-action v2.6.0's container image is missing on ghcr.io (pull fails). Skip only that version.",
+      "matchPackageNames": ["ossf/scorecard-action"],
+      "allowedVersions": "!/^v?2\\.6\\.0$/"
+    },
+    {
       "description": "Node majors follow LTS and are tracked as issues (SPEC §10b), not automatic PRs.",
       "matchDepNames": ["node", "@types/node"],
       "matchUpdateTypes": ["major"],

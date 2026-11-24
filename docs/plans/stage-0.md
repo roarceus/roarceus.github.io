@@ -84,28 +84,30 @@ Not installed in Stage 0 (added in the stage that uses them, to keep knip green)
 
 **Actions (latest release → SHA):**
 
-| Action                               | Version | SHA                                      |
-| ------------------------------------ | ------- | ---------------------------------------- |
-| actions/checkout                     | v7.0.1  | 3d3c42e5aac5ba805825da76410c181273ba90b1 |
-| actions/setup-node                   | v7.1.0  | 949feb2413d6458794dcd2491c4babbbce0c15c1 |
-| pnpm/action-setup                    | v6.1.1  | 73e46992e05b19abd31f2f3c20e0e7370d762115 |
-| actions/cache                        | v6.1.0  | 55cc8345863c7cc4c66a329aec7e433d2d1c52a9 |
-| actions/upload-artifact              | v7.0.2  | cf430e030ddbb5b0abf93d22962f4752f3646cd9 |
-| actions/download-artifact            | v8.0.2  | 9000827ccba6bdab643e8b6fd33ac0654aef8333 |
-| actions/github-script                | v9.0.0  | 3a2844b7e9c422d3c10d287c895573f7108da1b3 |
-| actions/labeler                      | v7.0.0  | bf12e9b00b37c5c0ca2b87b79b2daf7891dbda13 |
-| actions/dependency-review-action     | v5.0.1  | bbc44d14a204704ccc493733616cd1e93a0321ec |
-| actions/create-github-app-token      | v3.4.0  | f418cff399f7aef4c2f0ad47e25ca7a6abbdd6fc |
-| amannn/action-semantic-pull-request  | v6.1.3  | c5e23b7e584519ee15caa684cf60d056aa9f035f |
-| rossjrw/pr-preview-action            | v1.8.2  | 873417d2df72380da1f3978378fb58560bcde976 |
-| googleapis/release-please-action     | v5.0.0  | 45996ed1f6d02564a971a2fa1b5860e934307cf7 |
-| JamesIves/github-pages-deploy-action | v4.9.0  | fa24774553152dd7873cd16ebd8d959b010c5445 |
-| github/codeql-action (init/analyze)  | v4.39.4 | 1bd86f2fdb4b86187fa4059f16f31a3202acc9ea |
-| lycheeverse/lychee-action            | v2.9.0  | e7477775783ea5526144ba13e8db5eec57747ce8 |
-| EndBug/label-sync                    | v2.3.3  | 52074158190acb45f3077f9099fea818aa43f97a |
-| ossf/scorecard-action                | v2.6.0  | 23f22cd43608bae7a1f1fa2603d7314dee9538a5 |
+| Action                               | Version  | SHA                                      |
+| ------------------------------------ | -------- | ---------------------------------------- |
+| actions/checkout                     | v7.0.1   | 3d3c42e5aac5ba805825da76410c181273ba90b1 |
+| actions/setup-node                   | v7.1.0   | 949feb2413d6458794dcd2491c4babbbce0c15c1 |
+| pnpm/action-setup                    | v6.1.1   | 73e46992e05b19abd31f2f3c20e0e7370d762115 |
+| actions/cache                        | v6.1.0   | 55cc8345863c7cc4c66a329aec7e433d2d1c52a9 |
+| actions/upload-artifact              | v7.0.2   | cf430e030ddbb5b0abf93d22962f4752f3646cd9 |
+| actions/download-artifact            | v8.0.2   | 9000827ccba6bdab643e8b6fd33ac0654aef8333 |
+| actions/github-script                | v9.0.0   | 3a2844b7e9c422d3c10d287c895573f7108da1b3 |
+| actions/labeler                      | v7.0.0   | bf12e9b00b37c5c0ca2b87b79b2daf7891dbda13 |
+| actions/dependency-review-action     | v5.0.1   | bbc44d14a204704ccc493733616cd1e93a0321ec |
+| actions/create-github-app-token      | v3.4.0   | f418cff399f7aef4c2f0ad47e25ca7a6abbdd6fc |
+| amannn/action-semantic-pull-request  | v6.1.3   | c5e23b7e584519ee15caa684cf60d056aa9f035f |
+| rossjrw/pr-preview-action            | v1.8.2   | 873417d2df72380da1f3978378fb58560bcde976 |
+| googleapis/release-please-action     | v5.0.0   | 45996ed1f6d02564a971a2fa1b5860e934307cf7 |
+| JamesIves/github-pages-deploy-action | v4.9.0   | fa24774553152dd7873cd16ebd8d959b010c5445 |
+| github/codeql-action (init/analyze)  | v4.39.4  | 1bd86f2fdb4b86187fa4059f16f31a3202acc9ea |
+| lycheeverse/lychee-action            | v2.9.0   | e7477775783ea5526144ba13e8db5eec57747ce8 |
+| EndBug/label-sync                    | v2.3.3   | 52074158190acb45f3077f9099fea818aa43f97a |
+| ossf/scorecard-action                | v2.5.0 ⁴ | fa7117db83c52d787ae5a89f350999701505d78e |
 
 Lighthouse runs via the pinned `@lhci/cli` devDependency (no extra action).
+⁴ v2.6.0 (`23f22cd…`) was the latest, but its container image's platform manifests are gone from ghcr.io, so
+the pull fails. Pinned to v2.5.0; Renovate skips 2.6.0 only.
 
 ---
 
