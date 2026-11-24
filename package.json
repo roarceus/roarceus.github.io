@@ -26,6 +26,7 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test tests/e2e",
     "test:visual": "playwright test tests/visual --pass-with-no-tests",
+    "test:smoke": "playwright test --config playwright.smoke.config.ts",
     "lhci": "lhci autorun",
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm knip && pnpm depcruise && pnpm test:coverage && pnpm build",
     "prepare": "husky"
