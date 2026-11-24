@@ -1,0 +1,47 @@
+---
+import '@/styles/global.css';
+
+import { site } from '@/config/site';
+import { url } from '@/lib/utils/url';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title = `${site.name} | ${site.title}`, description = site.description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, site.url);
+
+// GitHub Pages can't set headers, so the CSP ships as a meta tag (SPEC §10b). Production only:
+// the dev server injects inline scripts and styles. Endpoints for analytics and the contact
+// form get added here when those features land.
+const csp = [
+  "default-src 'self'",
+  "script-src 'self'",
+  "style-src 'self'",
+  "img-src 'self' data:",
+  "font-src 'self'",
+  "connect-src 'self'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+].join('; ');
+---
+
+<!doctype html>
+<html lang={site.locale}>
+  <head>
+    <meta charset="utf-8" />
+    {import.meta.env.PROD && <meta http-equiv="Content-Security-Policy" content={csp} />}
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content={site.themeColor} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href={url('favicon.svg')} type="image/svg+xml" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
