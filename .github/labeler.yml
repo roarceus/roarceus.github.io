@@ -1,0 +1,60 @@
+# Area labels by changed path (actions/labeler). Type labels come from the PR title (pr-title.yml).
+
+'area: content':
+  - changed-files:
+      - any-glob-to-any-file: ['src/content/**', 'src/lib/content/**', 'public/resume.pdf']
+'area: plain':
+  - changed-files:
+      - any-glob-to-any-file: ['src/components/plain/**', 'src/pages/plain/**']
+'area: terminal':
+  - changed-files:
+      - any-glob-to-any-file: ['src/components/terminal/**']
+'area: commands':
+  - changed-files:
+      - any-glob-to-any-file: ['src/lib/commands/**', 'src/lib/parser/**']
+'area: cluster':
+  - changed-files:
+      - any-glob-to-any-file: ['src/components/cluster/**']
+'area: ui':
+  - changed-files:
+      - any-glob-to-any-file:
+          ['src/components/ui/**', 'src/components/layout/**', 'src/layouts/**', 'src/pages/**']
+'area: design':
+  - changed-files:
+      - any-glob-to-any-file: ['src/styles/**', 'public/favicon.svg']
+'area: game':
+  - changed-files:
+      - any-glob-to-any-file: ['src/components/game/**']
+'area: seo':
+  - changed-files:
+      - any-glob-to-any-file: ['public/robots.txt', 'src/pages/rss.xml.*']
+'area: a11y':
+  - changed-files:
+      - any-glob-to-any-file: ['tests/e2e/**/*a11y*']
+'area: perf':
+  - changed-files:
+      - any-glob-to-any-file: ['lighthouserc.json']
+'area: ci':
+  - changed-files:
+      - any-glob-to-any-file: ['.github/workflows/**', '.github/actions/**', 'lychee.toml']
+'area: deps':
+  - changed-files:
+      - any-glob-to-any-file: ['package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', 'renovate.json']
+'area: release':
+  - changed-files:
+      - any-glob-to-any-file: ['release-please-config.json', '.release-please-manifest.json']
+'area: docs':
+  - changed-files:
+      - any-glob-to-any-file: ['docs/**', '*.md']
+'area: config':
+  - changed-files:
+      - any-glob-to-any-file:
+          - '*.config.*'
+          - '.dependency-cruiser.cjs'
+          - 'tsconfig.json'
+          - '.npmrc'
+          - '.nvmrc'
+          - '.github/commit-convention.json'
+          - '.github/labeler.yml'
+          - '.github/labels.yml'
+          - 'src/config/**'

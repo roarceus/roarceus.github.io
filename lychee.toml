@@ -1,0 +1,18 @@
+# Link checker config (SPEC §10 Tests). CI runs it offline against the built site; the weekly
+# scheduled workflow runs it online against production to catch external link rot.
+
+# Fragment links (#section) must point at a real id.
+include_fragments = true
+
+# Retry flaky hosts instead of failing the build.
+max_retries = 3
+retry_wait_time = 2
+timeout = 20
+
+# Treat 429 (rate limited) as OK.
+accept = ["100..=103", "200..=299", "429"]
+
+exclude = [
+  # Canonical/OG URLs point at production, which doesn't exist until the first release.
+  "^https://roarceus\\.github\\.io/",
+]

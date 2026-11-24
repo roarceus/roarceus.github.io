@@ -17,23 +17,26 @@ Board: [Projects #1](https://github.com/users/roarceus/projects/1)
 - GitHub: 8 stage milestones, 34 labels, Projects board, Stage 0 issues #1–#16 (#16 closed).
 - PR 1 merged (#17): spec, rules, plan, templates, Claude settings.
 - PR 2 merged (#18): Astro scaffold, `url()` helper, build info, feature flags, placeholder page, ADR-0001.
+- PR 3 merged (#19): ESLint, Prettier, knip, dependency-cruiser, commit hooks, root-path test.
 - Pages source switched from `main` (auto-enabled Jekyll build, failed on `.astro` front matter) to
   "GitHub Actions" on 2026-11-24. The README page from PR 1 stays live until our first deploy.
 
 ## In progress
 
-- PR 3 `build/stage-0-quality-tooling` (#5, #6, #7): ESLint, Prettier, knip, dependency-cruiser,
-  Husky + lint-staged + commitlint, hardcoded root path test, full `pnpm check`.
+- PR 4 `ci/stage-0-ci-pipeline` (#8, #9, #10): CI (quality, build, Playwright + axe on 3 engines, Lighthouse,
+  lychee, dependency review, `ci-ok`), PR title check + labels, CodeQL.
+- PR #20 `fix/deps-minimatch-advisory`: overrides minimatch (Dependabot alert #1, GHSA-g3hv-75wg-m249)
+  and pins the npm registry to https.
 
 ## Next steps
 
-1. PR 4 `ci/stage-0-ci-pipeline` (#8, #9, #10), then Sohan adds required checks `ci-ok` and `validate` (M6).
+1. After PR 4's first CI run, Sohan adds required checks `ci-ok` and `validate` (M6).
 2. PR 5 `ci/stage-0-preview-and-release` (#11, #12), then Sohan switches the Pages source to `gh-pages` (M7).
 3. PR 6 `ci/stage-0-ops-and-renovate` (#10, #13, #14), PR 7 `docs/stage-0-project-docs` (#15), then the v0.1.0 release PR.
 
 ## Open questions
 
-- None.
+- Global `~/.npmrc` uses `registry=http://`; switching it to `https://` is Sohan's call (repo is pinned).
 
 ## Known issues
 
