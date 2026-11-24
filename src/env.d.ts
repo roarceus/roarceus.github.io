@@ -1,3 +1,5 @@
+/// <reference types="astro/client" />
+
 interface ImportMetaEnv {
   /** Release version injected by CI (e.g. "0.1.0" or "v0.1.0"). */
   readonly PUBLIC_VERSION?: string;

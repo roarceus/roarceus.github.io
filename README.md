@@ -50,6 +50,19 @@ the value into a Windows path. PowerShell needs `$env:BASE_PATH='/pr-preview/pr-
 | `pnpm test:coverage`                | Unit tests with coverage thresholds (`src/lib` ≥ 90%, overall ≥ 80%)            |
 | `pnpm check`                        | All of the above in order, then build. Run before every push                    |
 
+## CI
+
+Every PR runs these workflows (all actions pinned to commit SHAs, least-privilege permissions):
+
+| Workflow       | What it checks                                                                                                                                                                                                                                                                                                                                                                                |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ci.yml`       | Format, lint, typecheck, knip, dependency rules, unit tests + coverage, `pnpm audit` (high, prod deps), build (also under a preview base path), Playwright + axe on Chromium, Firefox, and WebKit across desktop, phone, and tablet sizes, Lighthouse mobile budgets (perf ≥ 90, a11y/best practices/SEO ≥ 95), offline link check, dependency review. `ci-ok` passes only if all of them do. |
+| `pr-title.yml` | The PR title is a Conventional Commit with an allowed type and scope, ≤ 72 chars (it becomes the squash commit). Adds `type:` and `area:` labels.                                                                                                                                                                                                                                             |
+| `codeql.yml`   | CodeQL security and quality queries for JavaScript/TypeScript (also weekly).                                                                                                                                                                                                                                                                                                                  |
+| `labels.yml`   | Syncs repository labels from `.github/labels.yml`.                                                                                                                                                                                                                                                                                                                                            |
+
+Required status checks on `main`: **`ci-ok`** and **`validate`**.
+
 ## Commits
 
 Commits follow [Conventional Commits](https://www.conventionalcommits.org/) with the types and scopes in
