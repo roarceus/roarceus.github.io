@@ -303,7 +303,8 @@ with `jq`). `tests/smoke/` and `tests/static/` are subfolders of the existing `t
 - [x] `tests/smoke/smoke.spec.ts` + `playwright.smoke.config.ts` (`SMOKE_BASE_URL`): waits until the live page
       reports the expected version/commit (cache-busted), home renders, every `link/script/img` under the base
       returns 200, no console errors.
-- [ ] Verify: PR 5 comment shows a working preview URL (after M7), smoke job green.
+- [x] Verify: PR 5 comment shows a working preview URL (after M7), smoke job green. (`/pr-preview/pr-23/`
+      served `v0.0.0 (9cadfcd)`; all 15 checks green.)
 
 ### Task 6: Ops and Renovate (PR 6)
 

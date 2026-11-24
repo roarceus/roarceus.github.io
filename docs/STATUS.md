@@ -24,6 +24,8 @@ Board: [Projects #1](https://github.com/users/roarceus/projects/1)
   review, `ci-ok`), PR title check + labels, CodeQL.
 - M6: `protect-main` requires `ci-ok` and `validate` (export in `docs/github/rulesets/`, #22).
 - #20 merged: minimatch override (Dependabot alert #1 fixed) and https registry.
+- M7: Pages serves `gh-pages` / root. PR previews work (first: `/pr-preview/pr-23/`). The site root returns
+  404 until the first release deploys production.
 
 ## In progress
 
@@ -32,9 +34,7 @@ Board: [Projects #1](https://github.com/users/roarceus/projects/1)
 
 ## Next steps
 
-1. PR 5's first preview run creates `gh-pages`; Sohan switches the Pages source to `gh-pages` / root (M7),
-   then re-runs the preview smoke job.
-2. PR 6 `ci/stage-0-ops-and-renovate` (#10, #13, #14), PR 7 `docs/stage-0-project-docs` (#15), then the v0.1.0 release PR.
+1. PR 6 `ci/stage-0-ops-and-renovate` (#10, #13, #14), PR 7 `docs/stage-0-project-docs` (#15), then the v0.1.0 release PR.
 
 ## Open questions
 
