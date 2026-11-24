@@ -12,6 +12,9 @@ export type FeatureFlag = keyof typeof features;
 /**
  * @public Used by later stages (boot sequence, chaos mode).
  */
-export function isEnabled(flag: FeatureFlag, flags: Readonly<Record<FeatureFlag, boolean>> = features): boolean {
+export function isEnabled(
+  flag: FeatureFlag,
+  flags: Readonly<Record<FeatureFlag, boolean>> = features,
+): boolean {
   return flags[flag];
 }

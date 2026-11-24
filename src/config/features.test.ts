@@ -4,7 +4,7 @@ import { features, isEnabled } from './features';
 
 describe('features', () => {
   it('ships every flag off by default (SPEC §10b: unfinished features stay off in production)', () => {
-    expect(Object.values(features).every((enabled) => !enabled)).toBe(true);
+    expect(Object.values(features)).not.toContain(true);
   });
 
   it('reads a flag from the default set', () => {

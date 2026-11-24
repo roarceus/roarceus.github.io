@@ -1,7 +1,7 @@
 name: Feature
 description: Propose new functionality or a change in behavior.
-title: "feat(<scope>): <short description>"
-labels: ["type: feat"]
+title: 'feat(<scope>): <short description>'
+labels: ['type: feat']
 body:
   - type: markdown
     attributes:
@@ -39,7 +39,26 @@ body:
     attributes:
       label: Affected areas
       multiple: true
-      options: [content, plain, terminal, commands, cluster, ui, design, game, boot, seo, a11y, perf, ci, deps, release, docs, config]
+      options:
+        [
+          content,
+          plain,
+          terminal,
+          commands,
+          cluster,
+          ui,
+          design,
+          game,
+          boot,
+          seo,
+          a11y,
+          perf,
+          ci,
+          deps,
+          release,
+          docs,
+          config,
+        ]
     validations:
       required: true
   - type: textarea

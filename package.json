@@ -15,10 +15,24 @@
     "build": "astro build",
     "preview": "astro preview",
     "typecheck": "astro check",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "knip": "knip",
+    "depcruise": "depcruise src --config .dependency-cruiser.cjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "check": "pnpm typecheck && pnpm test:coverage && pnpm build"
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm knip && pnpm depcruise && pnpm test:coverage && pnpm build",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,mjs,cjs,astro}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml,css}": "prettier --write"
   },
   "dependencies": {
     "@astrojs/react": "7.1.9",
@@ -30,13 +44,33 @@
   },
   "devDependencies": {
     "@astrojs/check": "0.9.12",
+    "@commitlint/cli": "21.2.4",
+    "@commitlint/config-conventional": "21.2.4",
+    "@commitlint/types": "21.2.3",
+    "@eslint-react/eslint-plugin": "5.30.6",
+    "@eslint/js": "10.0.1",
     "@tailwindcss/vite": "4.3.5",
     "@types/node": "26.6.6",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@vitest/coverage-v8": "5.1.1",
+    "dependency-cruiser": "18.9.0",
+    "eslint": "10.15.0",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-import-resolver-typescript": "4.4.5",
+    "eslint-plugin-astro": "3.2.1",
+    "eslint-plugin-import-x": "4.18.1",
+    "eslint-plugin-jsx-a11y-x": "0.2.0",
+    "globals": "17.14.0",
+    "husky": "9.1.7",
+    "knip": "6.48.0",
+    "lint-staged": "17.6.2",
+    "prettier": "3.10.1",
+    "prettier-plugin-astro": "1.1.2",
+    "prettier-plugin-tailwindcss": "0.8.1",
     "tailwindcss": "4.3.5",
     "typescript": "6.0.3",
+    "typescript-eslint": "8.74.0",
     "vitest": "5.1.1"
   }
 }
