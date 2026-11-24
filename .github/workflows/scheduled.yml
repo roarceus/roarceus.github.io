@@ -1,0 +1,146 @@
+name: Scheduled
+
+# SPEC §10b Operate and Maintain:
+# - weekly: smoke tests, external link check, and Lighthouse against production. A failure opens
+#   (or updates) one issue labeled `ops`; the next passing run closes it.
+# - quarterly: opens a "Content review" issue.
+
+on:
+  schedule:
+    - cron: '0 14 * * 1' # weekly ops check, Mondays 14:00 UTC
+    - cron: '0 15 1 1,4,7,10 *' # content review, first day of each quarter
+  workflow_dispatch:
+    inputs:
+      job:
+        description: Which check to run
+        type: choice
+        options: [ops, content-review]
+        default: ops
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.schedule || inputs.job }}
+  cancel-in-progress: false
+
+env:
+  SITE_URL: https://roarceus.github.io/
+  OPS_ISSUE_TITLE: 'ops: weekly production check failing'
+
+jobs:
+  ops:
+    name: ops
+    if: github.event.schedule == '0 14 * * 1' || inputs.job == 'ops'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      issues: write # open, update, or close the ops issue
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Smoke tests (production)
+        id: smoke
+        continue-on-error: true
+        env:
+          SMOKE_BASE_URL: ${{ env.SITE_URL }}
+        run: pnpm test:smoke
+
+      # External links only: internal links are checked offline on every PR. Build the site and
+      # check its links online, skipping our own domain.
+      - name: Build for the link check
+        run: pnpm build
+      - name: External link check
+        id: links
+        continue-on-error: true
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
+        with:
+          args: --config lychee.toml --root-dir ${{ github.workspace }}/dist --no-progress 'dist/**/*.html'
+          fail: true
+
+      - name: Lighthouse (production, mobile budgets)
+        id: lighthouse
+        continue-on-error: true
+        run: pnpm exec lhci autorun --collect.url=${{ env.SITE_URL }}
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: lighthouse-production
+          path: .lighthouseci/
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: ignore
+
+      - name: Open, update, or close the ops issue
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          RESULTS: >-
+            {"smoke tests": "${{ steps.smoke.outcome }}",
+             "link check": "${{ steps.links.outcome }}",
+             "Lighthouse": "${{ steps.lighthouse.outcome }}"}
+        with:
+          script: |
+            const fs = require('node:fs');
+            const results = JSON.parse(process.env.RESULTS);
+            const failed = Object.entries(results).filter(([, outcome]) => outcome !== 'success').map(([name]) => name);
+            const title = process.env.OPS_ISSUE_TITLE;
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const { owner, repo } = context.repo;
+
+            const open = await github.paginate(github.rest.issues.listForRepo, { owner, repo, state: 'open', labels: 'ops', per_page: 100 });
+            const existing = open.find((issue) => issue.title === title && !issue.pull_request);
+
+            if (failed.length === 0) {
+              if (existing) {
+                await github.rest.issues.createComment({ owner, repo, issue_number: existing.number, body: `Recovered: all checks passed in ${runUrl}.` });
+                await github.rest.issues.update({ owner, repo, issue_number: existing.number, state: 'closed', state_reason: 'completed' });
+              }
+              core.info('All production checks passed.');
+              return;
+            }
+
+            const body = fs.readFileSync('.github/issue-bodies/ops-failure.md', 'utf8')
+              .replace('{{RUN_URL}}', runUrl)
+              .replace('{{FAILED}}', failed.join(', '));
+            if (existing) {
+              await github.rest.issues.createComment({ owner, repo, issue_number: existing.number, body: `Still failing (${failed.join(', ')}): ${runUrl}` });
+            } else {
+              await github.rest.issues.create({ owner, repo, title, body, labels: ['ops', 'priority: p0'] });
+            }
+            core.setFailed(`Production checks failed: ${failed.join(', ')}`);
+
+  content-review:
+    name: content-review
+    if: github.event.schedule == '0 15 1 1,4,7,10 *' || inputs.job == 'content-review'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: .github/issue-bodies
+      - name: Open the quarterly content review issue
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const fs = require('node:fs');
+            const now = new Date();
+            const title = `Content review ${now.getUTCFullYear()}-Q${Math.floor(now.getUTCMonth() / 3) + 1}`;
+            const { owner, repo } = context.repo;
+            const open = await github.paginate(github.rest.issues.listForRepo, { owner, repo, state: 'open', labels: 'area: content', per_page: 100 });
+            if (open.some((issue) => issue.title === title)) {
+              core.info(`"${title}" is already open.`);
+              return;
+            }
+            const body = fs.readFileSync('.github/issue-bodies/content-review.md', 'utf8');
+            const { data } = await github.rest.issues.create({ owner, repo, title, body, labels: ['area: content', 'priority: p1'] });
+            core.info(`Opened ${data.html_url}`);

@@ -1,0 +1,54 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "SPEC §10 Dependencies: weekly, grouped, pinned; automerge only devDependency patches that pass CI.",
+  "extends": [
+    "config:recommended",
+    ":pinAllExceptPeerDependencies",
+    "helpers:pinGitHubActionDigests",
+    ":semanticCommits",
+    ":dependencyDashboard"
+  ],
+  "timezone": "America/Los_Angeles",
+  "schedule": ["before 6am on monday"],
+  "labels": ["dependencies", "area: deps"],
+  "prConcurrentLimit": 5,
+  "semanticCommitType": "chore",
+  "semanticCommitScope": "deps",
+  "commitMessageTopic": "{{depName}}",
+  "packageRules": [
+    {
+      "description": "Non-major npm updates in one PR.",
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "non-major dependencies"
+    },
+    {
+      "description": "devDependency patches merge themselves once CI is green.",
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["patch"],
+      "groupName": "devDependency patches",
+      "automerge": true
+    },
+    {
+      "description": "GitHub Actions digests and versions together, as ci(deps).",
+      "matchManagers": ["github-actions"],
+      "groupName": "github actions",
+      "semanticCommitType": "ci"
+    },
+    {
+      "description": "Node majors follow LTS and are tracked as issues (SPEC §10b), not automatic PRs.",
+      "matchDepNames": ["node", "@types/node"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "labels": ["dependencies", "area: deps", "priority: p0"],
+    "schedule": ["at any time"]
+  },
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 6am on the first day of the month"]
+  }
+}

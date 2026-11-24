@@ -1,5 +1,8 @@
 # roarceus.github.io
 
+[![CI](https://github.com/roarceus/roarceus.github.io/actions/workflows/ci.yml/badge.svg)](https://github.com/roarceus/roarceus.github.io/actions/workflows/ci.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/roarceus/roarceus.github.io/badge)](https://scorecard.dev/viewer/?uri=github.com/roarceus/roarceus.github.io)
+
 Personal portfolio of **Sohan Patil**, themed as an interactive Kubernetes cluster: explore with
 `kubectl`-style commands or a clickable cluster map, or switch to a plain, recruiter-friendly view.
 
@@ -62,6 +65,12 @@ Every PR runs these workflows (all actions pinned to commit SHAs, least-privileg
 | `labels.yml`   | Syncs repository labels from `.github/labels.yml`.                                                                                                                                                                                                                                                                                                                                            |
 
 Required status checks on `main`: **`ci-ok`** and **`validate`**.
+
+### Dependencies
+
+Renovate opens grouped update PRs on Monday mornings (non-major npm updates together, GitHub Actions
+together, both pinned). devDependency patches merge themselves once CI passes; everything else waits for
+review. Node majors are not automated (LTS upgrades are tracked as issues). Security fixes open right away.
 
 ### Releases and deploys
 

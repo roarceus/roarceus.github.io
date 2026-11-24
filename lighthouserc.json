@@ -1,8 +1,7 @@
 {
-  "$comment": "Lighthouse CI budgets (SPEC §10 Tests). Default form factor is mobile with throttling.",
+  "$comment": "Lighthouse CI budgets (SPEC §10 Tests), shared by CI (pnpm lhci, against dist/) and the weekly production check (--collect.url). Default form factor is mobile with throttling.",
   "ci": {
     "collect": {
-      "staticDistDir": "./dist",
       "numberOfRuns": 3
     },
     "assert": {

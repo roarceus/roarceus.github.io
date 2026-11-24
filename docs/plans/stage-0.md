@@ -306,13 +306,18 @@ with `jq`). `tests/smoke/` and `tests/static/` are subfolders of the existing `t
 - [x] Verify: PR 5 comment shows a working preview URL (after M7), smoke job green. (`/pr-preview/pr-23/`
       served `v0.0.0 (9cadfcd)`; all 15 checks green.)
 
-### Task 6: Ops and Renovate (PR 6)
+### Task 6: Ops and Renovate (PR 6) — issues #10 (Scorecard), #13, #14
 
-- [ ] `scheduled.yml` per the table; finds an open issue labeled `ops` with the same title before creating a new one.
-- [ ] `renovate.json`: `config:recommended`, `:pinAllExceptPeerDependencies`, `helpers:pinGitHubActionDigests`,
+- [x] `scheduled.yml` per the table; finds an open issue labeled `ops` with the same title before creating a new
+      one, and closes it when a later run passes. Lighthouse budgets are shared with CI (`lighthouserc.json` no
+      longer names an input; `pnpm lhci` passes `dist/`, the weekly job passes the production URL).
+- [x] `renovate.json`: `config:recommended`, `:pinAllExceptPeerDependencies`, `helpers:pinGitHubActionDigests`,
       weekly schedule, grouped non-major updates, automerge devDependency patches only, `dependencies` label,
-      semantic commits `chore(deps)`/`ci(deps)`.
-- [ ] Verify: `workflow_dispatch` run of scheduled.yml (smoke expected to fail until prod exists → confirms the ops issue path, then close it).
+      semantic commits `chore(deps)`/`ci(deps)`. Node majors disabled (tracked as issues).
+- [x] `scorecard.yml` + README badge (D3).
+- [ ] Verify after merge (`workflow_dispatch` only runs from `main`): `ops` before v0.1.0 should fail and open the
+      ops issue (production root is 404), then pass and close it after the release; `content-review` opens one
+      issue. Renovate onboarding validates `renovate.json` (M8).
 
 ### Task 7: Project docs and sign-off (PR 7)
 
