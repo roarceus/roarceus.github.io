@@ -24,13 +24,15 @@ Board: [Projects #1](https://github.com/users/roarceus/projects/1)
   review, `ci-ok`), PR title check + labels, CodeQL.
 - M6: `protect-main` requires `ci-ok` and `validate` (export in `docs/github/rulesets/`, #22).
 - #20 merged: minimatch override (Dependabot alert #1 fixed) and https registry.
+- PR 5 merged (#23): previews, release-please (App token), production deploy, rollback, smoke tests.
 - M7: Pages serves `gh-pages` / root. PR previews work (first: `/pr-preview/pr-23/`). The site root returns
   404 until the first release deploys production.
 
 ## In progress
 
-- PR 5 `ci/stage-0-preview-and-release` (#11, #12): PR previews, release-please (App token), production
-  deploy, rollback via `workflow_dispatch`, smoke tests.
+- Release PR #24 (bot) proposed **1.0.0**: with no prior tag, release-please treats the first release as
+  initial and ignores `bump-minor-pre-major`. Fix: `initial-version: 0.1.0` (this PR). Don't merge #24 until
+  it says 0.1.0; it should be the last merge of Stage 0 (after PRs 6 and 7).
 
 ## Next steps
 
