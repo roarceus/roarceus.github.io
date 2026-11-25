@@ -123,7 +123,7 @@ test.describe('contact form', () => {
 
 test.describe('contact form failure: explains when the service rejects the message', () => {
   test.use({
-    expectedConsoleErrors: [/^Failed to load resource: the server responded with a status of 400/],
+    expectedConsoleError: /^Failed to load resource: the server responded with a status of 400/,
   });
 
   test.beforeEach(async ({ page }) => {
@@ -141,7 +141,7 @@ test.describe('contact form failure: explains when the service rejects the messa
 
 test.describe('contact form failure: offers email when the service fails', () => {
   test.use({
-    expectedConsoleErrors: [/^Failed to load resource: the server responded with a status of 500/],
+    expectedConsoleError: /^Failed to load resource: the server responded with a status of 500/,
   });
 
   test.beforeEach(async ({ page }) => {
@@ -159,12 +159,13 @@ test.describe('contact form failure: offers email when the service fails', () =>
 
 test.describe('contact form failure: keeps the message when the visitor is offline', () => {
   test.use({
-    expectedConsoleErrors: [
-      // Chromium and WebKit
-      /^Failed to load resource: net::ERR_INTERNET_DISCONNECTED$/,
-      // Firefox reports a dropped request as a CORS failure with no status.
-      /^\[JavaScript Error: "Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at https:\/\/api\.web3forms\.com\/submit\. \(Reason: CORS request did not succeed\)\. Status code: \(null\)\."\]$/,
-    ],
+    // Chromium and WebKit log a failed load; Firefox reports a dropped request as a CORS failure.
+    expectedConsoleError: new RegExp(
+      [
+        String.raw`^Failed to load resource: net::ERR_INTERNET_DISCONNECTED$`,
+        String.raw`^\[JavaScript Error: "Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at https://api\.web3forms\.com/submit\. \(Reason: CORS request did not succeed\)\. Status code: \(null\)\."\]$`,
+      ].join('|'),
+    ),
   });
 
   test.beforeEach(async ({ page }) => {
