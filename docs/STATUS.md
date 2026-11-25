@@ -51,9 +51,9 @@ are on the roadmap (SPEC §11).
 
 ## Known issues
 
-- One WebKit (iPhone 15) axe run on main misread the plain view h1 color as black (7cc043d); a rerun
-  passed and the screenshot showed correct colors. Watch for a repeat before treating it as flaky.
-
+- WebKit on the Linux CI runners kept flagging page `h1`s for contrast (axe read the inherited text as
+  black) in 19 of 20 runs; retries hid it. `fix/webkit-heading-contrast-flake` gives headings an explicit
+  color and makes contrast failures print the measured and computed colors.
 - GitHub Pages serves only the root `404.html`, so a missing page under a PR preview shows production's
   404 page.
 - Scorecard shows 8 findings (repo age, solo reviews, fuzzing, best-practices badge, early commits without
