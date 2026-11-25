@@ -4,6 +4,10 @@
 # Fragment links (#section) must point at a real id (lychee >= 0.24 takes a mode, not a boolean).
 include_fragments = "full"
 
+# Resolve directory links (`plain/`) to their page, so `plain/#contact` is checked against the
+# ids in plain/index.html. Without this, lychee looks for the fragment on the folder and fails.
+index_files = ["index.html"]
+
 # Retry flaky hosts instead of failing the build.
 max_retries = 3
 retry_wait_time = 2
