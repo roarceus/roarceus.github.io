@@ -169,15 +169,22 @@ Certifications,Awards,Updates,Contact}*.astro`, `src/components/ui/{StatusPill,T
       Contact), and links to every `/plain/` section; works without JS. The version line moved to the
       footer on every page (smoke still finds `build-version`).
 
-### Task 6: Project pages, updates, RSS (PR 4)
+### Task 6: Project pages, updates, RSS (PR 4) — done
 
-**Files:** Create `src/pages/projects/[slug].astro`, `src/pages/updates/index.astro`,
-`src/pages/updates/[slug].astro`, `src/pages/rss.xml.ts`, `tests/e2e/projects-updates.spec.ts`.
+**Files:** `src/pages/projects/[slug].astro`, `src/pages/updates/{index,[slug]}.astro`, `src/pages/rss.xml.ts`,
+`src/components/plain/UpdateDate.astro`, `src/lib/markdown/external-links.ts`, `src/lib/content/nodes.ts`,
+`productionUrl()` in `src/lib/utils/url.ts`, `getNodeLabel()` in queries, `tests/e2e/projects-updates.spec.ts`.
 
-- [ ] Failing e2e: every project slug has a page with status, node, tech, links (external links
-      `rel="noopener noreferrer"`); updates list newest first; each update page renders; `/rss.xml` is valid RSS
-      with absolute production links and is linked via `<link rel="alternate">`.
-- [ ] Add @astrojs/rss; implement pages from helpers.
+- [x] Failing e2e first: all 16 project pages return 200 from the plain view's Details links; a project page
+      shows status, dates, "Built at" (hidden when unscheduled), tech, links, and the description;
+      `/updates/` lists 9 updates newest first; update pages render with safe external links; `/rss.xml` is
+      RSS with 9 items and production links only; every page advertises the feed.
+- [x] Added @astrojs/rss 4.0.19 (Astro's official feed builder, MIT, build time only).
+- [x] Found: Astro 7's default Markdown processor (Sätteri) doesn't run rehype plugins. The external-links
+      step is a Sätteri hast plugin, configured with `satteri()` from `@astrojs/markdown-satteri` (already
+      installed by Astro, now declared directly). The deprecated `markdown.smartypants` flag became
+      `features.smartPunctuation: false`.
+- [x] Checked a preview-base build: feed links stay on production, page links use the preview path.
 
 ### Task 7: Contact form (PR 5)
 

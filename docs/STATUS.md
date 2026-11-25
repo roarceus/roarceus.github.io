@@ -8,9 +8,9 @@ _Last updated: 2026-11-24_
 [`plans/stage-1.md`](plans/stage-1.md) · [milestone](https://github.com/roarceus/roarceus.github.io/milestone/2)
 (#32–#40) · [board](https://github.com/users/roarceus/projects/1)
 
-- **Done:** schemas and helpers (#41), content and content review (#43). Release PR #42 (v0.2.0) stays
-  open until the stage ends.
-- **In progress:** PR 3, `/plain/` and the home hero (#35, #36). **Next:** project pages, updates, RSS.
+- **Done:** schemas and helpers (#41), content and review (#43), `/plain/` and home hero (#44). Release PR
+  #42 (v0.2.0) stays open until the stage ends.
+- **In progress:** PR 4, project pages, updates, RSS (#37). **Next:** contact form (needs the Web3Forms key).
 
 ## Stage 0 sign-off
 
@@ -49,6 +49,8 @@ _Last updated: 2026-11-24_
 
 ## Open questions
 
+- Plain view length: Sohan checked it on iOS Safari (no clipping) but finds it long. Revisit at Stage 2
+  (summary-first layout or collapsible sections), keeping it complete and printable.
 - Design direction: Sohan wants real flair (3D, gamey, fun, many components), not a generic terminal
   look. That conflicts with SPEC §5's "real tool look"; explore options at Stage 2 planning and update
   SPEC §5 via an ADR once a direction is chosen. Keep the mobile perf budget, plain view, and a11y.
