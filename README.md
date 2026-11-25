@@ -13,10 +13,10 @@ switch to a plain, recruiter-friendly view.
 
 ## Status
 
-**Stage 1 — Content and plain view (in progress, → v0.2.0).** Live is still the v0.1.0 placeholder.
-Done so far: content, the full plain portfolio at `/plain/`, a home hero, project pages, updates, and an
-RSS feed, a contact form, and search and share metadata (sitemap, share image, themed 404 page). Next: the
-stage wrap-up (Lighthouse on more pages, sign-off). Progress:
+**Stage 1 — Content and plain view (done, releasing as v0.2.0).** Live is still the v0.1.0 placeholder until
+the release PR merges. Stage 1 adds the content, the full plain portfolio at `/plain/`, a home hero, project
+pages, updates and an RSS feed, a contact form, and search and share metadata (sitemap, share image, themed
+404 page). Next: Stage 2, the design system and layout. Progress:
 [`docs/STATUS.md`](docs/STATUS.md) · [project board](https://github.com/users/roarceus/projects/1) ·
 [changelog](CHANGELOG.md) (from v0.1.0).
 
@@ -85,21 +85,21 @@ Build the way a PR preview does: `BASE_PATH=/pr-preview/pr-0/ pnpm build` (Git B
 
 ## Scripts
 
-| Script                                     | What it does                                                                    |
-| ------------------------------------------ | ------------------------------------------------------------------------------- |
-| `pnpm dev` / `pnpm build` / `pnpm preview` | Dev server / static build into `dist/` / serve `dist/`                          |
-| `pnpm typecheck`                           | `astro check` (TypeScript + Astro files)                                        |
-| `pnpm lint` / `pnpm lint:fix`              | ESLint: type-aware TypeScript, Astro, React, a11y, import order and cycles      |
-| `pnpm format` / `pnpm format:check`        | Prettier (with Astro and Tailwind class sorting)                                |
-| `pnpm knip`                                | Unused files, exports, and dependencies                                         |
-| `pnpm depcruise`                           | Dependency direction (`lib/` free of UI code, React, Astro) and no cycles       |
-| `pnpm test` / `pnpm test:watch`            | Unit tests (Vitest), including the hardcoded root path check                    |
-| `pnpm test:coverage`                       | Unit tests with coverage thresholds (`src/lib` ≥ 90%, overall ≥ 80%)            |
-| `pnpm test:e2e`                            | Playwright + axe on the built site; one engine: `--project="chromium-*"`        |
-| `pnpm test:visual`                         | Visual regression (baselines arrive in Stage 2)                                 |
-| `pnpm test:smoke`                          | Smoke tests against a deployed URL: `SMOKE_BASE_URL=https://…/ pnpm test:smoke` |
-| `pnpm lhci`                                | Lighthouse CI against `dist/` with the mobile budgets                           |
-| `pnpm check`                               | Format check, lint, typecheck, knip, depcruise, tests with coverage, build      |
+| Script                                     | What it does                                                                                      |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| `pnpm dev` / `pnpm build` / `pnpm preview` | Dev server / static build into `dist/` / serve `dist/`                                            |
+| `pnpm typecheck`                           | `astro check` (TypeScript + Astro files)                                                          |
+| `pnpm lint` / `pnpm lint:fix`              | ESLint: type-aware TypeScript, Astro, React, a11y, import order and cycles                        |
+| `pnpm format` / `pnpm format:check`        | Prettier (with Astro and Tailwind class sorting)                                                  |
+| `pnpm knip`                                | Unused files, exports, and dependencies                                                           |
+| `pnpm depcruise`                           | Dependency direction (`lib/` free of UI code, React, Astro) and no cycles                         |
+| `pnpm test` / `pnpm test:watch`            | Unit tests (Vitest), including the hardcoded root path check                                      |
+| `pnpm test:coverage`                       | Unit tests with coverage thresholds (`src/lib` ≥ 90%, overall ≥ 80%)                              |
+| `pnpm test:e2e`                            | Playwright + axe on the built site; one engine: `--project="chromium-*"`                          |
+| `pnpm test:visual`                         | Visual regression (baselines arrive in Stage 2)                                                   |
+| `pnpm test:smoke`                          | Smoke tests against a deployed URL: `SMOKE_BASE_URL=https://…/ pnpm test:smoke`                   |
+| `pnpm lhci`                                | Lighthouse CI against `dist/` (home, plain view, a project, updates, 404) with the mobile budgets |
+| `pnpm check`                               | Format check, lint, typecheck, knip, depcruise, tests with coverage, build                        |
 
 ## Project structure
 
@@ -142,16 +142,16 @@ flowchart LR
   tag --> deploy["deploy to gh-pages root"] --> smoke["smoke tests on production"]
 ```
 
-| Workflow        | Runs on             | What it does                                                                                                                                                                                                                                                                                                                                                                            |
-| --------------- | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ci.yml`        | PRs, `main`         | Format, lint, typecheck, knip, dependency rules, unit tests + coverage, `pnpm audit` (high, prod deps), build (also under a preview base path), Playwright + axe on Chromium, Firefox, and WebKit across desktop, phone, and tablet sizes, Lighthouse mobile budgets (perf ≥ 90, a11y/best practices/SEO ≥ 95), offline link check, dependency review. `ci-ok` passes only if all pass. |
-| `pr-title.yml`  | PRs                 | PR title is a Conventional Commit with an allowed type and scope, ≤ 72 chars (it becomes the squash commit). Adds `type:` and `area:` labels.                                                                                                                                                                                                                                           |
-| `preview.yml`   | PRs                 | Builds under `/pr-preview/pr-<N>/`, deploys to `gh-pages`, comments the URL, smoke-tests it, removes it on close.                                                                                                                                                                                                                                                                       |
-| `release.yml`   | `main`, manual      | release-please (GitHub App token) keeps a release PR open; merging it tags, deploys production, and smoke-tests it. Manual run with a tag = rollback.                                                                                                                                                                                                                                   |
-| `codeql.yml`    | PRs, `main`, weekly | CodeQL security and quality queries (JavaScript/TypeScript).                                                                                                                                                                                                                                                                                                                            |
-| `scorecard.yml` | `main`, weekly      | OpenSSF Scorecard supply-chain checks (Security tab and badge).                                                                                                                                                                                                                                                                                                                         |
-| `scheduled.yml` | weekly, quarterly   | Smoke tests, external links, and Lighthouse against production; a failure opens one `ops` issue that closes itself on recovery. Quarterly content-review issue.                                                                                                                                                                                                                         |
-| `labels.yml`    | `main`, manual      | Syncs labels from `.github/labels.yml`.                                                                                                                                                                                                                                                                                                                                                 |
+| Workflow        | Runs on             | What it does                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| --------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ci.yml`        | PRs, `main`         | Format, lint, typecheck, knip, dependency rules, unit tests + coverage, `pnpm audit` (high, prod deps), build (also under a preview base path), Playwright + axe on Chromium, Firefox, and WebKit across desktop, phone, and tablet sizes, Lighthouse mobile budgets on home, the plain view, a project page, updates, and the 404 page (perf ≥ 90, a11y/best practices/SEO ≥ 95; the noindex 404 page skips only the indexing audit), offline link check, dependency review. `ci-ok` passes only if all pass. |
+| `pr-title.yml`  | PRs                 | PR title is a Conventional Commit with an allowed type and scope, ≤ 72 chars (it becomes the squash commit). Adds `type:` and `area:` labels.                                                                                                                                                                                                                                                                                                                                                                  |
+| `preview.yml`   | PRs                 | Builds under `/pr-preview/pr-<N>/`, deploys to `gh-pages`, comments the URL, smoke-tests it, removes it on close.                                                                                                                                                                                                                                                                                                                                                                                              |
+| `release.yml`   | `main`, manual      | release-please (GitHub App token) keeps a release PR open; merging it tags, deploys production, and smoke-tests it. Manual run with a tag = rollback.                                                                                                                                                                                                                                                                                                                                                          |
+| `codeql.yml`    | PRs, `main`, weekly | CodeQL security and quality queries (JavaScript/TypeScript).                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `scorecard.yml` | `main`, weekly      | OpenSSF Scorecard supply-chain checks (Security tab and badge).                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `scheduled.yml` | weekly, quarterly   | Smoke tests, external links, and Lighthouse against production; a failure opens one `ops` issue that closes itself on recovery. Quarterly content-review issue.                                                                                                                                                                                                                                                                                                                                                |
+| `labels.yml`    | `main`, manual      | Syncs labels from `.github/labels.yml`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 
 Required status checks on `main`: **`ci-ok`** and **`validate`**. All actions are pinned to commit SHAs
 and every job declares least-privilege permissions.

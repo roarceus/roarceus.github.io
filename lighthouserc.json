@@ -1,8 +1,15 @@
 {
-  "$comment": "Lighthouse CI budgets (SPEC §10 Tests), shared by CI (pnpm lhci, against dist/) and the weekly production check (--collect.url). Default form factor is mobile with throttling. The 404 and thank-you pages are noindex on purpose, which always fails Lighthouse's is-crawlable audit, so for them the SEO category is replaced by its other audits; every other budget is the same.",
+  "$comment": "Lighthouse CI budgets (SPEC §10 Tests), shared by CI (pnpm lhci, against dist/) and the weekly production check (--collect.url). Default form factor is mobile with throttling. CI audits the URLs below on the local dist/ server (lhci swaps in its port); the weekly check passes the production URL instead. The 404 and thank-you pages are noindex on purpose, which always fails Lighthouse's is-crawlable audit, so for them the SEO category is replaced by its other audits; every other budget is the same.",
   "ci": {
     "collect": {
-      "numberOfRuns": 3
+      "numberOfRuns": 3,
+      "url": [
+        "http://localhost/index.html",
+        "http://localhost/plain/index.html",
+        "http://localhost/projects/asktrace/index.html",
+        "http://localhost/updates/index.html",
+        "http://localhost/404.html"
+      ]
     },
     "assert": {
       "assertMatrix": [
