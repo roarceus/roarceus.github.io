@@ -203,17 +203,20 @@ script lives in the component; no new `src/scripts/` folder), `src/pages/contact
 - [x] Tests that cause a failed request opt in to the browser's own "Failed to load resource" console
       error with an exact pattern; every other console error still fails the test.
 
-### Task 8: SEO, sitemap, 404 (PR 6)
+### Task 8: SEO, sitemap, 404 (PR 6) — done
 
 **Files:** Create `src/components/layout/SeoHead.astro`, `src/pages/404.astro`, `tests/e2e/seo.spec.ts`.
 Modify `astro.config.mjs` (sitemap), `public/robots.txt` → `src/pages/robots.txt.ts`, `BaseLayout.astro`.
 
-- [ ] Failing e2e: every page has unique title/description, canonical to production, OG/Twitter tags, JSON-LD
+- [x] Failing e2e: every page has unique title/description, canonical to production, OG/Twitter tags, JSON-LD
       `Person` on `/` and `/plain/`; preview build is `noindex` and has no sitemap (D6); `/sitemap-index.xml`
       lists every page and nothing under `pr-preview/`; robots.txt points at it.
-- [ ] Failing e2e: unknown path shows `Error from server (NotFound): page "<path>" not found` with links home,
+- [x] Failing e2e: unknown path shows `Error from server (NotFound): page "<path>" not found` with links home,
       under the preview base too (Pages serves `404.html` only at the site root: document the preview limitation).
-- [ ] Add @astrojs/sitemap; implement.
+- [x] Add @astrojs/sitemap 3.7.6; implement. Also: `src/lib/seo/meta.ts` (+ unit tests), a static share
+      image `public/og-image.png` (source `docs/assets/og-image.html`, runbook `share-image.md`),
+      `/contact/thanks/` is noindex and out of the sitemap. Checked a preview-base build: noindex, no
+      sitemap, canonical and image on production.
 
 ### Task 9: Stage wrap-up (PR 7)
 
