@@ -8,8 +8,8 @@ _Last updated: 2026-11-24_
 [`plans/stage-1.md`](plans/stage-1.md) · [milestone](https://github.com/roarceus/roarceus.github.io/milestone/2)
 (#32–#40) · [board](https://github.com/users/roarceus/projects/1)
 
-- **In progress:** PR 1, content schemas and query helpers (#32, #33).
-- **Next:** PR 2 content extraction + `docs/content-review.md` (#34); then `/plain/` and the home hero.
+- **Done:** PR 1 schemas and query helpers (#41). Release PR #42 (v0.2.0) stays open until the stage ends.
+- **In progress:** PR 2, content + `docs/content-review.md` (#34). **Next:** `/plain/` and the home hero.
 
 ## Stage 0 sign-off
 

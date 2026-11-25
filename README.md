@@ -14,7 +14,7 @@ switch to a plain, recruiter-friendly view.
 ## Status
 
 **Stage 1 — Content and plain view (in progress, → v0.2.0).** Live is still the v0.1.0 placeholder.
-Done so far: content schemas and query helpers. Next: the content itself, then `/plain/`. Progress:
+Done so far: content schemas, query helpers, and the content itself. Next: `/plain/` and the home hero. Progress:
 [`docs/STATUS.md`](docs/STATUS.md) · [project board](https://github.com/users/roarceus/projects/1) ·
 [changelog](CHANGELOG.md) (from v0.1.0).
 

@@ -58,7 +58,7 @@ Web3Forms (contact), Vitest, Playwright + axe, Lighthouse CI.
   so Astro renders the body natively and we add no Markdown dependency. The rest are YAML.
 - **D3 Nodes.** A node is declared by the `node` field of an `experience` or `education` entry:
   `capgemini`, `mastercontrol` (work), `northeastern` (Master's, plus the TA role as its own `experience`
-  entry with `type: teaching`), and `mumbai` (Bachelor's, for the 2019–21 projects). `mumbai` is a fourth node
+  entry with `type: teaching`), `mumbai` (Bachelor's, for the 2019–21 projects), and `sparks-foundation` (2020 internship, added in PR 2). `mumbai` is a fourth node
   beyond SPEC §7's three; PR 1 updates §7. A project's `node` is optional: the portfolio itself runs on no
   past org, so it's unscheduled for now and Stage 4 decides how the map shows it.
 - **D4 `/` in Stage 1.** Pre-rendered hero (name, title, tagline, links to every `/plain/` section, Resume,
@@ -128,20 +128,23 @@ first), `getAchievements()`, `getUpdates()` (newest first, no drafts); `formatYe
 - [x] Coverage: `src/lib/content` 98% lines / 93% branches.
 - Deferred to Stage 3 (YAGNI until commands need them): `getTimeline()` and a kubectl-style `AGE` helper.
 
-### Task 3: Content extraction and review (PR 2)
+### Task 3: Content extraction and review (PR 2) — done
 
-**Files:** Create `src/content/**` entries, `docs/content-review.md`. Modify `docs/content-guide.md`,
-`docs/runbooks/adding-content.md`.
+**Files:** `src/content/**` (1 profile, 4 roles, 2 degrees, 16 projects, 5 skill groups, 2 certs, 4 awards,
+10 updates), `docs/content-review.md`; updated `docs/content-guide.md`, `docs/runbooks/adding-content.md`,
+SPEC §6 (CKAD) and §7 (nodes).
 
-- [ ] Map `roarceus/portfolio` `public/data/sections/*.json` into collections, applying SPEC §6 current facts
-      (current facts win). Scope per answers A1, A2, A4, A5; add the portfolio itself as a project.
-- [ ] PromotionBot and BoringBot aren't on the old site: details from SPEC only, gaps as `TODO(sohan)`.
-- [ ] `docs/content-review.md`: every outdated, conflicting, missing, vague, or metric-less item (known so far:
-      Northeastern dates 2024-01–2025-12 on the old site vs. "graduated spring 2026"; old bio says "TypeScript,
-      Python and Go" vs. current "TypeScript, Python, some Java"; location Boston → Santa Clara; askTRACE
-      and AWS IaaS repo links point at org/profile pages; no dates for most projects; Northeastern TA has no entry).
-- [ ] Fill in `docs/content-guide.md` (fields, file locations, how to add each type) and the runbook.
-- [ ] Remove the PR 1 fixture seed. Closes #30 (A8).
+- [x] Mapped the old site's `public/data/sections/*.json` with current facts winning; scope per A1, A2, A4,
+      A5; the portfolio itself is a featured, unscheduled project.
+- [x] The two MasterControl tools: details from Sohan; public names only ("Deployment gating bot",
+      "AI migration agent framework"), never the internal names.
+- [x] Found on the old site and kept: a 2020 **Web Development Intern** role at The Sparks Foundation, which
+      becomes a fifth node (`sparks-foundation`) running Credit Management System. Flagged for Sohan.
+- [x] `docs/content-review.md`: must-answer items (dates, degree names, locations, Sparks, bots,
+      SafeHaven), numbers wanted, and the conflicts current facts resolved.
+- [x] Content guide writing rules and the adding-content runbook filled in. Closes #30 (A8).
+- [x] Verified with a throwaway page: every query loads in the expected order, and a project on an unknown
+      node fails the build with the integrity message.
 
 ### Task 4: Plain view sections (PR 3)
 
@@ -219,7 +222,7 @@ Modify `astro.config.mjs` (sitemap), `public/robots.txt` → `src/pages/robots.t
 ## Answers (2026-11-24)
 
 - **A1 Projects:** featured = askTRACE, this portfolio (`roarceus-github-io`), SafeHaven (featured for now;
-  "maybe", flagged in content review). Everything else non-featured: AWS IaaS, PromotionBot, BoringBot,
+  "maybe", flagged in content review). Everything else non-featured: AWS IaaS, the two MasterControl tools,
   Grade Calculator, HuskyHub, Book Review System, and the 2019–21 web projects (travel site, maps clone,
   analog clock, both meeting-notes apps, credit management, Kounsellor).
 - **A2 Contact details:** email, GitHub, LinkedIn. No phone, no Instagram.

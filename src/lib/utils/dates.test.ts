@@ -17,12 +17,12 @@ describe('formatYearMonth', () => {
 });
 
 describe('formatRange', () => {
-  it('joins start and end with an en dash', () => {
-    expect(formatRange('2025-06', '2025-12')).toBe('Jun 2025 – Dec 2025');
+  it('joins start and end with a plain hyphen', () => {
+    expect(formatRange('2025-06', '2025-12')).toBe('Jun 2025 - Dec 2025');
   });
 
   it('shows Present for open-ended ranges', () => {
-    expect(formatRange('2021-05', 'present')).toBe('May 2021 – Present');
+    expect(formatRange('2021-05', 'present')).toBe('May 2021 - Present');
   });
 
   it('collapses a single-month range', () => {

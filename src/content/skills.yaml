@@ -1,1 +1,80 @@
-[]
+# kubectl top skills reads these. Levels are 1 to 5 and optional (no level means no bar).
+- id: languages
+  category: Languages
+  order: 1
+  items:
+    - name: TypeScript
+      level: 4
+    - name: Python
+      level: 4
+    - name: JavaScript
+      level: 4
+    - name: Java
+    - name: Go
+      level: 3
+    - name: Bash
+      level: 3
+    - name: SQL
+      level: 3
+- id: cloud-devops
+  category: Cloud and DevOps
+  order: 2
+  items:
+    - name: Kubernetes
+      level: 4
+    - name: Docker
+      level: 4
+    - name: Helm
+      level: 4
+    - name: Argo CD
+      level: 3
+    - name: Terraform
+      level: 4
+    - name: AWS
+      level: 4
+    - name: GCP
+      level: 3
+    - name: Jenkins
+      level: 3
+    - name: GitHub Actions
+      level: 4
+    - name: Artifactory
+    - name: Gradle
+    - name: Kafka
+      level: 3
+- id: backend-data
+  category: Back end and data
+  order: 3
+  items:
+    - name: Node.js
+      level: 4
+    - name: Express.js
+    - name: PostgreSQL
+      level: 3
+    - name: Redis
+    - name: MySQL
+    - name: MongoDB
+    - name: PHP
+- id: frontend
+  category: Front end
+  order: 4
+  items:
+    - name: React
+      level: 3
+    - name: Next.js
+    - name: HTML
+    - name: CSS
+    - name: Sass
+    - name: Tailwind CSS
+    - name: Bootstrap
+- id: ai-tooling
+  category: AI and tooling
+  order: 5
+  items:
+    - name: LangGraph
+      level: 3
+    - name: Claude Code
+      level: 4
+    - name: RAG
+    - name: Git
+    - name: Cypress

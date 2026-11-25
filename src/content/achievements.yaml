@@ -1,1 +1,22 @@
-[]
+- id: labs-intern-award
+  title: Labs Intern Award
+  org: MasterControl
+  date: 2025-12
+  description: Recognized for outstanding contributions and performance during my DevOps co-op.
+- id: star-award
+  title: Star Award
+  org: Capgemini
+  date: 2022-05
+  description: Recognized for innovative work optimizing front-end and back-end systems.
+- id: best-final-year-project
+  title: Best Final Year Project
+  org: University of Mumbai
+  date: 2020-10
+  description: >-
+    A machine learning model for price prediction with blockchain-based payments.
+  link: https://github.com/roarceus/nayamandi
+- id: sciencefest-first-place
+  title: 1st Place, ScienceFest
+  org: University of Mumbai
+  date: 2017-02
+  description: Built a heartbeat monitor that took first place at the undergraduate science fest.
