@@ -142,8 +142,11 @@ and the source for a future OG refresh.
 ### 4.5 Top bar (`src/components/layout/TopBar.astro`, replaces `SiteHeader`)
 
 ```
-≥ 640px  [mark] sohan-cluster (Ready) v0.3.0          [Plain view] [Resume] [Contact]
+≥ 1024px [mark] sohan-cluster (Ready) v0.3.0      [icon Plain view] [icon Resume] [icon Contact]
+≥ 768px  [mark] sohan-cluster (Ready) v0.3.0          [Plain view] [Resume] [Contact]
+≥ 640px  [mark] sohan-cluster                         [Plain view] [Resume] [Contact]
 < 640px  [mark] sohan                                  [Plain] [Resume] [Contact]
+< 360px  [mark]                                        [Plain] [Resume] [Contact]
 ```
 
 - **Left:**
@@ -151,7 +154,9 @@ and the source for a future OG refresh.
   - a "Ready" StatusPill;
   - the version from `buildInfo`, muted.
 
-  Below 640px the pill and version hide, and the name shortens to `sohan`.
+  The pill and version show from 768px, the name shortens to `sohan` below 640px, and below 360px only
+  the mark shows (the link keeps its name for screen readers), so the bar stays on one row at 320px
+  (measured in PR 4).
 
 - **Right, always visible:**
   - the view switch: `Plain view` on `/`; `Cluster view` on `/plain/` when the flag is on, otherwise

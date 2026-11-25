@@ -41,7 +41,7 @@ Everything stays reachable without typing (clickable map, command chips, plain v
 ## Tech stack
 
 Astro 7 (static output) · React 19 islands · TypeScript 6 (strict) · Tailwind CSS 4 with CSS-variable
-design tokens · self-hosted Inter and JetBrains Mono (Fontsource) · Vitest 5 · Playwright 1.65 + axe ·
+design tokens · self-hosted Inter and JetBrains Mono (Fontsource) · Lucide icons · Vitest 5 · Playwright 1.65 + axe ·
 Lighthouse CI · GitHub Pages. Choices and version pins: [ADR-0001](docs/adr/0001-stack-and-tooling.md).
 
 ## Architecture
@@ -109,7 +109,7 @@ Build the way a PR preview does: `BASE_PATH=/pr-preview/pr-0/ pnpm build` (Git B
 docs/           SPEC, STATUS, plans, ADRs, runbooks, postmortems, content guide
 public/         served as-is: favicon, resume, share image (og-image.png), .nojekyll
 src/
-  components/   layout/ (header, footer, SEO head tags), plain/ (plain view sections), ui/ (button, chip, panel,
+  components/   layout/ (top bar and site mark, footer, SEO head tags), plain/ (plain view sections), ui/ (button, chip, panel,
                 kubectl table, expander, status pill, tags, links; shared class recipes in recipes.ts)
   config/       site metadata, build info (version + commit), feature flags
   content/      portfolio content (YAML + Markdown); schemas registered in content.config.ts
