@@ -1,8 +1,8 @@
 ---
 name: Sohan Patil
 title: Software Engineer (DevOps, Cloud, Full Stack)
-location: Santa Clara, CA
-tagline: I build CI/CD and Kubernetes tooling. Most recently, a deploy gate for 60+ repos and AI agents that migrated 55 Java services.
+location: San Francisco Bay Area
+tagline: I build backend services, CI/CD pipelines, and Kubernetes tooling.
 links:
   github: https://github.com/roarceus
   linkedin: https://www.linkedin.com/in/sohanpatil98/
@@ -20,4 +20,4 @@ where I focused on DevOps and cloud. During the Master's I did a DevOps co-op at
 deployment tooling and an AI agent setup that migrated dozens of services. After that I was a TA for
 Northeastern's cloud computing course.
 
-I live in Santa Clara now. I'm looking for my next role and studying for the CKA and CKAD.
+I'm in the San Francisco Bay Area now. I'm looking for my next role and studying for the CKA and CKAD.

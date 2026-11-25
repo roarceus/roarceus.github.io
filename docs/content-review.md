@@ -12,8 +12,6 @@ Sohan's answers (2026-11-25). Nothing is invented: unknowns stay `TODO(sohan)` o
       Travel Website, Analog Clock, and Book Review System ("older than 2024"). Five of them sit on the
       `mumbai` node (assumed Bachelor's era); Book Review System and Meeting Notes (React) have no node.
       Fine as is, or do you know any of them?
-- [ ] **New profile tagline:** "I build CI/CD and Kubernetes tooling. Most recently, a deploy gate for 60+
-      repos and AI agents that migrated 55 Java services." Keep, or reword?
 
 ## Answered (2026-11-25)
 
@@ -34,12 +32,13 @@ Sohan's answers (2026-11-25). Nothing is invented: unknowns stay `TODO(sohan)` o
       `serverless`).
 - [x] Grade Calculator Jan to Apr 2025; HuskyHub Jan to Apr 2024.
 - [x] Skill levels (1 to 5) set for the 21 skills Sohan rated; the rest show no bar.
-- [x] Title kept, written without the middle dot.
+- [x] Title kept, written without the middle dot. Tagline shortened to cover backend too: "I build backend
+      services, CI/CD pipelines, and Kubernetes tooling." Location shown as "San Francisco Bay Area".
 
 ## Conflicts resolved by current facts (FYI)
 
 - Old bio said "TypeScript, Python and Go"; now "TypeScript and Python, some Java".
-- Old location Boston, MA, is now Santa Clara, CA. Old "currently pursuing a Master's" is now graduated.
+- Old location Boston, MA, is now the San Francisco Bay Area. Old "currently pursuing a Master's" is now graduated.
 - MasterControl "DevOps Intern" (old update) is now "DevOps Engineer (Co-op)".
 - Old capabilities blurbs, "fun facts", spoken languages, testimonials, phone, Instagram, and the 2020
   Coursera certificates are dropped (answers A2 to A5).
