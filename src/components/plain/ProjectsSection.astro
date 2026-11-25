@@ -1,9 +1,11 @@
 ---
+import Expander from '@/components/ui/Expander.astro';
 import ExternalLink from '@/components/ui/ExternalLink.astro';
 import StatusPill from '@/components/ui/StatusPill.astro';
 import TagList from '@/components/ui/TagList.astro';
 import { getProjects } from '@/lib/content/queries';
 import { formatRange } from '@/lib/utils/dates';
+import { moreLabel } from '@/lib/utils/plural';
 import { url } from '@/lib/utils/url';
 
 import Section from './Section.astro';
@@ -44,28 +46,30 @@ const linkClass = 'inline-flex min-h-11 items-center';
     ))}
   </ul>
 
-  <h3 class="mt-10 mb-4 font-mono text-base font-semibold text-text">More projects</h3>
-  <ul role="list" aria-label="More projects" class="flex flex-col divide-y divide-border">
-    {more.map(({ id, data }) => (
-      <li class="flex flex-col gap-1 py-3">
-        <p class="flex flex-wrap items-baseline gap-x-3">
-          <span class="font-semibold text-text">{data.name}</span>
-          {data.start && (
-            <span class="font-mono text-xs text-text-muted">{formatRange(data.start, data.end)}</span>
-          )}
-        </p>
-        <p class="text-text-muted">{data.tagline}</p>
-        <p class="flex flex-wrap gap-x-5 font-mono text-sm">
-          <a href={url(`projects/${id}/`)} class:list={['link', linkClass]}>
-            Details<span class="sr-only"> on {data.name}</span>
-          </a>
-          {data.links.repo && (
-            <ExternalLink href={data.links.repo} class={linkClass}>
-              Source<span class="sr-only"> for {data.name}</span>
-            </ExternalLink>
-          )}
-        </p>
-      </li>
-    ))}
-  </ul>
+  <h3 class="mt-8 mb-2 font-mono text-base font-semibold text-text">More projects</h3>
+  <Expander summary={moreLabel(more.length, 'project', 'projects')}>
+    <ul role="list" aria-label="More projects" class="flex flex-col divide-y divide-border">
+      {more.map(({ id, data }) => (
+        <li class="flex flex-col gap-1 py-3">
+          <p class="flex flex-wrap items-baseline gap-x-3">
+            <span class="font-semibold text-text">{data.name}</span>
+            {data.start && (
+              <span class="font-mono text-xs text-text-muted">{formatRange(data.start, data.end)}</span>
+            )}
+          </p>
+          <p class="text-text-muted">{data.tagline}</p>
+          <p class="flex flex-wrap gap-x-5 font-mono text-sm">
+            <a href={url(`projects/${id}/`)} class:list={['link', linkClass]}>
+              Details<span class="sr-only"> on {data.name}</span>
+            </a>
+            {data.links.repo && (
+              <ExternalLink href={data.links.repo} class={linkClass}>
+                Source<span class="sr-only"> for {data.name}</span>
+              </ExternalLink>
+            )}
+          </p>
+        </li>
+      ))}
+    </ul>
+  </Expander>
 </Section>

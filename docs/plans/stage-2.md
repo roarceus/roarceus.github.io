@@ -205,7 +205,7 @@ Stages 8 to 10), `docs/plans/stage-2-design.md`, this plan, `docs/STATUS.md`.
   - `Chip` renders a link with the recipe classes.
 - [x] `pnpm check` green; commit `feat(ui): add ui primitives`.
 
-### Task 4: Top bar and site mark (PR 4)
+### Task 4: Top bar and site mark (PR 4) — done (#61)
 
 **Files:**
 
@@ -245,7 +245,7 @@ Stages 8 to 10), `docs/plans/stage-2-design.md`, this plan, `docs/STATUS.md`.
 
 **Files:**
 
-- Create: `src/components/plain/JumpChips.astro`, with an inline script that marks the current section.
+- Create: `src/components/plain/JumpChips.astro` (replaces `SectionNav`: one responsive nav), with an inline script that marks the current section.
   The print expander script is inline in `Expander.astro`.
 - Modify: `src/pages/plain/index.astro`, `SectionNav.astro`, `ExperienceSection.astro`,
   `ProjectsSection.astro`, `UpdatesSection.astro`, `Section.astro`, `global.css` (print rules).
@@ -259,8 +259,8 @@ Stages 8 to 10), `docs/plans/stage-2-design.md`, this plan, `docs/STATUS.md`.
 
 **Steps:**
 
-- [ ] **Unit test first** for `moreLabel` (0 throws, 1 is singular, 13 is plural). Implement.
-- [ ] **Failing e2e first:**
+- [x] **Unit test first** for `moreLabel` (0 throws, 1 is singular, 13 is plural). Implement.
+- [x] **Failing e2e first:**
   - Below 1024px, a `navigation` named "On this page" stays in view after scrolling 2000px. At 1024px and
     up, the sidebar does instead.
   - Clicking `Projects` puts `#projects`' heading top at or below the jump bar's bottom edge, and that link
@@ -273,9 +273,9 @@ Stages 8 to 10), `docs/plans/stage-2-design.md`, this plan, `docs/STATUS.md`.
   - `emulateMedia({ media: 'print' })` in Chromium: hidden highlights and projects are visible, the summary
     and jump bar are hidden.
   - axe passes; no overflow at 320px.
-- [ ] **Implement** per design doc §4.7. The scripts are progressive: without JS the links and expanders
+- [x] **Implement** per design doc §4.7. The scripts are progressive: without JS the links and expanders
       still work. `scroll-margin-top: var(--jumpbar-h)` on sections.
-- [ ] Tests green; `pnpm check` and `pnpm lhci` green; check widths; commit
+- [x] Tests green; `pnpm check` and `pnpm lhci` green; check widths; commit
       `feat(plain): add jump chips and expanders to the plain view`.
 
 ### Task 6: Cluster data and flags (PR 6)

@@ -200,4 +200,11 @@
   li {
     break-inside: avoid;
   }
+
+  /* Folded content prints open (design doc §4.7); Expander's beforeprint script covers browsers
+     without ::details-content. */
+  details::details-content {
+    content-visibility: visible;
+    display: block;
+  }
 }
