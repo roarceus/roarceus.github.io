@@ -8,6 +8,8 @@ links:
   repo: https://github.com/roarceus/HuskyHub
 featured: false
 order: 8
+start: 2024-01
+end: 2024-04
 ---
 
 A Java Swing application backed by DB4O, built as a collaborative system that supports students'

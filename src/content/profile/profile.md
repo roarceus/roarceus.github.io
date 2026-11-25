@@ -1,8 +1,8 @@
 ---
 name: Sohan Patil
-title: Software Engineer · DevOps, Cloud, Full Stack
+title: Software Engineer (DevOps, Cloud, Full Stack)
 location: Santa Clara, CA
-tagline: I build cloud infrastructure, CI/CD pipelines, and the full-stack apps that run on them.
+tagline: I build CI/CD and Kubernetes tooling. Most recently, a deploy gate for 60+ repos and AI agents that migrated 55 Java services.
 links:
   github: https://github.com/roarceus
   linkedin: https://www.linkedin.com/in/sohanpatil98/
@@ -11,12 +11,13 @@ resume: resume.pdf
 openToWork: true
 ---
 
-I'm a software engineer with about three years of experience across the stack, working mostly in
-TypeScript and Python (and some Java), with React on the front end.
+I'm a software engineer with about three years of experience. I mostly write TypeScript and Python, some
+Java, and React on the front end.
 
-At **Capgemini** I built Node.js APIs and React dashboards for a medical imaging system used in heart
-procedures. I then did a **Master's at Northeastern University** focused on DevOps and application
-development, spent a co-op as a **DevOps Engineer at MasterControl** building deployment automation and
-AI-assisted tooling, and was a teaching assistant for Northeastern's cloud computing course.
+I started at Capgemini in Mumbai, building Node.js APIs and React dashboards for a medical imaging system
+used in heart procedures. In 2024 I moved to Boston for a Master's in Information Systems at Northeastern,
+where I focused on DevOps and cloud. During the Master's I did a DevOps co-op at MasterControl, building
+deployment tooling and an AI agent setup that migrated dozens of services. After that I was a TA for
+Northeastern's cloud computing course.
 
-I'm now based in the Bay Area, looking for my next role, and studying for the CKA and CKAD.
+I live in Santa Clara now. I'm looking for my next role and studying for the CKA and CKAD.

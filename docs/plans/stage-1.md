@@ -136,7 +136,8 @@ SPEC §6 (CKAD) and §7 (nodes).
 
 - [x] Mapped the old site's `public/data/sections/*.json` with current facts winning; scope per A1, A2, A4,
       A5; the portfolio itself is a featured, unscheduled project.
-- [x] PromotionBot and BoringBot: one line each from SPEC; details requested in the review.
+- [x] The two MasterControl tools: details from Sohan; public names only ("Deployment gating bot",
+      "AI migration agent framework"), never the internal names.
 - [x] Found on the old site and kept: a 2020 **Web Development Intern** role at The Sparks Foundation, which
       becomes a fifth node (`sparks-foundation`) running Credit Management System. Flagged for Sohan.
 - [x] `docs/content-review.md`: must-answer items (dates, degree names, locations, Sparks, bots,
@@ -221,7 +222,7 @@ Modify `astro.config.mjs` (sitemap), `public/robots.txt` → `src/pages/robots.t
 ## Answers (2026-11-24)
 
 - **A1 Projects:** featured = askTRACE, this portfolio (`roarceus-github-io`), SafeHaven (featured for now;
-  "maybe", flagged in content review). Everything else non-featured: AWS IaaS, PromotionBot, BoringBot,
+  "maybe", flagged in content review). Everything else non-featured: AWS IaaS, the two MasterControl tools,
   Grade Calculator, HuskyHub, Book Review System, and the 2019–21 web projects (travel site, maps clone,
   analog clock, both meeting-notes apps, credit management, Kounsellor).
 - **A2 Contact details:** email, GitHub, LinkedIn. No phone, no Instagram.
