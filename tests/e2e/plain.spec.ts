@@ -157,6 +157,15 @@ test.describe('plain view, shortened', () => {
     }
   });
 
+  test('marks the section a direct link lands on', async ({ page }) => {
+    await page.goto('./plain/#projects');
+    await expect(
+      page
+        .getByRole('navigation', { name: 'On this page' })
+        .getByRole('link', { name: 'Projects', exact: true }),
+    ).toHaveAttribute('aria-current', 'location');
+  });
+
   test('moves the current-section mark as the page scrolls', async ({ page }) => {
     const nav = page.getByRole('navigation', { name: 'On this page' });
     for (const name of ['Skills', 'Updates', 'Projects'] as const) {
