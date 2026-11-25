@@ -21,7 +21,8 @@ const BUTTON_BASE = [
 ].join(' ');
 
 const BUTTON_VARIANTS = {
-  primary: 'bg-accent text-on-accent hover:bg-accent-soft',
+  // Hover keeps the fill: white on --accent-soft would drop below AA.
+  primary: 'bg-accent text-on-accent hover:underline',
   secondary: 'border border-border-strong text-text hover:border-accent-soft hover:text-accent-soft',
   ghost: 'text-text hover:text-accent-soft',
 } as const;

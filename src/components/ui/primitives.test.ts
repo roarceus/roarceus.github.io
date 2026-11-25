@@ -99,6 +99,11 @@ describe('Panel', () => {
     expect(html).toMatch(/id="details-h"[^>]*>\s*Details/);
   });
 
+  it('never points aria-labelledby at a label that is not rendered', async () => {
+    const html = await render(Panel, { as: 'section', labelledBy: 'missing' }, { default: 'x' });
+    expect(html).not.toContain('aria-labelledby');
+  });
+
   it('is a plain div by default, without an empty header', async () => {
     const html = await render(Panel, {}, { default: 'x' });
     expect(html).toMatch(/^<div/);

@@ -9,6 +9,12 @@ describe('ui recipes', () => {
     expect(classes(button('primary'))).toEqual(expect.arrayContaining(['bg-accent', 'text-on-accent']));
   });
 
+  it('keeps the accent fill on hover so the white label stays at AA', () => {
+    const primary = classes(button('primary'));
+    expect(primary.filter((c) => c.startsWith('hover:bg-'))).toEqual([]);
+    expect(primary).toContain('hover:underline');
+  });
+
   it('outlines secondary buttons with the control border (3:1)', () => {
     expect(classes(button('secondary'))).toContain('border-border-strong');
   });

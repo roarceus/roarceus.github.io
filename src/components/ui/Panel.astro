@@ -14,9 +14,11 @@ interface Props {
 
 const { as: Tag = 'div', label, meta, labelledBy, class: className } = Astro.props;
 const hasHeader = label !== undefined || meta !== undefined;
+// Only reference the header label when it is actually rendered.
+const ariaLabelledBy = label !== undefined ? labelledBy : undefined;
 ---
 
-<Tag aria-labelledby={labelledBy} class:list={[panel(), 'flex flex-col', className]}>
+<Tag aria-labelledby={ariaLabelledBy} class:list={[panel(), 'flex flex-col', className]}>
   {hasHeader && (
     <header class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-border px-4 py-3 font-mono text-sm text-text-muted">
       {label !== undefined && (
