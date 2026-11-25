@@ -1,0 +1,87 @@
+---
+// Always-visible simple controls on every page (SPEC §4, design doc §4.5): the mark and cluster name
+// (home), cluster status and version from 768px, and the view switch, Resume, and Contact as text
+// at every width, on one row from 320px up. Icons join from 1024px. Not sticky, so it never eats
+// vertical space; hidden in print.
+import FileText from '@lucide/astro/icons/file-text';
+import House from '@lucide/astro/icons/house';
+import LayoutList from '@lucide/astro/icons/layout-list';
+import Mail from '@lucide/astro/icons/mail';
+
+import { button, focusRing, target } from '@/components/ui/recipes';
+import StatusPill from '@/components/ui/StatusPill.astro';
+import { buildInfo } from '@/config/build-info';
+import { getProfile } from '@/lib/content/queries';
+import { url } from '@/lib/utils/url';
+
+import SiteMark from './SiteMark.astro';
+
+interface Props {
+  /** Which view the page is: the cluster home, the plain view, or any other page. */
+  view?: 'cluster' | 'plain' | 'page';
+}
+
+const { view = 'page' } = Astro.props;
+const { data: profile } = await getProfile();
+
+// On the plain view the switch goes home; everywhere else it goes to the plain view. Task 7 turns
+// the plain view's link into "Cluster view" once the dashboard flag is on.
+const viewLink =
+  view === 'plain'
+    ? { href: url(), full: 'Home', short: 'Home', Icon: House }
+    : { href: url('plain/'), full: 'Plain view', short: 'Plain', Icon: LayoutList };
+
+// Compact padding below 640px so the three controls and the name fit at 320px.
+const compact = 'max-sm:gap-1.5 max-sm:px-2.5';
+const icon = 'size-4 max-lg:hidden';
+---
+
+<header class="border-b border-border print:hidden">
+  <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-3 gap-y-1 px-4 py-1.5 sm:px-8">
+    <div class="flex min-w-0 items-center gap-3">
+      <a
+        href={url()}
+        class:list={[
+          '-ml-2 inline-flex items-center gap-2 rounded-md px-2 font-mono font-semibold text-text hover:text-accent-soft',
+          target,
+          focusRing,
+        ]}
+      >
+        <SiteMark class="size-7" />
+        <span class="max-sm:hidden">sohan-cluster</span>
+        <!-- Below 360px only the mark shows; the link keeps its name for screen readers. -->
+        <span class="max-[359px]:sr-only sm:hidden">sohan</span>
+      </a>
+      <span class="max-md:hidden">
+        <StatusPill status="running" label="Ready" />
+      </span>
+      <span class="font-mono text-xs text-text-muted max-md:hidden">v{buildInfo.version}</span>
+    </div>
+    <nav aria-label="Site">
+      <ul role="list" class="flex items-center gap-1 sm:gap-2">
+        <li>
+          <a href={viewLink.href} class:list={[button('ghost'), compact]}>
+            <viewLink.Icon aria-hidden="true" class={icon} />
+            <span class="max-sm:hidden">{viewLink.full}</span>
+            <span class="sm:hidden" aria-hidden="true">
+              {viewLink.short}
+            </span>
+            <span class="sr-only sm:hidden">{viewLink.full}</span>
+          </a>
+        </li>
+        <li>
+          <a href={url(profile.resume)} class:list={[button('secondary'), compact]}>
+            <FileText aria-hidden="true" class={icon} />
+            Resume
+          </a>
+        </li>
+        <li>
+          <a href={url('plain/#contact')} class:list={[button('primary'), compact]}>
+            <Mail aria-hidden="true" class={icon} />
+            Contact
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>

@@ -155,7 +155,7 @@ Stages 8 to 10), `docs/plans/stage-2-design.md`, this plan, `docs/STATUS.md`.
       offending string, so the rule provably fires.
 - [x] `pnpm check` green; commit `feat(design): add design tokens with contrast and scope checks`.
 
-### Task 3: UI primitives (PR 3)
+### Task 3: UI primitives (PR 3) — done (#60)
 
 **Files:**
 
@@ -224,21 +224,21 @@ Stages 8 to 10), `docs/plans/stage-2-design.md`, this plan, `docs/STATUS.md`.
 
 **Steps:**
 
-- [ ] **Failing e2e first, on every project:**
+- [x] **Failing e2e first, on every project:**
   - a `banner` with a link to home named `sohan-cluster` (or `sohan` below 640px), plus links `Resume`
     and `Contact`;
   - on `/` the view link reads `Plain view` and goes to `plain/`;
   - on `/plain/` it reads `Home` while the flag is off;
-  - the `Ready` text and the version (matching `/^v\d+\.\d+\.\d+/`) are visible at 640px and up, and
+  - the `Ready` text and the version (matching `/^v\d+\.\d+\.\d+/`) are visible at 768px and up, and
     hidden below;
   - no horizontal overflow, also on the 320px project;
   - all controls ≥ 44 by 44;
   - print hides the banner.
-- [ ] **Build `SiteMark`.** Flat hexagon outline, node dot, "SP" in the mono font, `aria-hidden`; the link
+- [x] **Build `SiteMark`.** Flat hexagon outline, node dot, "SP" in the mono font, `aria-hidden`; the link
       text names it. Export the same geometry to `public/favicon.svg`. No helm wheel shapes.
-- [ ] **Build `TopBar`** per design doc §4.5. Wire it into `BaseLayout`, delete `SiteHeader`, and keep the
+- [x] **Build `TopBar`** per design doc §4.5. Wire it into `BaseLayout`, delete `SiteHeader`, and keep the
       skip link first.
-- [ ] Tests green; `pnpm check` green; check 320, 375, 768, 1280, and 1920px; commit
+- [x] Tests green; `pnpm check` green; check 320, 375, 768, 1280, and 1920px; commit
       `feat(ui): add top bar and site mark on every page`.
 
 ### Task 5: Shorter plain view (PR 5)
