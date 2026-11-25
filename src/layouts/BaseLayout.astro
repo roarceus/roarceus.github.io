@@ -15,18 +15,19 @@ const { title = `${site.name} | ${site.title}`, description = site.description }
 const canonical = new URL(Astro.url.pathname, site.url);
 
 // GitHub Pages can't set headers, so the CSP ships as a meta tag (SPEC §10b). Production only:
-// the dev server injects inline scripts and styles. Endpoints for analytics and the contact
-// form get added here when those features land.
+// the dev server injects inline scripts and styles. The only off-site endpoint is the contact
+// form's (Web3Forms): fetch from the script, or a plain form post without JavaScript.
+const contactOrigin = new URL(site.contact.endpoint).origin;
 const csp = [
   "default-src 'self'",
   "script-src 'self'",
   "style-src 'self'",
   "img-src 'self' data:",
   "font-src 'self'",
-  "connect-src 'self'",
+  `connect-src 'self' ${contactOrigin}`,
   "object-src 'none'",
   "base-uri 'self'",
-  "form-action 'self'",
+  `form-action 'self' ${contactOrigin}`,
 ].join('; ');
 ---
 

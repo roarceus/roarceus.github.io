@@ -1,0 +1,18 @@
+---
+// Where Web3Forms redirects after a form post without JavaScript.
+import { site } from '@/config/site';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { url } from '@/lib/utils/url';
+---
+
+<BaseLayout title={`Message sent | ${site.name}`} description="Your message was sent.">
+  <main id="main" class="mx-auto flex max-w-3xl flex-col gap-5 px-4 py-16 sm:px-8">
+    <h1 class="text-[length:var(--text-display-fluid)] leading-tight font-semibold tracking-tight">
+      Message sent
+    </h1>
+    <p class="max-w-prose text-text-muted">Thanks for reaching out. I'll reply by email.</p>
+    <a href={url('plain/')} class="link inline-flex min-h-11 items-center self-start font-mono text-sm">
+      Back to the portfolio
+    </a>
+  </main>
+</BaseLayout>
