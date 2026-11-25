@@ -1,0 +1,36 @@
+---
+import UpdateDate from '@/components/plain/UpdateDate.astro';
+import { site } from '@/config/site';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getUpdates } from '@/lib/content/queries';
+import { url } from '@/lib/utils/url';
+
+const updates = await getUpdates();
+---
+
+<BaseLayout title={`Updates | ${site.name}`} description={`News and milestones from ${site.name}.`}>
+  <main id="main" class="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-10 sm:px-8">
+    <h1 class="text-[length:var(--text-display-fluid)] leading-tight font-semibold tracking-tight">
+      Updates
+    </h1>
+    <p class="font-mono text-sm">
+      <a href={url('rss.xml')} class="link inline-flex min-h-11 items-center">
+        RSS feed
+      </a>
+    </p>
+    <ol role="list" aria-label="All updates" class="flex flex-col divide-y divide-border">
+      {updates.map(({ id, data }) => (
+        <li class="flex flex-col gap-1 py-4">
+          <UpdateDate date={data.date} />
+          <a
+            href={url(`updates/${id}/`)}
+            class="link inline-flex min-h-11 items-center self-start font-semibold"
+          >
+            {data.title}
+          </a>
+          <p class="text-text-muted">{data.summary}</p>
+        </li>
+      ))}
+    </ol>
+  </main>
+</BaseLayout>

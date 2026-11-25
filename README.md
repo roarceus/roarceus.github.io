@@ -14,8 +14,8 @@ switch to a plain, recruiter-friendly view.
 ## Status
 
 **Stage 1 — Content and plain view (in progress, → v0.2.0).** Live is still the v0.1.0 placeholder.
-Done so far: content, the full plain portfolio at `/plain/`, and a home hero. Next: project pages,
-updates, and RSS. Progress:
+Done so far: content, the full plain portfolio at `/plain/`, a home hero, project pages, updates, and an
+RSS feed. Next: the contact form. Progress:
 [`docs/STATUS.md`](docs/STATUS.md) · [project board](https://github.com/users/roarceus/projects/1) ·
 [changelog](CHANGELOG.md) (from v0.1.0).
 

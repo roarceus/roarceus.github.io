@@ -1,0 +1,16 @@
+---
+import { formatYearMonth } from '@/lib/utils/dates';
+
+interface Props {
+  date: Date;
+  class?: string;
+}
+
+const { date, class: className } = Astro.props;
+// Update dates are calendar days (YYYY-MM-DD in front matter), parsed as UTC midnight.
+const iso = date.toISOString().slice(0, 10);
+---
+
+<time datetime={iso} class:list={['font-mono text-sm text-text-muted', className]}>
+  {formatYearMonth(iso.slice(0, 7))}
+</time>

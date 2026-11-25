@@ -14,6 +14,7 @@ const {
   getCertifications,
   getEducation,
   getExperience,
+  getNodeLabel,
   getProfile,
   getProject,
   getProjects,
@@ -29,10 +30,12 @@ beforeEach(() => {
   Object.assign(collections, {
     profile: [{ id: 'profile', data: { name: 'Test Person' } }],
     experience: [
-      { id: 'old-job', data: { node: 'old', start: '2021-05', end: '2023-10' } },
+      { id: 'old-job', data: { node: 'old', org: 'Old Co', start: '2021-05', end: '2023-10' } },
       { id: 'new-job', data: { node: 'new', start: '2025-06', end: 'present' } },
     ],
-    education: [{ id: 'degree', data: { node: 'school', start: '2016-08', end: '2020-10' } }],
+    education: [
+      { id: 'degree', data: { node: 'school', school: 'A School', start: '2016-08', end: '2020-10' } },
+    ],
     projects: [
       { id: 'side', data: { node: 'old', featured: false, order: 2 } },
       { id: 'main', data: { node: 'new', featured: true, order: 1 }, body: 'About main.' },
@@ -98,5 +101,11 @@ describe('content queries', () => {
   it('renders an entry body through astro:content', async () => {
     const profile = await getProfile();
     expect(await renderEntry(profile)).toEqual({ Content: 'rendered:profile' });
+  });
+
+  it('names a node after its org or school', async () => {
+    expect(await getNodeLabel('old')).toBe('Old Co');
+    expect(await getNodeLabel('school')).toBe('A School');
+    expect(await getNodeLabel('nowhere')).toBeUndefined();
   });
 });

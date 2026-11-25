@@ -1,6 +1,7 @@
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 
 import { assertIntegrity } from './integrity';
+import { nodeLabels } from './nodes';
 import { sortByDateDesc, sortByOrder, sortByRecency } from './sort';
 
 // The only module that touches astro:content (SPEC §3: components read content only through
@@ -60,6 +61,12 @@ export async function getProjects(
 
 export async function getProject(slug: string): Promise<CollectionEntry<'projects'> | undefined> {
   return (await getProjects()).find((project) => project.id === slug);
+}
+
+/** Display name of a node ("Northeastern University"), or undefined for an unknown node. */
+export async function getNodeLabel(node: string): Promise<string | undefined> {
+  const { experience, education } = await load();
+  return nodeLabels(experience, education).get(node);
 }
 
 /** Pods scheduled on a node, by `order`. */

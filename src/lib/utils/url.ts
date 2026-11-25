@@ -27,6 +27,14 @@ export function joinBase(base: string, path = ''): string {
   return prefix + pathname.replace(/\/{2,}/g, '/') + suffix;
 }
 
+/**
+ * Absolute URL on production (no preview base path), for canonical links and the RSS feed:
+ * those must always point at the real site, even when built for a PR preview.
+ */
+export function productionUrl(origin: string, path = ''): string {
+  return origin.replace(/\/+$/, '') + joinBase('/', path);
+}
+
 /** Prefixes an internal path with the site's base path (`import.meta.env.BASE_URL`). */
 export function url(path = ''): string {
   return joinBase(import.meta.env.BASE_URL, path);

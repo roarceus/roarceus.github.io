@@ -1,0 +1,37 @@
+---
+import UpdateDate from '@/components/plain/UpdateDate.astro';
+import TagList from '@/components/ui/TagList.astro';
+import { site } from '@/config/site';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getUpdates, renderEntry } from '@/lib/content/queries';
+import { url } from '@/lib/utils/url';
+
+import type { GetStaticPaths } from 'astro';
+
+export const getStaticPaths = (async () => {
+  const updates = await getUpdates();
+  return updates.map((update) => ({ params: { slug: update.id }, props: { update } }));
+}) satisfies GetStaticPaths;
+
+const { update } = Astro.props;
+const { data } = update;
+const { Content } = await renderEntry(update);
+---
+
+<BaseLayout title={`${data.title} | ${site.name}`} description={data.summary}>
+  <main id="main" class="mx-auto flex max-w-3xl flex-col gap-5 px-4 py-10 sm:px-8">
+    <a href={url('updates/')} class="link inline-flex min-h-11 items-center self-start font-mono text-sm">
+      All updates
+    </a>
+    <article class="flex flex-col gap-4">
+      <h1 class="text-[length:var(--text-display-fluid)] leading-tight font-semibold tracking-tight">
+        {data.title}
+      </h1>
+      <UpdateDate date={data.date} />
+      {data.tags.length > 0 && <TagList items={data.tags} label="Tags" />}
+      <div class="prose border-t border-border pt-6">
+        <Content />
+      </div>
+    </article>
+  </main>
+</BaseLayout>

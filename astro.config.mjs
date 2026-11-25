@@ -1,7 +1,10 @@
 // @ts-check
+import { satteri } from '@astrojs/markdown-satteri';
 import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
+
+import { externalLinkRel } from './src/lib/markdown/external-links.ts';
 
 // Production builds at "/", PR previews at "/pr-preview/pr-<N>/" (set by CI). See SPEC §2.
 const base = process.env.BASE_PATH || '/';
@@ -13,9 +16,24 @@ export default defineConfig({
   trailingSlash: 'always',
   integrations: [react()],
   markdown: {
-    // Site copy must read as human-written: no curly quotes or typographic dashes added at build
-    // time (tests/static/content-style.test.ts checks the source, the plain e2e the output).
-    smartypants: false,
+    processor: satteri({
+      // Site copy must read as human-written: no curly quotes or typographic dashes added at
+      // build time (tests/static/content-style.test.ts checks the source, the e2e the output).
+      features: { smartPunctuation: false },
+      // Off-site links in Markdown get rel="noopener noreferrer", like the ExternalLink component.
+      hastPlugins: [
+        {
+          name: 'external-links',
+          element: {
+            filter: ['a'],
+            visit(node, ctx) {
+              const rel = externalLinkRel(node.properties);
+              if (rel) ctx.setProperty(node, 'rel', rel);
+            },
+          },
+        },
+      ],
+    }),
   },
   build: {
     // GitHub Pages branch deploys run Jekyll, which hides "_"-prefixed folders like Astro's
