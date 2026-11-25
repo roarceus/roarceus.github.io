@@ -1,6 +1,7 @@
 /*
- * Design tokens (SPEC §5). Dark only. Components use these variables (or the Tailwind theme
- * mapped from them in global.css), never raw hex values. Stage 2 finalizes and documents them.
+ * Design tokens (SPEC §5, ADR 0002). Dark only. Components use these variables (or the Tailwind theme
+ * mapped from them in global.css), never raw hex values. src/styles/tokens.test.ts checks every
+ * text and UI pairing for WCAG AA, so tune values freely as long as it passes.
  */
 :root {
   color-scheme: dark;
@@ -9,7 +10,10 @@
   --bg: #0a0e14;
   --surface-1: #111722;
   --surface-2: #18202e;
+  /* Decorative hairlines (dividers, panel edges). */
   --border: #243044;
+  /* Boundaries that identify a control (secondary buttons, chips, inputs): 3:1 on every surface. */
+  --border-strong: #5f6d85;
 
   /* Text */
   --text: #e6edf3;
@@ -20,12 +24,19 @@
   --accent-soft: #5b8def;
   /* Text on an --accent fill (white passes AA there; --text does not). */
   --on-accent: #ffffff;
+  /* Selected rows and the selected node card. */
+  --accent-fill: #0e2350;
 
   /* Status language */
   --status-running: #3fb950;
   --status-pending: #d29922;
   --status-failed: #f85149;
   --status-completed: #8b98a9;
+  /* Tinted fills behind status text (pills, alerts). */
+  --status-running-soft: #0f2a17;
+  --status-pending-soft: #2b2108;
+  --status-failed-soft: #3a1414;
+  --status-completed-soft: #1a212c;
 
   /* Typography */
   --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
@@ -34,13 +45,56 @@
   /* Fluid type scale */
   --text-sm-fluid: clamp(0.875rem, 0.84rem + 0.15vw, 0.95rem);
   --text-base-fluid: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+  --text-xs-fluid: clamp(0.75rem, 0.73rem + 0.1vw, 0.8rem);
+  --text-h2-fluid: clamp(1.25rem, 1.1rem + 0.75vw, 1.75rem);
   --text-display-fluid: clamp(2rem, 1.4rem + 3vw, 3.75rem);
+  --leading-tight: 1.2;
+  --leading-body: 1.6;
+
+  /* Shape */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-full: 9999px;
 
   /* Print (the only light colors: printed pages use ink on paper) */
   --print-bg: #ffffff;
   --print-text: #000000;
   --print-muted: #333333;
 
-  /* Motion */
+  /* Motion: chrome stays within 150 to 300ms; exits run at about 70% of the enter time. */
+  --duration-fast: 150ms;
   --duration-ui: 200ms;
+  --duration-slow: 300ms;
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-standard: cubic-bezier(0.2, 0, 0.2, 1);
+
+  /* Layers: always use these, never ad hoc z-index values. */
+  --z-sticky: 10;
+  --z-dock: 20;
+  --z-sheet: 30;
+  --z-overlay: 40;
+  --z-skip: 50;
+
+  /* Layout */
+  --topbar-h: 3.5rem;
+  --jumpbar-h: 3.25rem;
+  --terminal-h: 14rem;
+
+  /*
+   * Cluster scene (ADR 0002): flat, Mini Metro-like colors and the only place glow is allowed.
+   * Used only by src/components/cluster/ and src/components/game/ (tests/static/scene-scope.test.ts).
+   */
+  --scene-bg: #0d121a;
+  --scene-platform: #1c2533;
+  --scene-platform-edge: #2e3a4f;
+  --scene-platform-selected: #12306e;
+  --scene-link: #3a475c;
+  --scene-packet: #5b8def;
+  --scene-glow-running: rgb(63 185 80 / 35%);
+  --scene-glow-pending: rgb(210 153 34 / 35%);
+  --scene-glow-failed: rgb(248 81 73 / 45%);
+  --scene-duration-packet: 1600ms;
+  --scene-duration-pulse: 2400ms;
 }

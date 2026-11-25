@@ -34,3 +34,4 @@ Thumbs.db
 # personal Claude Code files (never commit)
 CLAUDE.local.md
 .claude/settings.local.json
+.superpowers/

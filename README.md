@@ -115,9 +115,10 @@ src/
   layouts/      page layouts (BaseLayout sets meta tags and the CSP)
   lib/content/  Zod schemas, query helpers, integrity check (how components read content)
   lib/seo/      share metadata and JSON-LD helpers
-  lib/utils/    framework-free helpers: url() for the base path, date formatting
+  lib/utils/    framework-free helpers: url() for the base path, date formatting, contrast ratios
   pages/        routes (plus rss.xml, robots.txt, and the 404 page)
-  styles/       tokens.css (design tokens) and global.css
+  styles/       tokens.css (design tokens, AA-checked by tokens.test.ts; --scene-* only for the cluster
+                scene, ADR 0002) and global.css
 tests/
   e2e/          Playwright specs (fail on any console error)
   smoke/        post-deploy checks against a live URL
