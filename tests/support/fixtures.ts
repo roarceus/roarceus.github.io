@@ -7,13 +7,23 @@ const FIXED_NOW = new Date('2026-01-15T12:00:00Z');
  * Every e2e test fails on an uncaught exception or a console error (SPEC §10 Tests), including
  * CSP violations, which browsers report as console errors.
  */
-export const test = base.extend<{ runtimeErrors: string[] }>({
+export const test = base.extend<{ expectedConsoleError: RegExp | null; runtimeErrors: string[] }>({
+  /**
+   * Console errors a test causes on purpose (e.g. the browser's own "Failed to load resource" when
+   * a mocked request fails). Each test opts in with exact patterns; everything else still fails.
+   */
+  // One RegExp (use alternation for several): test.use() would read a two-item array as
+  // [value, options].
+  expectedConsoleError: [null, { option: true }],
   runtimeErrors: [
-    async ({ page }, use) => {
+    async ({ page, expectedConsoleError }, use) => {
       const errors: string[] = [];
       page.on('pageerror', (error) => errors.push(`pageerror: ${error.message}`));
       page.on('console', (message) => {
-        if (message.type() === 'error') errors.push(`console.error: ${message.text()}`);
+        const text = message.text();
+        if (message.type() !== 'error') return;
+        if (expectedConsoleError?.test(text)) return;
+        errors.push(`console.error: ${text}`);
       });
       await page.clock.setFixedTime(FIXED_NOW);
 

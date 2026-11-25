@@ -2,6 +2,7 @@
 import ExternalLink from '@/components/ui/ExternalLink.astro';
 import { getProfile } from '@/lib/content/queries';
 
+import ContactForm from './ContactForm.astro';
 import Section from './Section.astro';
 
 const { data } = await getProfile();
@@ -9,9 +10,9 @@ const linkClass = 'inline-flex min-h-11 items-center';
 ---
 
 <Section id="contact" title="Contact">
-  <p class="mb-3 max-w-prose text-text-muted">
-    The best way to reach me is email. I'm also on LinkedIn and GitHub.
-  </p>
+  <p class="mb-6 max-w-prose text-text-muted">Send me a message and I'll get back to you by email.</p>
+  <ContactForm email={data.links.email} />
+  <p class="mt-8 mb-1 text-text-muted">Or reach me directly:</p>
   <ul role="list" class="flex flex-col font-mono text-sm sm:flex-row sm:gap-x-6">
     <li>
       <a href={`mailto:${data.links.email}`} class:list={['link', linkClass]}>
