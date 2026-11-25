@@ -27,6 +27,10 @@ Dates are `YYYY-MM` (`end` may be `present`); update dates are `YYYY-MM-DD`. Lin
   [`content-review.md`](content-review.md); never guess.
 - Prose fields (summaries, descriptions, update bodies) are short, first person, and concrete: what you
   built, with what, and the result. Put numbers in a highlight's `metric` (`~40% faster`).
+- Write like a person, not a model. No em dashes, en dashes, middle dots, curly quotes, ellipsis or arrow
+  characters (`tests/static/content-style.test.ts` fails CI on them); use commas, periods, and plain
+  hyphens. Skip filler ("passionate about", "leveraging", tidy three-part slogans). Say the specific thing.
+- Internal employer tool names stay private: describe the tool instead (e.g. "Deployment gating bot").
 - YAML: quote a value that contains `: ` (`tagline: "This site: …"`). Unquoted `2025-06` stays a string;
   unquoted `2025-06-26` in update front matter becomes a date (both are what the schemas expect).
 - Links between pages in Markdown are relative (`../../projects/asktrace/` from an update), so they work
