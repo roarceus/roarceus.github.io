@@ -43,7 +43,8 @@ const expectDashboard = process.env.SMOKE_EXPECT_DASHBOARD;
 test('ships the cluster dashboard only where its flag is on', async ({ page }) => {
   test.skip(expectDashboard === undefined, 'SMOKE_EXPECT_DASHBOARD not set');
   await page.goto('./');
-  await expect(page.getByRole('region', { name: 'Cluster map' })).toHaveCount(
+  // Whether it was built, not whether it is on screen: phones keep it hidden until cluster mode.
+  await expect(page.getByRole('region', { name: 'Cluster map', includeHidden: true })).toHaveCount(
     expectDashboard === 'true' ? 1 : 0,
   );
 });
