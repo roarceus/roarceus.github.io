@@ -1,0 +1,52 @@
+---
+// GitHub Pages serves this for any missing path on the site. It only serves the root 404.html, so
+// a missing page under a PR preview shows the production 404 (documented in docs/runbooks).
+import { site } from '@/config/site';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { url } from '@/lib/utils/url';
+
+const links = [
+  { label: 'Home', href: url() },
+  { label: 'Plain view', href: url('plain/') },
+  { label: 'Updates', href: url('updates/') },
+];
+---
+
+<BaseLayout
+  title={`Page not found | ${site.name}`}
+  description="This page doesn't exist. Head back to the portfolio."
+  noindex
+>
+  <main id="main" class="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-16 sm:px-8">
+    <h1 class="text-[length:var(--text-display-fluid)] leading-tight font-semibold tracking-tight">
+      Page not found
+    </h1>
+    <pre class="rounded-md border border-border bg-surface-1 p-4 font-mono text-sm break-all whitespace-pre-wrap text-text"><span class="text-text-muted">$ kubectl get page <span data-missing-path>this page</span></span>
+<span class="text-status-failed">Error from server (NotFound): page "<span data-missing-path>this page</span>" not found</span></pre>
+    <p class="max-w-prose text-text-muted">The link might be old, or the address has a typo.</p>
+    <nav aria-label="Ways back">
+      <ul role="list" class="flex flex-wrap gap-x-6 font-mono text-sm">
+        {links.map((link) => (
+          <li>
+            <a href={link.href} class="link inline-flex min-h-11 min-w-11 items-center">
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </main>
+</BaseLayout>
+
+<script>
+  // Without JavaScript the error reads "this page"; with it, the real path the visitor asked for.
+  let path = window.location.pathname;
+  try {
+    path = decodeURI(path);
+  } catch {
+    // A malformed escape like "%E0%A4%A": show the path as it was typed.
+  }
+  document.querySelectorAll('[data-missing-path]').forEach((element) => {
+    element.textContent = path;
+  });
+</script>

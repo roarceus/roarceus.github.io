@@ -5,7 +5,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import { url } from '@/lib/utils/url';
 ---
 
-<BaseLayout title={`Message sent | ${site.name}`} description="Your message was sent.">
+<BaseLayout title={`Message sent | ${site.name}`} description="Your message was sent." noindex>
   <main id="main" class="mx-auto flex max-w-3xl flex-col gap-5 px-4 py-16 sm:px-8">
     <h1 class="text-[length:var(--text-display-fluid)] leading-tight font-semibold tracking-tight">
       Message sent

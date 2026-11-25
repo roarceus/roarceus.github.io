@@ -1,6 +1,7 @@
 // @ts-check
 import { satteri } from '@astrojs/markdown-satteri';
 import react from '@astrojs/react';
+import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
 
@@ -8,13 +9,19 @@ import { externalLinkRel } from './src/lib/markdown/external-links.ts';
 
 // Production builds at "/", PR previews at "/pr-preview/pr-<N>/" (set by CI). See SPEC §2.
 const base = process.env.BASE_PATH || '/';
+const isProduction = base === '/';
 
 export default defineConfig({
   site: 'https://roarceus.github.io',
   base,
   output: 'static',
   trailingSlash: 'always',
-  integrations: [react()],
+  integrations: [
+    react(),
+    // Production only (plan D6): previews are noindex and must never be listed. The thank-you page
+    // is only reached after sending a message; Astro already leaves out the 404 page.
+    ...(isProduction ? [sitemap({ filter: (page) => !page.includes('/contact/thanks/') })] : []),
+  ],
   markdown: {
     processor: satteri({
       // Site copy must read as human-written: no curly quotes or typographic dashes added at
