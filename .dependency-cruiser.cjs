@@ -15,9 +15,14 @@ module.exports = {
     {
       name: 'lib-is-framework-free',
       severity: 'error',
-      comment: 'src/lib must not depend on UI code, React, or Astro.',
+      comment:
+        'src/lib must not depend on UI code, React, or Astro. astro/zod is allowed: it only ' +
+        're-exports Zod, so content schemas use the same Zod as Astro.',
       from: { path: '^src/lib/' },
-      to: { path: ['^src/(components|layouts|pages)/', '(^|/)node_modules/(react|react-dom|astro)/'] },
+      to: {
+        path: ['^src/(components|layouts|pages)/', '(^|/)node_modules/(react|react-dom|astro)/'],
+        pathNot: '(^|/)node_modules/astro/dist/zod\\.js$',
+      },
     },
     {
       name: 'components-not-pages',

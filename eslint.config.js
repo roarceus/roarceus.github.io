@@ -86,7 +86,33 @@ export default defineConfig(
               group: ['@/components/*', '@/layouts/*', '@/pages/*'],
               message: 'src/lib must not import UI code.',
             },
-            { group: ['astro:*'], message: 'src/lib must not depend on Astro modules.' },
+            {
+              group: ['astro:*', '!astro:content'],
+              message: 'src/lib must not depend on Astro modules.',
+            },
+            {
+              group: ['astro:content'],
+              message: 'Only src/lib/content/queries.ts may read astro:content.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  // The one content adapter (SPEC §3: components read content only through lib/content).
+  {
+    files: ['src/lib/content/queries.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            { group: ['react', 'react-dom', 'react/*', 'react-dom/*'], message: 'No React in src/lib.' },
+            { group: ['@/components/*', '@/layouts/*', '@/pages/*'], message: 'No UI code in src/lib.' },
+            {
+              group: ['astro:*', '!astro:content'],
+              message: 'src/lib must not depend on Astro modules.',
+            },
           ],
         },
       ],

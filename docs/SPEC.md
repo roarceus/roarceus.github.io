@@ -91,12 +91,12 @@ Production-grade layout. New top-level folders or changes to this structure need
 │   │   ├── terminal/           # React island: input, output renderer, chips
 │   │   └── game/               # React island: chaos mode, badges, easter eggs
 │   ├── config/                 # site.ts: metadata, links, public keys (Web3Forms, GoatCounter)
-│   ├── content/                # collections + config.ts (Zod schemas)
+│   ├── content/                # content entries (YAML + Markdown); registered in src/content.config.ts
 │   ├── layouts/                # Astro page layouts
 │   ├── lib/                    # framework-agnostic TypeScript (no React, no DOM)
 │   │   ├── commands/           # registry + one module per command
 │   │   ├── parser/             # command parser
-│   │   ├── content/            # content query helpers (the only way components read content)
+│   │   ├── content/            # Zod schemas + query helpers (the only way components read content)
 │   │   ├── state/              # stores shared by islands
 │   │   └── utils/              # url()/base path, dates, formatting
 │   ├── pages/                  # routes
@@ -222,15 +222,15 @@ uppercase headers, `AGE` style values, realistic error messages). Infra engineer
 
 ## 6. Content model
 
-All content lives in `src/content/` and is validated by Zod schemas in `src/content/config.ts`
-(the "CRDs"). Both views (plain and cluster) render from the same data.
+All content lives in `src/content/` and is validated by Zod schemas in `src/lib/content/schemas/`, registered
+in `src/content.config.ts` (Astro 5+ location) (the "CRDs"). Both views (plain and cluster) render from the same data.
 
 Collections (adjust fields as needed, but keep this shape):
 
 - **profile** (single file): name, title, location, tagline, about (markdown), links (GitHub, LinkedIn, email), resume path, open-to-work flag.
 - **experience**: slug, org, role, type (`work` | `education` | `teaching`), location, start, end (or `present`), summary, highlights (list, each may include a metric), tech (list), node label (e.g. `capgemini`).
 - **education**: slug, school, degree, field, start, end, location, highlights.
-- **projects**: slug, name, tagline, description (markdown), status (`running` = active, `completed`, `pending` = planned), node (which experience/education node it "runs on"), tech, links (repo, demo), highlights, featured flag, order.
+- **projects**: slug, name, tagline, description (markdown), status (`running` = active, `completed`, `pending` = planned), node (which experience/education node it "runs on"; optional, absent = unscheduled, e.g. this site), tech, links (repo, demo), highlights, featured flag, order.
 - **skills**: category, items with optional proficiency level (used by `kubectl top skills`).
 - **certifications**: name, issuer, status (`issued` | `in-progress`), date, credential URL.
 - **achievements**: title, date, description, link.
@@ -259,7 +259,8 @@ Collections (adjust fields as needed, but keep this shape):
 
 ### Mapping
 - **Cluster** = Sohan's career. Name: `sohan-cluster`.
-- **Nodes** = organizations/eras: `capgemini`, `northeastern`, `mastercontrol` (labels: `role=work|education|teaching`).
+- **Nodes** = organizations/eras: `capgemini`, `northeastern`, `mastercontrol`, `mumbai` (Bachelor's era) (labels: `role=work|education|teaching`).
+  A node is declared by the `node` field of an experience or education entry.
 - **Pods** = projects, scheduled on the node where they were built. Pod status mirrors project status.
 - **Namespaces** = sections: `career`, `projects`, `skills`, `updates`.
 - Real achievements = `achievements` resource. Game unlocks = **badges** (different word on purpose).
