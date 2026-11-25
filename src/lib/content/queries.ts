@@ -1,4 +1,4 @@
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
 
 import { assertIntegrity } from './integrity';
 import { sortByDateDesc, sortByOrder, sortByRecency } from './sort';
@@ -83,4 +83,11 @@ export async function getAchievements(): Promise<CollectionEntry<'achievements'>
 /** Published updates (no drafts), newest first. */
 export async function getUpdates(): Promise<CollectionEntry<'updates'>[]> {
   return sortByDateDesc((await load()).updates.filter((update) => !update.data.draft));
+}
+
+/** Renders a Markdown entry's body (profile about, project description, update post). */
+export async function renderEntry(
+  entry: CollectionEntry<'profile' | 'projects' | 'updates'>,
+): ReturnType<typeof render> {
+  return render(entry);
 }

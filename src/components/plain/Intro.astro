@@ -1,0 +1,47 @@
+---
+import ExternalLink from '@/components/ui/ExternalLink.astro';
+import StatusPill from '@/components/ui/StatusPill.astro';
+import { getProfile, renderEntry } from '@/lib/content/queries';
+import { url } from '@/lib/utils/url';
+
+const profile = await getProfile();
+const { Content } = await renderEntry(profile);
+const { data } = profile;
+---
+
+<div class="flex flex-col gap-4">
+  <h1 class="text-[length:var(--text-display-fluid)] leading-tight font-semibold tracking-tight">
+    {data.name}
+  </h1>
+  <p class="text-lg text-text">{data.title}</p>
+  <p class="flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-sm text-text-muted">
+    <span>{data.location}</span>
+    {data.openToWork && <StatusPill status="running" label="Open to work" />}
+  </p>
+  <p class="max-w-prose text-[length:var(--text-base-fluid)] text-text-muted">{data.tagline}</p>
+  <ul role="list" aria-label="Links" class="flex flex-wrap gap-x-5 gap-y-1 font-mono text-sm">
+    <li>
+      <ExternalLink href={data.links.github} class="inline-flex min-h-11 items-center">
+        GitHub
+      </ExternalLink>
+    </li>
+    <li>
+      <ExternalLink href={data.links.linkedin} class="inline-flex min-h-11 items-center">
+        LinkedIn
+      </ExternalLink>
+    </li>
+    <li>
+      <a href={`mailto:${data.links.email}`} class="link inline-flex min-h-11 items-center">
+        Email
+      </a>
+    </li>
+    <li>
+      <a href={url(data.resume)} class="link inline-flex min-h-11 items-center">
+        Resume (PDF)
+      </a>
+    </li>
+  </ul>
+  <div class="prose">
+    <Content />
+  </div>
+</div>

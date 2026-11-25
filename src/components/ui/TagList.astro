@@ -1,0 +1,17 @@
+---
+interface Props {
+  items: readonly string[];
+  /** Accessible name for the list, e.g. "Tech used". */
+  label: string;
+}
+
+const { items, label } = Astro.props;
+---
+
+<ul role="list" aria-label={label} class="flex flex-wrap gap-1.5">
+  {items.map((item) => (
+    <li class="rounded border border-border bg-surface-2 px-2 py-0.5 font-mono text-xs text-text-muted">
+      {item}
+    </li>
+  ))}
+</ul>
