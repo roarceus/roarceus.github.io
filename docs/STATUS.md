@@ -1,53 +1,47 @@
 # Status
 
-_Last updated: 2026-11-24_
+_Last updated: 2026-11-25_
 
 ## Current stage
 
-**Stage 1 — Content and plain view (in progress → v0.2.0).** Production still serves v0.1.0. Plan:
-[`plans/stage-1.md`](plans/stage-1.md) · [milestone](https://github.com/roarceus/roarceus.github.io/milestone/2)
-(#32–#40) · [board](https://github.com/users/roarceus/projects/1)
+**Stage 1 — Content and plain view: done, ready to release as v0.2.0.** Production still serves v0.1.0
+until release PR #42 merges. Plan: [`plans/stage-1.md`](plans/stage-1.md) ·
+[milestone](https://github.com/roarceus/roarceus.github.io/milestone/2) (#32–#40) ·
+[board](https://github.com/users/roarceus/projects/1). **Next:** Stage 2 planning (design system and layout).
 
-- **Done:** schemas and helpers (#41), content and review (#43), `/plain/` and home hero (#44). Release PR
-  #42 (v0.2.0) stays open until the stage ends.
-- **Done:** project pages, updates, RSS (#45); contact form (#46).
-- **In progress:** PR 6, SEO metadata, share image, sitemap, robots.txt, 404 (#39). **Next:** stage
-  wrap-up (#40): Lighthouse URLs, width checks, sign-off, then merge release PR #42 (v0.2.0).
+## Stage 1 sign-off
 
-## Stage 0 sign-off
-
-- **Shipped:** Astro/React/TS/Tailwind scaffold with `url()` base-path helper and placeholder page (#18);
-  lint/format/knip/depcruise/commit hooks and root-path test (#19); CI with Playwright + axe on 3 engines,
-  Lighthouse, links, dependency review, `ci-ok`, PR title check, CodeQL (#21); PR previews, release-please
-  (App token), production deploy, rollback, smoke tests (#23); weekly ops checks, Renovate, Scorecard (#26);
-  docs and runbooks (#28); release **v0.1.0** (#24), deployed and smoke-tested in production.
-- **Fixes along the way:** minimatch advisory (#20), required-checks ruleset export (#22), first release
-  0.1.0 not 1.0.0 (#25), Scorecard v2.6.0 image missing upstream, pinned v2.5.0 (#27).
-- **Manual setup done:** M1–M9 (Node/pnpm, `gh` scope, Actions + security settings, release App, required
-  checks, Pages from `gh-pages`, Renovate app).
-- **Post-release checks:** manual `Scheduled → ops` run passed (smoke, external links, Lighthouse on
-  production; no ops issue); `content-review` opened #30; Renovate dashboard #29 has no config errors.
-- **Links:** https://roarceus.github.io/ · [v0.1.0 release](https://github.com/roarceus/roarceus.github.io/releases/tag/v0.1.0) · first verified preview https://roarceus.github.io/pr-preview/pr-23/ (Lighthouse 100 ×4 mobile).
+- **Shipped:** content schemas, query helpers, and integrity checks (#41); all portfolio content with a
+  content review (#43); the plain portfolio at `/plain/` and the home hero (#44); 16 project pages, updates,
+  and an RSS feed (#45); a contact form through Web3Forms that also works without JavaScript (#46); page
+  metadata, a share image, JSON-LD, a production-only sitemap, robots.txt, and the kubectl 404 page (#47);
+  Lighthouse on every page type and this sign-off (#48).
+- **Checks:** Lighthouse mobile 100/100/100/100 on `/`, `/plain/`, a project page, and `/updates/`; the 404
+  page 100/100/100 (SEO is 63 by design: it's noindex). No sideways scroll on 7 page types at 320, 375, 768,
+  1280, and 1920px. e2e passes on Chromium, Firefox, and WebKit across phone, tablet, and desktop sizes.
+  Sohan checked the plain view on iOS Safari. No `TODO(sohan)` left in `src/`.
+- **Links:** last preview https://roarceus.github.io/pr-preview/pr-47/ · release PR #42 (v0.2.0).
 
 ## Retrospective
 
-- **Went well:** pinning and verifying versions up front (TS 6, ESLint-10 plugins) avoided churn; local
-  probes (rule violations, base-path builds, smoke under a sub-path) caught bugs before CI; one
-  aggregated `ci-ok` check kept the ruleset simple.
-- **Didn't:** several assumptions only failed on GitHub: Pages was auto-enabled from `main`, CI lacked
-  Astro's generated types on a fresh checkout, lychee changed a config type, release-please defaulted to
-  1.0.0, an upstream action image vanished. README table edits silently didn't apply for three PRs
-  (string match broke after Prettier padded the tables).
-- **Change next stage:** verify every doc edit by reading the result (or edit with exact anchors); run a
-  fresh-checkout check (`rm -rf .astro node_modules && pnpm install && pnpm check`) before opening PRs;
-  check platform defaults (GitHub settings, tool defaults) explicitly instead of assuming.
+- **Went well:** tests first caught real bugs before review (the hidden live region, the 404 canonical);
+  the content review with Sohan meant no invented facts; a static test keeps AI-style punctuation out of the
+  copy; local preview-base builds proved canonical, RSS, and sitemap stay on production.
+- **Didn't:** one push went out with a failing local test (`ec38b8f`), fixed in the next commit. Changing
+  site-wide head tags broke two CI consumers no unit test covers (the smoke asset check and Lighthouse's
+  SEO score on noindex pages). Firefox logs failed requests differently from Chromium. Astro 7's new
+  Markdown processor silently ignores rehype plugins. Internal tool names once reached a PR body.
+- **Change next stage:** only push when `pnpm check` and the affected e2e exit 0 in the same command; when
+  changing `<head>` or routes, run smoke against a local preview-base build and `pnpm lhci` before pushing;
+  check PR bodies against the public-names rule before posting.
 
 ## Next steps
 
-1. Sohan: uptime monitor (M10). After v0.2.0 ships: submit the sitemap in Google Search Console and check
-   the share preview in a link inspector (runbook: `docs/runbooks/share-image.md`).
-2. Decide on Renovate's queued TypeScript 7 PR (fails until `typescript-eslint` supports TS 7; a
-   `packageRules` entry can hold TS majors until then).
+1. Sohan: merge release PR #42 (v0.2.0) once this PR is in, then watch Actions → Release (deploy, smoke).
+2. After v0.2.0: submit the sitemap in Google Search Console; check the share card in a link inspector
+   (runbook: `docs/runbooks/share-image.md`); set up the uptime monitor (M10).
+3. Stage 2 planning: a design-direction ADR first (see open questions), then `plans/stage-2.md`.
+4. Decide on Renovate's queued TypeScript 7 PR (fails until `typescript-eslint` supports TS 7).
 
 ## Open questions
 
@@ -56,14 +50,15 @@ _Last updated: 2026-11-24_
 - Design direction: Sohan wants real flair (3D, gamey, fun, many components), not a generic terminal
   look. That conflicts with SPEC §5's "real tool look"; explore options at Stage 2 planning and update
   SPEC §5 via an ADR once a direction is chosen. Keep the mobile perf budget, plain view, and a11y.
+- Older project dates and eras are still open in `docs/content-review.md`.
 - Global `~/.npmrc` uses `registry=http://`; switching it to `https://` is Sohan's call (repo is pinned).
 
 ## Known issues
 
+- GitHub Pages serves only the root `404.html`, so a missing page under a PR preview shows production's
+  404 page.
 - Scorecard shows 8 findings (repo age, solo reviews, fuzzing, best-practices badge, early commits without
   CI/SAST, security policy before #28). Several clear over time; the rest are expected for a solo static site.
 - Claude Code sessions must source `~/.ssh/agent.env` before git network commands (passphrase-protected
   `id_roarceus` key) and refresh PATH for fnm's Node 26.
-- GitHub Pages serves only the root `404.html`, so a missing page under a PR preview shows production's
-  404 page.
 - Git Bash rewrites `BASE_PATH=/...`; use `MSYS2_ENV_CONV_EXCL=BASE_PATH` (runbook: local setup).

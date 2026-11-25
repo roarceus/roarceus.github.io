@@ -218,21 +218,23 @@ Modify `astro.config.mjs` (sitemap), `public/robots.txt` → `src/pages/robots.t
       `/contact/thanks/` is noindex and out of the sitemap. Checked a preview-base build: noindex, no
       sitemap, canonical and image on production.
 
-### Task 9: Stage wrap-up (PR 7)
+### Task 9: Stage wrap-up (PR 7) — done
 
-- [ ] Lighthouse budgets on `/`, `/plain/`, a project page, `/updates/` (add URLs to `lighthouserc.json`).
-- [ ] Preview checked at 320/375/768/1280/1920; README (features, structure, status), STATUS sign-off and
-      retrospective; release PR checklist → v0.2.0.
+- [x] Lighthouse budgets on `/`, `/plain/`, a project page, `/updates/` (add URLs to `lighthouserc.json`).
+      Also `/404.html`, with the noindex budget set from PR 6. All four pages 100/100/100/100 locally; the
+      weekly production check still overrides the URL list.
+- [x] Checked at 320/375/768/1280/1920 on the production build (7 page types, no sideways scroll; screenshots
+      at 375, 768, 1920); README status, STATUS sign-off and retrospective; release PR #42 → v0.2.0.
 
 ---
 
 ## Manual steps for Sohan (each done before the PR that needs it)
 
-| #   | When        | Step                                                                                                                                          | Status           |
-| --- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
-| M11 | before PR 3 | Put the current resume at `public/resume.pdf`.                                                                                                | Done 2026-11-24  |
-| M12 | before PR 3 | Answer `docs/content-review.md` (dates, metrics, links) so the plain view ships with real facts; answers land in PR 2 or a `fix(content)` PR. | After PR 2 opens |
-| M13 | before PR 5 | Create a Web3Forms access key for your email at web3forms.com and paste it in chat (public-safe; goes in `src/config/site.ts`).               | Done 2026-11-25  |
+| #   | When        | Step                                                                                                                                          | Status                                           |
+| --- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| M11 | before PR 3 | Put the current resume at `public/resume.pdf`.                                                                                                | Done 2026-11-24                                  |
+| M12 | before PR 3 | Answer `docs/content-review.md` (dates, metrics, links) so the plain view ships with real facts; answers land in PR 2 or a `fix(content)` PR. | Done 2026-11-25 (older project dates still open) |
+| M13 | before PR 5 | Create a Web3Forms access key for your email at web3forms.com and paste it in chat (public-safe; goes in `src/config/site.ts`).               | Done 2026-11-25                                  |
 
 ## Answers (2026-11-24)
 
