@@ -1,15 +1,21 @@
 ---
+import Expander from '@/components/ui/Expander.astro';
 import TagList from '@/components/ui/TagList.astro';
 import { getExperience } from '@/lib/content/queries';
 import { formatRange } from '@/lib/utils/dates';
+import { moreLabel } from '@/lib/utils/plural';
 
 import Section from './Section.astro';
 
 const roles = await getExperience();
+
+// Each role shows its first highlights; the rest fold behind a counted expander (design doc §4.7).
+const SHOWN = 2;
+const listClass = 'flex list-disc flex-col gap-2 pl-5 text-text-muted marker:text-border';
 ---
 
 <Section id="experience" title="Experience">
-  <div class="flex flex-col gap-10">
+  <div class="flex flex-col gap-6">
     {roles.map(({ data }) => (
       <article class="flex flex-col gap-3">
         <h3 class="text-lg font-semibold text-text">
@@ -21,14 +27,26 @@ const roles = await getExperience();
         </p>
         <p class="text-text-muted">{data.summary}</p>
         {data.highlights.length > 0 && (
-          <ul class="flex list-disc flex-col gap-2 pl-5 text-text-muted marker:text-border">
-            {data.highlights.map((highlight) => (
+          <ul aria-label={`Highlights at ${data.org}`} class={listClass}>
+            {data.highlights.slice(0, SHOWN).map((highlight) => (
               <li>
                 {highlight.metric && <strong class="font-semibold text-text">{highlight.metric}: </strong>}
                 {highlight.text}
               </li>
             ))}
           </ul>
+        )}
+        {data.highlights.length > SHOWN && (
+          <Expander summary={moreLabel(data.highlights.length - SHOWN, 'highlight', 'highlights')}>
+            <ul aria-label={`More highlights at ${data.org}`} class={listClass}>
+              {data.highlights.slice(SHOWN).map((highlight) => (
+                <li>
+                  {highlight.metric && <strong class="font-semibold text-text">{highlight.metric}: </strong>}
+                  {highlight.text}
+                </li>
+              ))}
+            </ul>
+          </Expander>
         )}
         <TagList items={data.tech} label={`Tech used at ${data.org}`} />
       </article>

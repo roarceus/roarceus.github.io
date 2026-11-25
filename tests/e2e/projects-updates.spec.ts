@@ -23,7 +23,8 @@ async function expectSafeExternalLinks(page: Page): Promise<void> {
 test.describe('project pages', () => {
   test('every project on the plain view links to a working detail page', async ({ page }) => {
     await page.goto('./plain/');
-    const details = page.locator('#projects').getByRole('link', { name: /^Details/ });
+    // Most projects sit in the closed "more projects" expander: in the page, not on screen.
+    const details = page.locator('#projects').getByRole('link', { name: /^Details/, includeHidden: true });
     const hrefs = await details.evaluateAll((links) => links.map((a) => a.getAttribute('href')));
     expect(hrefs.length).toBe(16);
     for (const href of hrefs) {

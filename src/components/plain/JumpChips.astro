@@ -1,0 +1,88 @@
+---
+// Section links for the plain view (design doc §4.7). Below 1024px: a sticky row of chips under the
+// top bar that scrolls sideways inside itself (never the page). From 1024px: the sticky sidebar.
+// One nav either way, so screen readers find a single "On this page" landmark. A small script marks
+// the section in view with aria-current; without JS the links still jump.
+import { focusRing, target } from '@/components/ui/recipes';
+import { plainSections } from '@/config/sections';
+---
+
+<nav aria-labelledby="section-nav-label" class="print:hidden">
+  <p
+    id="section-nav-label"
+    class="sr-only font-mono text-xs tracking-wide text-text-muted uppercase lg:not-sr-only lg:mb-1"
+  >
+    On this page
+  </p>
+  <ul
+    role="list"
+    class="flex gap-2 overflow-x-auto py-1 [scrollbar-width:none] lg:flex-col lg:gap-0 lg:overflow-visible lg:py-0"
+  >
+    {plainSections.map(({ id, label }) => (
+      <li class="shrink-0">
+        <a
+          href={`#${id}`}
+          data-section-link={id}
+          class:list={[
+            'inline-flex items-center rounded-md font-mono text-sm whitespace-nowrap text-text-muted',
+            'transition-colors duration-ui ease-out hover:text-accent-soft',
+            'aria-[current=location]:text-text',
+            // Chips below 1024px, plain links in the sidebar.
+            'max-lg:border max-lg:border-border-strong max-lg:px-3',
+            'max-lg:aria-[current=location]:border-accent-soft max-lg:aria-[current=location]:bg-accent-fill',
+            'lg:-ml-2 lg:px-2 lg:aria-[current=location]:font-semibold',
+            target,
+            focusRing,
+          ]}
+        >
+          {label}
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<script>
+  // Marks the link of the section nearest the top of the viewport as current.
+  const links = new Map<string, HTMLAnchorElement>();
+  for (const link of document.querySelectorAll<HTMLAnchorElement>('[data-section-link]')) {
+    if (link.dataset.sectionLink) links.set(link.dataset.sectionLink, link);
+  }
+
+  function markCurrent(id: string): void {
+    for (const [key, link] of links) {
+      if (key === id) {
+        link.setAttribute('aria-current', 'location');
+        // Keep the current chip visible in the sideways-scrolling row.
+        link.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      } else {
+        link.removeAttribute('aria-current');
+      }
+    }
+  }
+
+  const sections = [...links.keys()]
+    .map((id) => document.getElementById(id))
+    .filter((section): section is HTMLElement => section !== null);
+
+  const visible = new Set<string>();
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) visible.add(entry.target.id);
+        else visible.delete(entry.target.id);
+      }
+      const first = sections.find((section) => visible.has(section.id));
+      if (first) markCurrent(first.id);
+    },
+    // A band near the top of the viewport, below the sticky bar.
+    { rootMargin: '-15% 0px -70% 0px' },
+  );
+  for (const section of sections) observer.observe(section);
+
+  for (const [id, link] of links) {
+    link.addEventListener('click', () => {
+      markCurrent(id);
+    });
+  }
+</script>

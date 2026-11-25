@@ -61,8 +61,12 @@ test.describe('plain view', () => {
     await expect(featured).toHaveCount(3);
     await expect(featured.first()).toContainText('askTRACE');
     await expect(featured.first()).toContainText('Completed');
+    // The other projects sit in a closed expander, so they are in the page but not on screen.
     expect(
-      await page.getByRole('list', { name: 'More projects' }).locator(':scope > li').count(),
+      await page
+        .getByRole('list', { name: 'More projects', includeHidden: true })
+        .locator(':scope > li')
+        .count(),
     ).toBeGreaterThan(0);
   });
 
@@ -121,5 +125,119 @@ test.describe('plain view', () => {
     await expect(page.getByRole('banner')).toBeHidden();
     await expect(page.getByRole('navigation', { name: 'On this page' })).toBeHidden();
     await expect(page.getByRole('heading', { level: 1, name: 'Sohan Patil' })).toBeVisible();
+  });
+});
+
+// Stage 2: a shorter plain view (design doc §4.7) that keeps every word in the HTML and in print.
+test.describe('plain view, shortened', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('./plain/');
+  });
+
+  test('keeps the section links in view while scrolling', async ({ page }) => {
+    await page.evaluate(() => {
+      window.scrollTo(0, 2000);
+    });
+    await expect(page.getByRole('navigation', { name: 'On this page' })).toBeInViewport();
+  });
+
+  test('lands a jumped-to heading below the sticky links and marks the link current', async ({ page }) => {
+    const nav = page.getByRole('navigation', { name: 'On this page' });
+    const link = nav.getByRole('link', { name: 'Projects', exact: true });
+    await link.click();
+    await expect(link).toHaveAttribute('aria-current', 'location');
+    const heading = await page
+      .getByRole('heading', { level: 2, name: 'Projects', exact: true })
+      .boundingBox();
+    const bar = await nav.boundingBox();
+    if ((page.viewportSize()?.width ?? 1280) < 1024) {
+      expect(heading?.y ?? 0).toBeGreaterThanOrEqual((bar?.y ?? 0) + (bar?.height ?? 0) - 1);
+    } else {
+      expect(heading?.y ?? -1).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  test('marks the section a direct link lands on', async ({ page }) => {
+    await page.goto('./plain/#projects');
+    await expect(
+      page
+        .getByRole('navigation', { name: 'On this page' })
+        .getByRole('link', { name: 'Projects', exact: true }),
+    ).toHaveAttribute('aria-current', 'location');
+  });
+
+  test('moves the current-section mark as the page scrolls', async ({ page }) => {
+    const nav = page.getByRole('navigation', { name: 'On this page' });
+    for (const name of ['Skills', 'Updates', 'Projects'] as const) {
+      await page.evaluate((id) => {
+        const top = document.getElementById(id)?.getBoundingClientRect().top ?? 0;
+        window.scrollTo(0, window.scrollY + top);
+      }, name.toLowerCase());
+      await expect(nav.getByRole('link', { name, exact: true })).toHaveAttribute('aria-current', 'location');
+      await expect(nav.locator('[aria-current="location"]')).toHaveCount(1);
+    }
+  });
+
+  test('shows two highlights per role and folds the rest behind a counted expander', async ({ page }) => {
+    const roles = page.locator('#experience article');
+    const count = await roles.count();
+    expect(count).toBeGreaterThan(0);
+    let folded = 0;
+    for (let i = 0; i < count; i += 1) {
+      const role = roles.nth(i);
+      const shown = await role
+        .getByRole('list', { name: /^Highlights at / })
+        .locator(':scope > li')
+        .count();
+      const hidden = await role
+        .getByRole('list', { name: /^More highlights at /, includeHidden: true })
+        .locator(':scope > li')
+        .count();
+      expect(shown).toBeLessThanOrEqual(2);
+      if (hidden === 0) {
+        await expect(role.locator('details')).toHaveCount(0);
+      } else {
+        folded += 1;
+        expect(shown).toBe(2);
+        await expect(role.locator('summary')).toHaveText(
+          `Show ${String(hidden)} more ${hidden === 1 ? 'highlight' : 'highlights'}`,
+        );
+      }
+    }
+    expect(folded).toBeGreaterThan(0);
+  });
+
+  test('folds the other projects into one counted expander', async ({ page }) => {
+    const more = page.locator('#projects details');
+    await expect(more).toHaveCount(1);
+    const items = await more
+      .getByRole('list', { name: 'More projects', includeHidden: true })
+      .locator(':scope > li')
+      .count();
+    expect(items).toBeGreaterThan(0);
+    await expect(more.locator('summary')).toHaveText(`Show ${String(items)} more projects`);
+  });
+
+  test('opens an expander from the keyboard', async ({ page }) => {
+    const more = page.locator('#projects details');
+    await more.locator('summary').focus();
+    await page.keyboard.press('Enter');
+    await expect(more).toHaveAttribute('open', '');
+    await expect(more.getByRole('list', { name: 'More projects' })).toBeVisible();
+  });
+
+  test('shows the latest three updates and a link to all of them', async ({ page }) => {
+    await expect(page.locator('#updates ol > li')).toHaveCount(3);
+    await expect(page.locator('#updates').getByRole('link', { name: 'All updates' })).toBeVisible();
+  });
+
+  test('prints every folded item open', async ({ page, browserName }) => {
+    test.skip(browserName !== 'chromium', 'print rendering of ::details-content is checked in Chromium');
+    await page.emulateMedia({ media: 'print' });
+    await expect(
+      page.locator('#projects details').getByRole('list', { name: 'More projects' }),
+    ).toBeVisible();
+    await expect(page.locator('#experience details li').first()).toBeVisible();
+    await expect(page.locator('#projects details summary')).toBeHidden();
   });
 });
