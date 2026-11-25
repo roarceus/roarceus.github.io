@@ -1,0 +1,59 @@
+---
+// "Show more" disclosure (design doc §4.7): native <details>, so it works without JS, stays in the
+// HTML for search engines, and prints open.
+import { focusRing, target } from './recipes';
+
+interface Props {
+  /** What is hidden, with a count: "Show 3 more highlights". */
+  summary: string;
+  class?: string;
+}
+
+const { summary, class: className } = Astro.props;
+---
+
+<details class:list={['expander group', className]}>
+  <summary
+    class:list={[
+      'inline-flex cursor-pointer list-none items-center gap-2 rounded-md font-mono text-sm text-accent-soft',
+      'hover:text-text [&::-webkit-details-marker]:hidden print:hidden',
+      target,
+      focusRing,
+    ]}
+  >
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 16 16"
+      class="size-4 transition-transform duration-ui ease-out group-open:rotate-90"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.75"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="m6 4 4 4-4 4"></path>
+    </svg>
+    {summary}
+  </summary>
+  <div class="mt-2">
+    <slot />
+  </div>
+</details>
+
+<script>
+  // Print every expander open, then restore what the visitor had (design doc §4.7). Browsers with
+  // ::details-content get this from CSS too; this covers the rest.
+  const opened = new Set<HTMLDetailsElement>();
+  window.addEventListener('beforeprint', () => {
+    for (const details of document.querySelectorAll<HTMLDetailsElement>('details.expander')) {
+      if (!details.open) {
+        details.open = true;
+        opened.add(details);
+      }
+    }
+  });
+  window.addEventListener('afterprint', () => {
+    for (const details of opened) details.open = false;
+    opened.clear();
+  });
+</script>

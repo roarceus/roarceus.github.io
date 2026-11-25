@@ -1,0 +1,59 @@
+---
+// kubectl-style table (SPEC §5 "Accuracy matters"): uppercase mono headers, left-aligned columns, the
+// name column as links. Below 640px each row becomes a stacked card labelled by `data-label`; wider
+// tables scroll inside their own container, never the page.
+interface Column {
+  key: string;
+  label: string;
+}
+
+type Cell = string | { text: string; href: string };
+
+interface Props {
+  caption: string;
+  columns: readonly Column[];
+  rows: readonly Record<string, Cell>[];
+  /** Hide the caption visually (it stays for screen readers). */
+  hideCaption?: boolean;
+}
+
+const { caption, columns, rows, hideCaption = true } = Astro.props;
+---
+
+<div class="kube-table overflow-x-auto">
+  <table class="w-full border-collapse font-mono text-sm tabular-nums max-sm:block">
+    <caption class:list={['text-left text-text-muted', { 'sr-only': hideCaption }]}>{caption}</caption>
+    <thead class="text-xs text-text-muted uppercase max-sm:sr-only">
+      <tr>
+        {columns.map(({ label }) => (
+          <th scope="col" class="py-1 pr-6 text-left font-normal whitespace-nowrap">
+            {label}
+          </th>
+        ))}
+      </tr>
+    </thead>
+    <tbody class="text-text max-sm:block">
+      {rows.map((row) => (
+        <tr class="max-sm:mb-3 max-sm:block max-sm:rounded-md max-sm:border max-sm:border-border max-sm:p-3">
+          {columns.map(({ key, label }) => {
+            const cell = row[key] ?? '';
+            return (
+              <td
+                data-label={label}
+                class="py-0.5 pr-6 align-top whitespace-nowrap max-sm:flex max-sm:gap-3 max-sm:whitespace-normal max-sm:before:w-20 max-sm:before:shrink-0 max-sm:before:text-xs max-sm:before:text-text-muted max-sm:before:uppercase max-sm:before:content-[attr(data-label)]"
+              >
+                {typeof cell === 'string' ? (
+                  cell
+                ) : (
+                  <a href={cell.href} class="link">
+                    {cell.text}
+                  </a>
+                )}
+              </td>
+            );
+          })}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
