@@ -1,7 +1,5 @@
 # Content guide
 
-> **In progress.** Schemas landed in Stage 1 PR 1; the real content and full field reference arrive in PR 2.
-
 All portfolio content lives in `src/content/` as YAML and Markdown, validated by Zod schemas in
 `src/lib/content/schemas/collections.ts` and registered in `src/content.config.ts`. Both the plain view and
 the cluster view render from the same data, so updating content never means touching components. An invalid
@@ -22,6 +20,20 @@ description) are checked whenever a page loads content (`src/lib/content/integri
 
 Dates are `YYYY-MM` (`end` may be `present`); update dates are `YYYY-MM-DD`. Links must be `https:`
 (or `mailto:`). The file name (or `id`) is the slug and must be lowercase kebab-case.
+
+## Writing rules
+
+- Facts only. If you don't know a date, link, or number, write `TODO(sohan)` (text fields) and list it in
+  [`content-review.md`](content-review.md); never guess.
+- Prose fields (summaries, descriptions, update bodies) are short, first person, and concrete: what you
+  built, with what, and the result. Put numbers in a highlight's `metric` (`~40% faster`).
+- YAML: quote a value that contains `: ` (`tagline: "This site: …"`). Unquoted `2025-06` stays a string;
+  unquoted `2025-06-26` in update front matter becomes a date (both are what the schemas expect).
+- Links between pages in Markdown are relative (`../../projects/asktrace/` from an update), so they work
+  under PR preview paths. External links must be `https://`.
+- A project's `order` sets its position everywhere; `featured: true` puts it in the highlights (needs a
+  body). `node` is the org it was built at (`capgemini`, `mastercontrol`, `northeastern`, `mumbai`,
+  `sparks-foundation`); leave it out for unscheduled work like this site.
 
 How to add an update, a project, or a role, step by step:
 [`docs/runbooks/adding-content.md`](runbooks/adding-content.md).

@@ -249,7 +249,7 @@ Collections (adjust fields as needed, but keep this shape):
 - **Northeastern University**: Master's (focus on DevOps and application development). Graduated spring 2026.
 - **MasterControl**: DevOps Engineer co-op. Projects there include an AI agent framework for Gradle rollouts (LangGraph + Claude Code) and a GitOps deployment bot (GitHub App / Probot).
 - **Teaching assistant** for a cloud computing course at Northeastern for one semester (after the co-op).
-- Currently: based in Santa Clara, CA (Bay Area, moved August 2026), job searching, and studying for the **CKA** (certification status: in progress).
+- Currently: based in Santa Clara, CA (Bay Area, moved August 2026), job searching, and studying for the **CKA** and **CKAD** (both in progress).
 - Notable projects to include (details from the old repo, project READMEs, and Sohan): **askTRACE** (Kafka / GKE / RAG, GCP Terraform, Jenkins CI), **AWS infrastructure automation with Terraform** (webapp + serverless, CI/CD), **PromotionBot** (GitOps deployment bot), **BoringBot** (AI agent framework), **SafeHaven** (MERN refugee portal).
 - Exact dates, metrics, links, and contact details not listed here: `TODO(sohan)`.
 
@@ -259,7 +259,7 @@ Collections (adjust fields as needed, but keep this shape):
 
 ### Mapping
 - **Cluster** = Sohan's career. Name: `sohan-cluster`.
-- **Nodes** = organizations/eras: `capgemini`, `northeastern`, `mastercontrol`, `mumbai` (Bachelor's era) (labels: `role=work|education|teaching`).
+- **Nodes** = organizations/eras: `capgemini`, `northeastern`, `mastercontrol`, `mumbai` (Bachelor's era), `sparks-foundation` (2020 internship) (labels: `role=work|education|teaching`).
   A node is declared by the `node` field of an experience or education entry.
 - **Pods** = projects, scheduled on the node where they were built. Pod status mirrors project status.
 - **Namespaces** = sections: `career`, `projects`, `skills`, `updates`.
@@ -280,7 +280,7 @@ Collections (adjust fields as needed, but keep this shape):
 | `kubectl get pods -o wide` | Projects with node and tech columns |
 | `kubectl get <resource> -o yaml` | Raw YAML of the content entry |
 | `kubectl top skills` | Skills with usage bars |
-| `kubectl get certificates` | Certifications (CKA shows `in-progress`) |
+| `kubectl get certificates` | Certifications (CKA and CKAD show `in-progress`) |
 | `kubectl get achievements` | Achievements |
 | `kubectl logs updates` (`-f` streams them in) | Latest updates |
 | `kubectl get events` | Combined timeline (roles, projects, updates), newest first |
