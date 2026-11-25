@@ -8,8 +8,6 @@ Sohan's answers (2026-11-25). Nothing is invented: unknowns stay `TODO(sohan)` o
 
 ## Open
 
-- [ ] **askTRACE teammate:** the project says "a team of two" without naming your teammate. Credit them by
-      name (with a link, if they'd like one), or keep it as is?
 - [ ] **Older project dates and eras:** no dates for Kounsellor, both Meeting Notes apps, Maps Clone,
       Travel Website, Analog Clock, and Book Review System ("older than 2024"). Five of them sit on the
       `mumbai` node (assumed Bachelor's era); Book Review System and Meeting Notes (React) have no node.
@@ -31,7 +29,7 @@ Sohan's answers (2026-11-25). Nothing is invented: unknowns stay `TODO(sohan)` o
 - [x] MasterControl numbers: 60+ repos (deploy gate), about 55 services and 100+ merged PRs (agents).
       Deploy time saved was never tracked, so it's left out.
 - [x] Capgemini: no team size or user counts available; added who used it and the terabytes of data.
-- [x] askTRACE: two-person team, 13 repos, demo video linked, org link confirmed.
+- [x] askTRACE: two-person team, 13 repos, demo video linked, org link confirmed. The teammate stays unnamed.
 - [x] AWS project: CSYE 6225, solo, three repos; the org link resolves (`tf-aws-infra`, `webapp`,
       `serverless`).
 - [x] Grade Calculator Jan to Apr 2025; HuskyHub Jan to Apr 2024.
