@@ -6,6 +6,7 @@ const collections: Record<string, { id: string; data: Record<string, unknown>; b
 
 vi.mock('astro:content', () => ({
   getCollection: vi.fn((name: string) => Promise.resolve(collections[name] ?? [])),
+  render: vi.fn((entry: { id: string }) => Promise.resolve({ Content: `rendered:${entry.id}` })),
 }));
 
 const {
@@ -19,6 +20,7 @@ const {
   getProjectsByNode,
   getSkills,
   getUpdates,
+  renderEntry,
 } = await import('./queries');
 
 const ids = (entries: { id: string }[]) => entries.map((entry) => entry.id);
@@ -91,5 +93,10 @@ describe('content queries', () => {
   it('fails loudly when content is inconsistent', async () => {
     collections.projects?.push({ id: 'ghost', data: { node: 'nowhere', featured: false, order: 9 } });
     await expect(getProjects()).rejects.toThrow('projects/ghost: node "nowhere"');
+  });
+
+  it('renders an entry body through astro:content', async () => {
+    const profile = await getProfile();
+    expect(await renderEntry(profile)).toEqual({ Content: 'rendered:profile' });
   });
 });

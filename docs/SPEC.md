@@ -249,7 +249,7 @@ Collections (adjust fields as needed, but keep this shape):
 - **Northeastern University**: Master's (focus on DevOps and application development). Graduated spring 2026.
 - **MasterControl**: DevOps Engineer co-op. Projects there include an AI agent framework for Gradle rollouts (LangGraph + Claude Code) and a GitOps deployment bot (GitHub App / Probot).
 - **Teaching assistant** for a cloud computing course at Northeastern for one semester (after the co-op).
-- Currently: based in Santa Clara, CA (Bay Area, moved August 2026), job searching, and studying for the **CKA** and **CKAD** (both in progress).
+- Currently: based in the San Francisco Bay Area (moved August 2026; shown as "San Francisco Bay Area", not a city), job searching, and studying for the **CKA** and **CKAD** (both in progress).
 - Notable projects to include (details from the old repo, project READMEs, and Sohan): **askTRACE** (Kafka / GKE / RAG, GCP Terraform, Jenkins CI), **AWS infrastructure automation with Terraform** (webapp + serverless, CI/CD), a **GitOps deployment-gating bot** and an **AI agent framework for large-scale code migrations** (both internal to MasterControl: never use their internal names publicly), **SafeHaven** (MERN refugee portal).
 - Exact dates, metrics, links, and contact details not listed here: `TODO(sohan)`.
 

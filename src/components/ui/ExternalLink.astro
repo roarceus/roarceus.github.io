@@ -1,0 +1,13 @@
+---
+// Every off-site link goes through here so it always gets rel="noopener noreferrer" (SPEC §10b).
+interface Props {
+  href: string;
+  class?: string;
+}
+
+const { href, class: className } = Astro.props;
+---
+
+<a href={href} rel="noopener noreferrer" class:list={['link', className]}>
+  <slot />
+</a>

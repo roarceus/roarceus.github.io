@@ -1,0 +1,32 @@
+---
+import { getEducation } from '@/lib/content/queries';
+import { formatRange } from '@/lib/utils/dates';
+
+import Section from './Section.astro';
+
+const degrees = await getEducation();
+---
+
+<Section id="education" title="Education">
+  <div class="flex flex-col gap-8">
+    {degrees.map(({ data }) => (
+      <article class="flex flex-col gap-2">
+        <h3 class="text-lg font-semibold text-text">
+          {data.degree}, {data.field}
+        </h3>
+        <p class="text-text-muted">{data.school}</p>
+        <p class="flex flex-wrap gap-x-4 font-mono text-sm text-text-muted">
+          <span>{data.location}</span>
+          <span>{formatRange(data.start, data.end)}</span>
+        </p>
+        {data.highlights.length > 0 && (
+          <ul class="flex list-disc flex-col gap-1 pl-5 text-text-muted marker:text-border">
+            {data.highlights.map((highlight) => (
+              <li>{highlight}</li>
+            ))}
+          </ul>
+        )}
+      </article>
+    ))}
+  </div>
+</Section>

@@ -12,6 +12,11 @@ export default defineConfig({
   output: 'static',
   trailingSlash: 'always',
   integrations: [react()],
+  markdown: {
+    // Site copy must read as human-written: no curly quotes or typographic dashes added at build
+    // time (tests/static/content-style.test.ts checks the source, the plain e2e the output).
+    smartypants: false,
+  },
   build: {
     // GitHub Pages branch deploys run Jekyll, which hides "_"-prefixed folders like Astro's
     // default "_astro". Use a plain name; public/.nojekyll is the second safeguard.

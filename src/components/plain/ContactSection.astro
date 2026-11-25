@@ -1,0 +1,32 @@
+---
+import ExternalLink from '@/components/ui/ExternalLink.astro';
+import { getProfile } from '@/lib/content/queries';
+
+import Section from './Section.astro';
+
+const { data } = await getProfile();
+const linkClass = 'inline-flex min-h-11 items-center';
+---
+
+<Section id="contact" title="Contact">
+  <p class="mb-3 max-w-prose text-text-muted">
+    The best way to reach me is email. I'm also on LinkedIn and GitHub.
+  </p>
+  <ul role="list" class="flex flex-col font-mono text-sm sm:flex-row sm:gap-x-6">
+    <li>
+      <a href={`mailto:${data.links.email}`} class:list={['link', linkClass]}>
+        {data.links.email}
+      </a>
+    </li>
+    <li>
+      <ExternalLink href={data.links.linkedin} class={linkClass}>
+        LinkedIn
+      </ExternalLink>
+    </li>
+    <li>
+      <ExternalLink href={data.links.github} class={linkClass}>
+        GitHub
+      </ExternalLink>
+    </li>
+  </ul>
+</Section>

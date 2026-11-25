@@ -18,6 +18,8 @@
   /* Accent */
   --accent: #326ce5;
   --accent-soft: #5b8def;
+  /* Text on an --accent fill (white passes AA there; --text does not). */
+  --on-accent: #ffffff;
 
   /* Status language */
   --status-running: #3fb950;
@@ -33,6 +35,11 @@
   --text-sm-fluid: clamp(0.875rem, 0.84rem + 0.15vw, 0.95rem);
   --text-base-fluid: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
   --text-display-fluid: clamp(2rem, 1.4rem + 3vw, 3.75rem);
+
+  /* Print (the only light colors: printed pages use ink on paper) */
+  --print-bg: #ffffff;
+  --print-text: #000000;
+  --print-muted: #333333;
 
   /* Motion */
   --duration-ui: 200ms;

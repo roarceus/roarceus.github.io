@@ -4,6 +4,10 @@
 # Fragment links (#section) must point at a real id (lychee >= 0.24 takes a mode, not a boolean).
 include_fragments = "full"
 
+# Resolve directory links (`plain/`) to their page, so `plain/#contact` is checked against the
+# ids in plain/index.html. Without this, lychee looks for the fragment on the folder and fails.
+index_files = ["index.html"]
+
 # Retry flaky hosts instead of failing the build.
 max_retries = 3
 retry_wait_time = 2
@@ -13,6 +17,9 @@ timeout = 20
 accept = ["100..=103", "200..=299", "429"]
 
 exclude = [
-  # Canonical/OG URLs point at production, which doesn't exist until the first release.
+  # Canonical/OG URLs point at production, which only has pages from the last release (a PR's new
+  # pages aren't live yet). Production itself is covered by the smoke tests.
   "^https://roarceus\\.github\\.io/",
+  # LinkedIn answers automated requests with a non-standard 999 status, even for valid profiles.
+  "^https://(www\\.)?linkedin\\.com/",
 ]

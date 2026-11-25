@@ -1,0 +1,37 @@
+---
+import TagList from '@/components/ui/TagList.astro';
+import { getExperience } from '@/lib/content/queries';
+import { formatRange } from '@/lib/utils/dates';
+
+import Section from './Section.astro';
+
+const roles = await getExperience();
+---
+
+<Section id="experience" title="Experience">
+  <div class="flex flex-col gap-10">
+    {roles.map(({ data }) => (
+      <article class="flex flex-col gap-3">
+        <h3 class="text-lg font-semibold text-text">
+          {data.role}, <span class="text-text-muted">{data.org}</span>
+        </h3>
+        <p class="flex flex-wrap gap-x-4 font-mono text-sm text-text-muted">
+          <span>{data.location}</span>
+          <span>{formatRange(data.start, data.end)}</span>
+        </p>
+        <p class="text-text-muted">{data.summary}</p>
+        {data.highlights.length > 0 && (
+          <ul class="flex list-disc flex-col gap-2 pl-5 text-text-muted marker:text-border">
+            {data.highlights.map((highlight) => (
+              <li>
+                {highlight.metric && <strong class="font-semibold text-text">{highlight.metric}: </strong>}
+                {highlight.text}
+              </li>
+            ))}
+          </ul>
+        )}
+        <TagList items={data.tech} label={`Tech used at ${data.org}`} />
+      </article>
+    ))}
+  </div>
+</Section>

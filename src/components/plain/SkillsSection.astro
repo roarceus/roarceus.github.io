@@ -1,0 +1,19 @@
+---
+import TagList from '@/components/ui/TagList.astro';
+import { getSkills } from '@/lib/content/queries';
+
+import Section from './Section.astro';
+
+const groups = await getSkills();
+---
+
+<Section id="skills" title="Skills">
+  <div class="grid gap-6 sm:grid-cols-2">
+    {groups.map(({ data }) => (
+      <div class="flex flex-col gap-2">
+        <h3 class="font-mono text-sm font-semibold text-text">{data.category}</h3>
+        <TagList items={data.items.map((item) => item.name)} label={data.category} />
+      </div>
+    ))}
+  </div>
+</Section>

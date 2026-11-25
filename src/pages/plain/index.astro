@@ -1,0 +1,42 @@
+---
+import AwardsSection from '@/components/plain/AwardsSection.astro';
+import CertificationsSection from '@/components/plain/CertificationsSection.astro';
+import ContactSection from '@/components/plain/ContactSection.astro';
+import EducationSection from '@/components/plain/EducationSection.astro';
+import ExperienceSection from '@/components/plain/ExperienceSection.astro';
+import Intro from '@/components/plain/Intro.astro';
+import ProjectsSection from '@/components/plain/ProjectsSection.astro';
+import SectionNav from '@/components/plain/SectionNav.astro';
+import SkillsSection from '@/components/plain/SkillsSection.astro';
+import UpdatesSection from '@/components/plain/UpdatesSection.astro';
+import { site } from '@/config/site';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+---
+
+<BaseLayout title={`${site.name} | Portfolio`}>
+  <!--
+    Mobile and tablet: intro, then the section links, then the sections, in one column.
+    1024px and up: the section links become a sticky sidebar on the left.
+  -->
+  <main
+    id="main"
+    class="mx-auto grid max-w-6xl gap-10 px-4 py-10 sm:px-8 lg:grid-cols-[12rem_minmax(0,48rem)] lg:gap-x-12"
+  >
+    <div class="lg:col-start-2">
+      <Intro />
+    </div>
+    <aside class="lg:sticky lg:top-6 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:self-start">
+      <SectionNav />
+    </aside>
+    <div class="flex flex-col gap-12 lg:col-start-2">
+      <ExperienceSection />
+      <ProjectsSection />
+      <SkillsSection />
+      <EducationSection />
+      <CertificationsSection />
+      <AwardsSection />
+      <UpdatesSection />
+      <ContactSection />
+    </div>
+  </main>
+</BaseLayout>

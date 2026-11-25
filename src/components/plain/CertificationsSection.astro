@@ -1,0 +1,32 @@
+---
+import ExternalLink from '@/components/ui/ExternalLink.astro';
+import StatusPill from '@/components/ui/StatusPill.astro';
+import { getCertifications } from '@/lib/content/queries';
+import { formatYearMonth } from '@/lib/utils/dates';
+
+import Section from './Section.astro';
+
+const certifications = await getCertifications();
+---
+
+<Section id="certifications" title="Certifications">
+  <ul role="list" class="flex flex-col gap-4">
+    {certifications.map(({ data }) => (
+      <li class="flex flex-col gap-1">
+        <p class="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <span class="font-semibold text-text">{data.name}</span>
+          <StatusPill status={data.status} />
+        </p>
+        <p class="text-text-muted">
+          {data.issuer}
+          {data.date && <span class="font-mono text-sm">, {formatYearMonth(data.date)}</span>}
+        </p>
+        {data.credentialUrl && (
+          <ExternalLink href={data.credentialUrl} class="inline-flex min-h-11 items-center font-mono text-sm">
+            Credential<span class="sr-only"> for {data.name}</span>
+          </ExternalLink>
+        )}
+      </li>
+    ))}
+  </ul>
+</Section>

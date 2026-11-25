@@ -1,23 +1,59 @@
 ---
-import { buildInfo } from '@/config/build-info';
-import { site } from '@/config/site';
+// Pre-rendered hero and the no-JS entry point (SPEC §4). The cluster dashboard builds on top of
+// this in Stage 2; until then it sends visitors to the plain view.
+import StatusPill from '@/components/ui/StatusPill.astro';
+import { plainSections } from '@/config/sections';
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getProfile } from '@/lib/content/queries';
+import { url } from '@/lib/utils/url';
+
+const { data: profile } = await getProfile();
+const button =
+  'inline-flex min-h-11 min-w-11 items-center justify-center rounded-md px-4 font-mono text-sm font-semibold';
 ---
 
 <BaseLayout>
-  <main class="mx-auto flex min-h-dvh max-w-3xl flex-col justify-center gap-6 px-4 py-16 sm:px-8">
+  <main
+    id="main"
+    class="mx-auto flex min-h-[70dvh] max-w-3xl flex-col justify-center gap-6 px-4 py-16 sm:px-8"
+  >
     <p class="font-mono text-[length:var(--text-sm-fluid)] text-text-muted">sohan-cluster</p>
-    <h1 class="text-[length:var(--text-display-fluid)] leading-tight font-semibold tracking-tight text-text">
-      {site.name}
+    <h1 class="text-[length:var(--text-display-fluid)] leading-tight font-semibold tracking-tight">
+      {profile.name}
     </h1>
-    <p class="text-[length:var(--text-base-fluid)] text-text-muted">Site under construction.</p>
-    <p class="flex items-center gap-2 font-mono text-[length:var(--text-sm-fluid)] text-text-muted">
-      <span aria-hidden="true" class="text-status-pending">
-        ●
-      </span>
-      <span data-testid="build-version">
-        v{buildInfo.version} ({buildInfo.shortCommit})
-      </span>
+    <p class="text-lg text-text">{profile.title}</p>
+    <p class="max-w-prose text-[length:var(--text-base-fluid)] text-text-muted">{profile.tagline}</p>
+    <p class="flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-sm text-text-muted">
+      <span>{profile.location}</span>
+      {profile.openToWork && <StatusPill status="running" label="Open to work" />}
     </p>
+    <div role="group" aria-label="Main actions" class="flex flex-wrap gap-3">
+      <a href={url('plain/')} class:list={[button, 'bg-accent text-on-accent hover:underline']}>
+        View portfolio
+      </a>
+      <a
+        href={url(profile.resume)}
+        class:list={[button, 'border border-border text-text hover:border-accent-soft']}
+      >
+        Resume
+      </a>
+      <a
+        href={url('plain/#contact')}
+        class:list={[button, 'border border-border text-text hover:border-accent-soft']}
+      >
+        Contact
+      </a>
+    </div>
+    <nav aria-label="Portfolio sections">
+      <ul role="list" class="flex flex-wrap gap-x-1 font-mono text-sm">
+        {plainSections.map(({ id, label }) => (
+          <li>
+            <a href={url(`plain/#${id}`)} class="link inline-flex min-h-11 items-center px-2 first:-ml-2">
+              {label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
   </main>
 </BaseLayout>

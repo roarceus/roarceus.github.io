@@ -1,0 +1,29 @@
+---
+import ExternalLink from '@/components/ui/ExternalLink.astro';
+import { getAchievements } from '@/lib/content/queries';
+import { formatYearMonth } from '@/lib/utils/dates';
+
+import Section from './Section.astro';
+
+const awards = await getAchievements();
+---
+
+<Section id="awards" title="Awards">
+  <ul role="list" class="flex flex-col gap-5">
+    {awards.map(({ data }) => (
+      <li class="flex flex-col gap-1">
+        <p class="font-semibold text-text">{data.title}</p>
+        <p class="flex flex-wrap gap-x-4 font-mono text-sm text-text-muted">
+          {data.org && <span>{data.org}</span>}
+          <span>{formatYearMonth(data.date)}</span>
+        </p>
+        <p class="text-text-muted">{data.description}</p>
+        {data.link && (
+          <ExternalLink href={data.link} class="inline-flex min-h-11 items-center font-mono text-sm">
+            Details<span class="sr-only"> on {data.title}</span>
+          </ExternalLink>
+        )}
+      </li>
+    ))}
+  </ul>
+</Section>

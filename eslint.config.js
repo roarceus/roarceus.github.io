@@ -69,6 +69,14 @@ export default defineConfig(
   // Astro components (with JSX a11y rules).
   ...astro.configs['flat/recommended'],
   ...astro.configs['flat/jsx-a11y-recommended'],
+  {
+    files: ['**/*.astro'],
+    rules: {
+      // Safari/VoiceOver drops list semantics from lists styled with list-style: none, so unstyled
+      // lists keep an explicit role="list".
+      'astro/jsx-a11y/no-redundant-roles': ['error', { ul: ['list'], ol: ['list'] }],
+    },
+  },
 
   // Dependency direction (SPEC §3): lib/ stays framework-free so it's unit-testable without a DOM.
   {

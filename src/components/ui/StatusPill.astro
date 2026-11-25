@@ -1,0 +1,33 @@
+---
+// Status is always spelled out; color only reinforces it (SPEC §5 state language, WCAG 1.4.1).
+type Status = 'running' | 'completed' | 'pending' | 'in-progress' | 'issued';
+
+interface Props {
+  status: Status;
+  /** Overrides the default label, e.g. "Open to work". */
+  label?: string;
+}
+
+const LABELS: Record<Status, string> = {
+  running: 'Running',
+  completed: 'Completed',
+  pending: 'Pending',
+  'in-progress': 'In progress',
+  issued: 'Issued',
+};
+
+const DOTS: Record<Status, string> = {
+  running: 'bg-status-running',
+  completed: 'bg-status-completed',
+  pending: 'bg-status-pending',
+  'in-progress': 'bg-status-pending',
+  issued: 'bg-status-running',
+};
+
+const { status, label = LABELS[status] } = Astro.props;
+---
+
+<span class="inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 py-0.5 font-mono text-xs whitespace-nowrap text-text">
+  <span aria-hidden="true" class:list={['size-2 rounded-full', DOTS[status]]}></span>
+  {label}
+</span>

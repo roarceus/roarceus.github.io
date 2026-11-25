@@ -1,6 +1,8 @@
 ---
 import '@/styles/global.css';
 
+import SiteFooter from '@/components/layout/SiteFooter.astro';
+import SiteHeader from '@/components/layout/SiteHeader.astro';
 import { site } from '@/config/site';
 import { url } from '@/lib/utils/url';
 
@@ -42,6 +44,11 @@ const csp = [
     <link rel="icon" href={url('favicon.svg')} type="image/svg+xml" />
   </head>
   <body>
+    <a href="#main" class="skip-link">
+      Skip to content
+    </a>
+    <SiteHeader />
     <slot />
+    <SiteFooter />
   </body>
 </html>
