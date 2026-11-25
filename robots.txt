@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://roarceus.github.io/sitemap-index.xml
