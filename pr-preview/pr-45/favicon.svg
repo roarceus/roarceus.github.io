@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="SP">
+  <!-- Original mark: a node hexagon with initials. Not the Kubernetes logo (SPEC §5 trademarks). -->
+  <polygon points="32,3 57,17.5 57,46.5 32,61 7,46.5 7,17.5" fill="#111722" stroke="#326CE5" stroke-width="4" stroke-linejoin="round"/>
+  <text x="32" y="41" text-anchor="middle" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="22" font-weight="700" fill="#E6EDF3">SP</text>
+</svg>
