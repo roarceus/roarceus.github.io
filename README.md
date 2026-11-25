@@ -15,7 +15,8 @@ switch to a plain, recruiter-friendly view.
 
 **Stage 1 — Content and plain view (in progress, → v0.2.0).** Live is still the v0.1.0 placeholder.
 Done so far: content, the full plain portfolio at `/plain/`, a home hero, project pages, updates, and an
-RSS feed, and a contact form. Next: SEO metadata, sitemap, and the 404 page. Progress:
+RSS feed, a contact form, and search and share metadata (sitemap, share image, themed 404 page). Next: the
+stage wrap-up (Lighthouse on more pages, sign-off). Progress:
 [`docs/STATUS.md`](docs/STATUS.md) · [project board](https://github.com/users/roarceus/projects/1) ·
 [changelog](CHANGELOG.md) (from v0.1.0).
 
@@ -23,16 +24,16 @@ RSS feed, and a contact form. Next: SEO metadata, sitemap, and the 404 page. Pro
 
 Planned per stage ([SPEC §11](docs/SPEC.md)):
 
-| Stage                        | Version | What ships                                                                                 |
-| ---------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| 0 — Foundation               | 0.1.0   | Scaffold, quality gates, CI, PR previews, releases, placeholder page                       |
-| 1 — Content and plain view   | 0.2.0   | Schema-validated content, full plain portfolio, project pages, updates + RSS, contact form |
-| 2 — Design system and layout | 0.3.0   | Tokens, components, dashboard layout, mobile layout                                        |
-| 3 — Terminal engine          | 0.4.0   | `kubectl`-style commands, autocomplete, history, clickable output                          |
-| 4 — Cluster visualization    | 0.5.0   | Interactive map of nodes (roles) and pods (projects), synced with the terminal             |
-| 5 — Boot sequence and polish | 0.6.0   | Boot animation, transitions, OG images, tap-first mobile cluster                           |
-| 6 — Game layer               | 0.7.0   | Self-healing pods, chaos mode, badges, easter eggs                                         |
-| 7 — Hardening                | 1.0.0   | Accessibility and performance passes, cross-browser checks, launch                         |
+| Stage                        | Version | What ships                                                                                                    |
+| ---------------------------- | ------- | ------------------------------------------------------------------------------------------------------------- |
+| 0 — Foundation               | 0.1.0   | Scaffold, quality gates, CI, PR previews, releases, placeholder page                                          |
+| 1 — Content and plain view   | 0.2.0   | Schema-validated content, full plain portfolio, project pages, updates + RSS, contact form, SEO, sitemap, 404 |
+| 2 — Design system and layout | 0.3.0   | Tokens, components, dashboard layout, mobile layout                                                           |
+| 3 — Terminal engine          | 0.4.0   | `kubectl`-style commands, autocomplete, history, clickable output                                             |
+| 4 — Cluster visualization    | 0.5.0   | Interactive map of nodes (roles) and pods (projects), synced with the terminal                                |
+| 5 — Boot sequence and polish | 0.6.0   | Boot animation, transitions, OG images, tap-first mobile cluster                                              |
+| 6 — Game layer               | 0.7.0   | Self-healing pods, chaos mode, badges, easter eggs                                                            |
+| 7 — Hardening                | 1.0.0   | Accessibility and performance passes, cross-browser checks, launch                                            |
 
 Everything stays reachable without typing (clickable map, command chips, plain view), works from 320px to
 2560px, and respects reduced motion.
@@ -106,15 +107,16 @@ Build the way a PR preview does: `BASE_PATH=/pr-preview/pr-0/ pnpm build` (Git B
 .github/        workflows, composite setup action, issue/PR templates, labels, commit convention
 .husky/         pre-commit (lint-staged) and commit-msg (commitlint) hooks
 docs/           SPEC, STATUS, plans, ADRs, runbooks, postmortems, content guide
-public/         served as-is: favicon, robots.txt, .nojekyll
+public/         served as-is: favicon, resume, share image (og-image.png), .nojekyll
 src/
-  components/   layout/ (header, footer), plain/ (plain view sections), ui/ (status pill, tags, links)
+  components/   layout/ (header, footer, SEO head tags), plain/ (plain view sections), ui/ (status pill, tags, links)
   config/       site metadata, build info (version + commit), feature flags
   content/      portfolio content (YAML + Markdown); schemas registered in content.config.ts
   layouts/      page layouts (BaseLayout sets meta tags and the CSP)
   lib/content/  Zod schemas, query helpers, integrity check (how components read content)
+  lib/seo/      share metadata and JSON-LD helpers
   lib/utils/    framework-free helpers: url() for the base path, date formatting
-  pages/        routes
+  pages/        routes (plus rss.xml, robots.txt, and the 404 page)
   styles/       tokens.css (design tokens) and global.css
 tests/
   e2e/          Playwright specs (fail on any console error)

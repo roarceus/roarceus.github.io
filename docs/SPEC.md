@@ -80,7 +80,7 @@ Production-grade layout. New top-level folders or changes to this structure need
 │   ├── plans/                  # stage-N.md
 │   ├── adr/                    # NNNN-title.md
 │   └── github/rulesets/        # exported ruleset JSON
-├── public/                     # resume.pdf, favicon, robots.txt (served as-is)
+├── public/                     # resume.pdf, favicon, og-image.png (served as-is)
 ├── src/
 │   ├── assets/                 # images processed by astro:assets
 │   ├── components/

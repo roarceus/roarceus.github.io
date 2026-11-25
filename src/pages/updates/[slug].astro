@@ -18,7 +18,7 @@ const { data } = update;
 const { Content } = await renderEntry(update);
 ---
 
-<BaseLayout title={`${data.title} | ${site.name}`} description={data.summary}>
+<BaseLayout title={`${data.title} | ${site.name}`} description={data.summary} type="article">
   <main id="main" class="mx-auto flex max-w-3xl flex-col gap-5 px-4 py-10 sm:px-8">
     <a href={url('updates/')} class="link inline-flex min-h-11 items-center self-start font-mono text-sm">
       All updates

@@ -1,0 +1,155 @@
+<!doctype html>
+<!--
+  Source for public/og-image.png, the 1200x630 link preview image. Colors match src/styles/tokens.css.
+  Regenerate: docs/runbooks/share-image.md.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      @font-face {
+        font-family: 'Inter Variable';
+        src: url('../../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2')
+          format('woff2');
+        font-weight: 100 900;
+      }
+      @font-face {
+        font-family: 'JetBrains Mono Variable';
+        src: url('../../node_modules/@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2')
+          format('woff2');
+        font-weight: 100 800;
+      }
+      :root {
+        --bg: #0a0e14;
+        --surface-1: #111722;
+        --border: #243044;
+        --text: #e6edf3;
+        --text-muted: #8b98a9;
+        --accent: #326ce5;
+        --accent-soft: #5b8def;
+        --running: #3fb950;
+      }
+      * {
+        margin: 0;
+        box-sizing: border-box;
+      }
+      body {
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'Inter Variable', sans-serif;
+      }
+      .card {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        padding: 72px 80px;
+        display: flex;
+        flex-direction: column;
+        background-image:
+          radial-gradient(circle at 88% 12%, rgb(50 108 229 / 0.28), transparent 45%),
+          linear-gradient(var(--border) 1px, transparent 1px),
+          linear-gradient(90deg, var(--border) 1px, transparent 1px);
+        background-size:
+          100% 100%,
+          48px 48px,
+          48px 48px;
+        background-position:
+          0 0,
+          -1px -1px,
+          -1px -1px;
+      }
+      .card::after {
+        /* Fade the grid toward the bottom left so the text stays readable. */
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(115deg, var(--bg) 35%, rgb(10 14 20 / 0.6) 75%, rgb(10 14 20 / 0.3));
+      }
+      .content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+      .mono {
+        font-family: 'JetBrains Mono Variable', monospace;
+      }
+      .cluster {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-size: 26px;
+        color: var(--text-muted);
+      }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 16px;
+        border: 2px solid var(--running);
+        border-radius: 999px;
+        color: var(--running);
+        font-size: 20px;
+      }
+      .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--running);
+      }
+      h1 {
+        margin-top: 56px;
+        font-size: 104px;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        line-height: 1;
+      }
+      .title {
+        margin-top: 24px;
+        font-size: 36px;
+        font-weight: 500;
+        color: var(--accent-soft);
+      }
+      .tagline {
+        margin-top: 18px;
+        font-size: 30px;
+        color: var(--text-muted);
+      }
+      .footer {
+        margin-top: auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        font-size: 24px;
+        color: var(--text-muted);
+      }
+      .footer .url {
+        color: var(--text);
+      }
+      .prompt {
+        color: var(--accent-soft);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="content">
+        <div class="cluster mono">
+          <span>sohan-cluster</span>
+          <span class="pill"><span class="dot"></span>Running</span>
+        </div>
+        <h1>Sohan Patil</h1>
+        <p class="title">Software Engineer (DevOps, Cloud, Full Stack)</p>
+        <p class="tagline">I build backend services, CI/CD pipelines, and Kubernetes tooling.</p>
+        <div class="footer mono">
+          <span><span class="prompt">$</span> kubectl get portfolio</span>
+          <span class="url">roarceus.github.io</span>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

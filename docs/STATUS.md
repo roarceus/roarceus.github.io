@@ -10,8 +10,9 @@ _Last updated: 2026-11-24_
 
 - **Done:** schemas and helpers (#41), content and review (#43), `/plain/` and home hero (#44). Release PR
   #42 (v0.2.0) stays open until the stage ends.
-- **Done:** project pages, updates, RSS (#45).
-- **In progress:** PR 5, contact form (#38). **Next:** SEO metadata, sitemap, 404 (#39).
+- **Done:** project pages, updates, RSS (#45); contact form (#46).
+- **In progress:** PR 6, SEO metadata, share image, sitemap, robots.txt, 404 (#39). **Next:** stage
+  wrap-up (#40): Lighthouse URLs, width checks, sign-off, then merge release PR #42 (v0.2.0).
 
 ## Stage 0 sign-off
 
@@ -43,8 +44,8 @@ _Last updated: 2026-11-24_
 
 ## Next steps
 
-1. Sohan: answer `docs/content-review.md` once PR 2 opens (before PR 3); Web3Forms access key before PR 5;
-   uptime monitor (M10).
+1. Sohan: uptime monitor (M10). After v0.2.0 ships: submit the sitemap in Google Search Console and check
+   the share preview in a link inspector (runbook: `docs/runbooks/share-image.md`).
 2. Decide on Renovate's queued TypeScript 7 PR (fails until `typescript-eslint` supports TS 7; a
    `packageRules` entry can hold TS majors until then).
 
@@ -63,4 +64,6 @@ _Last updated: 2026-11-24_
   CI/SAST, security policy before #28). Several clear over time; the rest are expected for a solo static site.
 - Claude Code sessions must source `~/.ssh/agent.env` before git network commands (passphrase-protected
   `id_roarceus` key) and refresh PATH for fnm's Node 26.
+- GitHub Pages serves only the root `404.html`, so a missing page under a PR preview shows production's
+  404 page.
 - Git Bash rewrites `BASE_PATH=/...`; use `MSYS2_ENV_CONV_EXCL=BASE_PATH` (runbook: local setup).

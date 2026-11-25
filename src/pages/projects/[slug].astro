@@ -22,7 +22,7 @@ const builtAt = data.node ? await getNodeLabel(data.node) : undefined;
 const linkClass = 'inline-flex min-h-11 items-center';
 ---
 
-<BaseLayout title={`${data.name} | ${site.name}`} description={data.tagline}>
+<BaseLayout title={`${data.name} | ${site.name}`} description={data.tagline} type="article">
   <main id="main" class="mx-auto flex max-w-3xl flex-col gap-5 px-4 py-10 sm:px-8">
     <a
       href={url('plain/#projects')}

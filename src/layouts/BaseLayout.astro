@@ -1,6 +1,7 @@
 ---
 import '@/styles/global.css';
 
+import SeoHead from '@/components/layout/SeoHead.astro';
 import SiteFooter from '@/components/layout/SiteFooter.astro';
 import SiteHeader from '@/components/layout/SiteHeader.astro';
 import { site } from '@/config/site';
@@ -9,10 +10,19 @@ import { url } from '@/lib/utils/url';
 interface Props {
   title?: string;
   description?: string;
+  type?: 'website' | 'article';
+  /** Adds the schema.org Person JSON-LD. */
+  person?: boolean;
+  noindex?: boolean;
 }
 
-const { title = `${site.name} | ${site.title}`, description = site.description } = Astro.props;
-const canonical = new URL(Astro.url.pathname, site.url);
+const {
+  title = `${site.name} | ${site.title}`,
+  description = site.description,
+  type = 'website',
+  person = false,
+  noindex = false,
+} = Astro.props;
 
 // GitHub Pages can't set headers, so the CSP ships as a meta tag (SPEC §10b). Production only:
 // the dev server injects inline scripts and styles. The only off-site endpoint is the contact
@@ -39,9 +49,7 @@ const csp = [
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="dark" />
     <meta name="theme-color" content={site.themeColor} />
-    <title>{title}</title>
-    <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
+    <SeoHead title={title} description={description} type={type} person={person} noindex={noindex} />
     <link rel="icon" href={url('favicon.svg')} type="image/svg+xml" />
     <link rel="alternate" type="application/rss+xml" title={`${site.name}: updates`} href={url('rss.xml')} />
   </head>

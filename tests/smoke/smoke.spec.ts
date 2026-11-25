@@ -40,8 +40,9 @@ test('home page renders', async ({ page }) => {
 test('every asset resolves under the base path', async ({ page, request, baseURL }) => {
   await page.goto('./');
   const base = new URL(baseURL ?? '');
+  // The canonical link names the production page on purpose (also on previews), so it isn't an asset.
   const urls = await page
-    .locator('link[href], script[src], img[src]')
+    .locator('link[href]:not([rel="canonical"]), script[src], img[src]')
     .evaluateAll((elements) =>
       elements.map((el) => (el as HTMLLinkElement).href || (el as HTMLScriptElement | HTMLImageElement).src),
     );

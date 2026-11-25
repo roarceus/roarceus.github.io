@@ -13,7 +13,11 @@ import { site } from '@/config/site';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title={`${site.name} | Portfolio`}>
+<BaseLayout
+  title={`${site.name} | Portfolio`}
+  description={`Experience, projects, skills, education, and contact details for ${site.name}.`}
+  person
+>
   <!--
     Mobile and tablet: intro, then the section links, then the sections, in one column.
     1024px and up: the section links become a sticky sidebar on the left.
