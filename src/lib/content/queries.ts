@@ -1,5 +1,6 @@
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 
+import { clusterNodes, experienceRows, preselectedRole, unscheduledPods } from './cluster';
 import { assertIntegrity } from './integrity';
 import { nodeLabels } from './nodes';
 import { sortByDateDesc, sortByOrder, sortByRecency } from './sort';
@@ -72,6 +73,23 @@ export async function getNodeLabel(node: string): Promise<string | undefined> {
 /** Pods scheduled on a node, by `order`. */
 export async function getProjectsByNode(node: string): Promise<CollectionEntry<'projects'>[]> {
   return (await getProjects()).filter((project) => project.data.node === node);
+}
+
+/**
+ * The cluster view (SPEC §7, design doc §4.12): nodes on the map with their pods, unscheduled pods,
+ * the pre-selected role, and the `kubectl get experience` rows aged against `now`.
+ *
+ * @public Rendered by the dashboard shell (Stage 2, Task 7); the logic is unit-tested in cluster.ts.
+ */
+export async function getCluster(now: Date = new Date()) {
+  const { experience, education, projects } = await load();
+  const nodes = clusterNodes(experience, education, projects);
+  return {
+    nodes,
+    unscheduled: unscheduledPods(projects),
+    selected: preselectedRole(sortByRecency(experience), nodes),
+    rows: experienceRows(experience, nodes, now),
+  };
 }
 
 export async function getSkills(): Promise<CollectionEntry<'skills'>[]> {

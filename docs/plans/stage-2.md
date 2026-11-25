@@ -241,7 +241,7 @@ Stages 8 to 10), `docs/plans/stage-2-design.md`, this plan, `docs/STATUS.md`.
 - [x] Tests green; `pnpm check` green; check 320, 375, 768, 1280, and 1920px; commit
       `feat(ui): add top bar and site mark on every page`.
 
-### Task 5: Shorter plain view (PR 5)
+### Task 5: Shorter plain view (PR 5) — done (#62)
 
 **Files:**
 
@@ -329,7 +329,7 @@ import.meta.env.PUBLIC_ENABLED_FLAGS)`. `isEnabled` stays the same.
 
 **Steps:**
 
-- [ ] **Failing unit tests first:**
+- [x] **Failing unit tests first:**
   - `kubectlAge('2025-06', new Date('2026-11-25'))` is `'542d'`; `('2021-05', same)` is `'5y209d'`;
     `('2026-11', new Date('2026-11-03'))` is `'2d'`; a start after `now` throws.
   - `toKubeName` covers the example above, plus `'Teaching Assistant, Network Structures & Cloud Computing (CSYE 6225)'`
@@ -347,9 +347,9 @@ import.meta.env.PUBLIC_ENABLED_FLAGS)`. `isEnabled` stays the same.
     - `' clusterDashboard , '` turns it on;
     - `'clusterDashbord'` throws naming it (Review Focus 5).
   - The schema: `cluster` defaults to `true` and accepts `false`.
-- [ ] **Implement.** `cluster.ts` stays pure (no `astro:content`); only `queries.ts` wires it to the
+- [x] **Implement.** `cluster.ts` stays pure (no `astro:content`); only `queries.ts` wires it to the
       collections.
-- [ ] Coverage holds; `pnpm check` green; commit
+- [x] Coverage holds; `pnpm check` green; commit
       `feat(cluster): add cluster data helpers and feature flags`.
 
 ### Task 7: Dashboard shell (PR 7)

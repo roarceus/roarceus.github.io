@@ -92,6 +92,12 @@ describe('experienceSchema', () => {
   it('rejects an empty tech list', () => {
     expect(experienceSchema.safeParse({ ...experience, tech: [] }).success).toBe(false);
   });
+
+  it('puts a role on the cluster map unless it opts out (SPEC §7)', () => {
+    expect(experienceSchema.parse(experience).cluster).toBe(true);
+    expect(experienceSchema.parse({ ...experience, cluster: false }).cluster).toBe(false);
+    expect(experienceSchema.safeParse({ ...experience, cluster: 'no' }).success).toBe(false);
+  });
 });
 
 describe('educationSchema', () => {
@@ -112,6 +118,11 @@ describe('educationSchema', () => {
 
   it('rejects an end before the start', () => {
     expect(educationSchema.safeParse({ ...education, end: '2023-01' }).success).toBe(false);
+  });
+
+  it('puts a degree on the cluster map unless it opts out (SPEC §7)', () => {
+    expect(educationSchema.parse(education).cluster).toBe(true);
+    expect(educationSchema.parse({ ...education, cluster: false }).cluster).toBe(false);
   });
 });
 

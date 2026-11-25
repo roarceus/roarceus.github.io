@@ -83,6 +83,11 @@ pnpm check      # what CI runs, except e2e
 Build the way a PR preview does: `BASE_PATH=/pr-preview/pr-0/ pnpm build` (Git Bash needs
 `MSYS2_ENV_CONV_EXCL=BASE_PATH` in front; PowerShell: `$env:BASE_PATH='/pr-preview/pr-0/'; pnpm build`).
 
+Unfinished features sit behind build-time flags in `src/config/features.ts`, all off by default and
+never turned on for production. Turn one on for a local build with
+`PUBLIC_ENABLED_FLAGS=clusterDashboard pnpm build` (PowerShell: `$env:PUBLIC_ENABLED_FLAGS='clusterDashboard'`);
+an unknown flag name fails the build.
+
 ## Scripts
 
 | Script                                     | What it does                                                                                      |

@@ -8,3 +8,5 @@ highlights:
   - Coursework in web development, data structures and algorithms, object-oriented programming,
     machine learning, and NLP.
 node: mumbai
+# An older era: in the plain view, not on the cluster map (SPEC §7).
+cluster: false

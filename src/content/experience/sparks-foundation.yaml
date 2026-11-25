@@ -10,3 +10,5 @@ summary: >-
 highlights: []
 tech: [React, Node.js, Express.js, PHP, MySQL, Bootstrap, Material UI, Heroku]
 node: sparks-foundation
+# An older era: in the plain view, not on the cluster map (SPEC §7).
+cluster: false
