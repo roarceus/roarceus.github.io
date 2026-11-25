@@ -1,0 +1,33 @@
+---
+// Panel surface with an optional mono header: a label on the left ("namespace: career") and meta on the
+// right ("3/3 nodes ready"). Used for cards, the detail panel, and the cluster stage frame.
+import { panel } from './recipes';
+
+interface Props {
+  as?: 'section' | 'div';
+  label?: string;
+  meta?: string;
+  /** Id for the header label; the panel is then labelled by it (use with as="section"). */
+  labelledBy?: string;
+  class?: string;
+}
+
+const { as: Tag = 'div', label, meta, labelledBy, class: className } = Astro.props;
+const hasHeader = label !== undefined || meta !== undefined;
+---
+
+<Tag aria-labelledby={labelledBy} class:list={[panel(), 'flex flex-col', className]}>
+  {hasHeader && (
+    <header class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-border px-4 py-3 font-mono text-sm text-text-muted">
+      {label !== undefined && (
+        <h2 id={labelledBy} class="font-mono text-sm font-normal">
+          {label}
+        </h2>
+      )}
+      {meta !== undefined && <p>{meta}</p>}
+    </header>
+  )}
+  <div class="flex-1 p-4">
+    <slot />
+  </div>
+</Tag>

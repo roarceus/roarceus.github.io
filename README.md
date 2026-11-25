@@ -109,7 +109,8 @@ Build the way a PR preview does: `BASE_PATH=/pr-preview/pr-0/ pnpm build` (Git B
 docs/           SPEC, STATUS, plans, ADRs, runbooks, postmortems, content guide
 public/         served as-is: favicon, resume, share image (og-image.png), .nojekyll
 src/
-  components/   layout/ (header, footer, SEO head tags), plain/ (plain view sections), ui/ (status pill, tags, links)
+  components/   layout/ (header, footer, SEO head tags), plain/ (plain view sections), ui/ (button, chip, panel,
+                kubectl table, expander, status pill, tags, links; shared class recipes in recipes.ts)
   config/       site metadata, build info (version + commit), feature flags
   content/      portfolio content (YAML + Markdown); schemas registered in content.config.ts
   layouts/      page layouts (BaseLayout sets meta tags and the CSP)

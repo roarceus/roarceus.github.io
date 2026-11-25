@@ -1,0 +1,15 @@
+---
+// Command chip (SPEC §7 "Terminal behavior"). A link until Stage 3 turns chips into commands.
+import { chip } from './recipes';
+
+interface Props {
+  href: string;
+  class?: string;
+}
+
+const { href, class: className } = Astro.props;
+---
+
+<a href={href} class:list={[chip(), className]}>
+  <slot />
+</a>

@@ -1,0 +1,28 @@
+---
+// Button or link styled as a button (design doc §4.3). One primary per view. Put a Lucide icon in the
+// "icon" slot; it always sits next to visible text.
+import { button, type ButtonVariant } from './recipes';
+
+interface Props {
+  variant?: ButtonVariant;
+  /** Renders an `<a>` when set, otherwise a `<button>`. */
+  href?: string;
+  type?: 'button' | 'submit';
+  class?: string;
+}
+
+const { variant = 'secondary', href, type = 'button', class: className } = Astro.props;
+const classes = [button(variant), className];
+---
+
+{href !== undefined ? (
+  <a href={href} class:list={classes}>
+    <slot name="icon" />
+    <slot />
+  </a>
+) : (
+  <button type={type} class:list={classes}>
+    <slot name="icon" />
+    <slot />
+  </button>
+)}

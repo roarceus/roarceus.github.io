@@ -89,8 +89,8 @@ Vitest, Playwright and axe, Lighthouse CI.
 | --- | --------------------------------- | ---------------------------------------------------------------- | ----- | ------ |
 | 1   | `docs/stage-2-design-direction`   | `docs(design): adopt the tool-and-game design direction`         | 1     | #49    |
 | 2   | `feat/stage-2-design-tokens`      | `feat(design): add design tokens with contrast and scope checks` | 2     | #50    |
-| 3   | `feat/stage-2-ui-primitives`      | `feat(ui): add ui primitives and lucide icons`                   | 3     | #51    |
-| 4   | `feat/stage-2-top-bar`            | `feat(ui): add top bar and site mark on every page`              | 4     | #52    |
+| 3   | `feat/stage-2-ui-primitives`      | `feat(ui): add ui primitives`                                    | 3     | #51    |
+| 4   | `feat/stage-2-top-bar`            | `feat(ui): add top bar, site mark, and lucide icons`             | 4     | #52    |
 | 5   | `feat/stage-2-plain-view-shorter` | `feat(plain): add jump chips and expanders to the plain view`    | 5     | #53    |
 | 6   | `feat/stage-2-cluster-data`       | `feat(cluster): add cluster data helpers and feature flags`      | 6     | #54    |
 | 7   | `feat/stage-2-dashboard-shell`    | `feat(cluster): add dashboard shell behind a feature flag`       | 7     | #55    |
@@ -101,7 +101,7 @@ changes and ticks this file.
 
 ---
 
-### Task 1: Design direction docs (PR 1)
+### Task 1: Design direction docs (PR 1) — done (#57)
 
 **Files:** `docs/adr/0002-design-direction-tool-and-game.md`, `docs/SPEC.md` (§5 scene rule, §7 nodes, §11
 Stages 8 to 10), `docs/plans/stage-2-design.md`, this plan, `docs/STATUS.md`.
@@ -109,11 +109,11 @@ Stages 8 to 10), `docs/plans/stage-2-design.md`, this plan, `docs/STATUS.md`.
 - [x] ADR 0002 accepted; SPEC and the design doc updated (approved 2026-11-25).
 - [x] Create one issue per task on milestone 3, and milestones `Stage 8 — 3D cluster view`,
       `Stage 9 — Missions`, `Stage 10 — Incidents`. Fill in the issue numbers above.
-- [ ] STATUS: Stage 2 in progress, and the open "design direction" and "plain view length" questions
+- [x] STATUS: Stage 2 in progress, and the open "design direction" and "plain view length" questions
       closed with links.
-- [ ] `pnpm check` green; open the PR as a draft.
+- [x] `pnpm check` green; open the PR as a draft.
 
-### Task 2: Design tokens (PR 2)
+### Task 2: Design tokens (PR 2) — done (#58)
 
 **Files:**
 
@@ -132,11 +132,11 @@ Stages 8 to 10), `docs/plans/stage-2-design.md`, this plan, `docs/STATUS.md`.
 
 **Steps:**
 
-- [ ] **Contrast test first.** `contrastRatio('#ffffff', '#000000')` is `21`; `('#e6edf3', '#0a0e14')` is
+- [x] **Contrast test first.** `contrastRatio('#ffffff', '#000000')` is `21`; `('#e6edf3', '#0a0e14')` is
       ≈ `16.36` (2 dp); `('#fff', '#326ce5')` is ≈ `4.75`; `'blue'` throws. Run
       `pnpm vitest run src/lib/utils/contrast.test.ts`; it fails (module missing). Implement it, and the
       test passes.
-- [ ] **Tokens test first** (`tokens.test.ts`). It reads `tokens.css` and asserts these pairs:
+- [x] **Tokens test first** (`tokens.test.ts`). It reads `tokens.css` and asserts these pairs:
   - **≥ 4.5:**
     - `text` and `text-muted` on `bg`, `surface-1`, `surface-2`, and each `status-*-soft`;
     - `accent-soft` on `bg`, `surface-1`, `surface-2`, and `accent-fill`;
@@ -149,11 +149,11 @@ Stages 8 to 10), `docs/plans/stage-2-design.md`, this plan, `docs/STATUS.md`.
   It fails on the missing tokens. Add the tokens from design doc §4.1 and tune the values until it
   passes.
 
-- [ ] **Scope test** (`scene-scope.test.ts`). It walks `src/` (`.astro`, `.ts`, `.tsx`, `.css`) and
+- [x] **Scope test** (`scene-scope.test.ts`). It walks `src/` (`.astro`, `.ts`, `.tsx`, `.css`) and
       reports `file:line` for `--scene-`, `text-shadow`, `drop-shadow`, or a `box-shadow` with a color,
       outside `src/components/{cluster,game}/` and `src/styles/tokens.css`. A self-test feeds it a fake
       offending string, so the rule provably fires.
-- [ ] `pnpm check` green; commit `feat(design): add design tokens with contrast and scope checks`.
+- [x] `pnpm check` green; commit `feat(design): add design tokens with contrast and scope checks`.
 
 ### Task 3: UI primitives (PR 3)
 
@@ -161,7 +161,7 @@ Stages 8 to 10), `docs/plans/stage-2-design.md`, this plan, `docs/STATUS.md`.
 
 - Create: `src/components/ui/recipes.ts` (with test), `Button.astro`, `Panel.astro`, `Table.astro`,
   `Chip.astro`, `Expander.astro`.
-- Modify: `StatusPill.astro`, `TagList.astro`, `package.json` (`@lucide/astro`).
+- Modify: `StatusPill.astro`, `TagList.astro`.
 - Test: `src/components/ui/recipes.test.ts`, and `src/components/ui/primitives.test.ts`, which renders each
   component with Astro's Container API (`experimental_AstroContainer` from `astro/container`; Vitest already
   uses `getViteConfig`). Layout behavior (44px targets, cards at 320px) is checked in e2e where the
@@ -188,13 +188,14 @@ Stages 8 to 10), `docs/plans/stage-2-design.md`, this plan, `docs/STATUS.md`.
 
 **Steps:**
 
-- [ ] **Recipes test first.** `button('primary')` contains `bg-accent`, `text-on-accent`, `min-h-11`;
+- [x] **Recipes test first.** `button('primary')` contains `bg-accent`, `text-on-accent`, `min-h-11`;
       `secondary` contains `border-border`; every recipe contains `focusRing`. Fails, implement, passes.
-- [ ] **Add `@lucide/astro`.** Check the latest stable version on npm, pin it exactly, and record size and
+- [x] **Moved to Task 4:** knip fails on unused dependencies, so Lucide arrives with its first use (the top
+      bar). Was: **Add `@lucide/astro`.** Check the latest stable version on npm, pin it exactly, and record size and
       license (ISC) for the PR body. No other icon set.
-- [ ] **Build the components.** Restyle `StatusPill` and `TagList` to the recipes. Update existing usages
+- [x] **Build the components.** Restyle `StatusPill` and `TagList` to the recipes. Update existing usages
       only where their props change.
-- [ ] **Container API tests first** (then implement until they pass):
+- [x] **Container API tests first** (then implement until they pass):
   - `Button` renders `<a href>` when `href` is set, otherwise `<button type="button">`.
   - `Table` renders a `<caption>`, a `<th scope="col">` per column, and `data-label` on each cell; link
     cells render `<a>`.
@@ -202,14 +203,15 @@ Stages 8 to 10), `docs/plans/stage-2-design.md`, this plan, `docs/STATUS.md`.
   - `StatusPill` renders its status word as text and an `aria-hidden` SVG shape, for each of the four
     statuses.
   - `Chip` renders a link with the recipe classes.
-- [ ] `pnpm check` green; commit `feat(ui): add ui primitives and lucide icons`.
+- [x] `pnpm check` green; commit `feat(ui): add ui primitives`.
 
 ### Task 4: Top bar and site mark (PR 4)
 
 **Files:**
 
 - Create: `src/components/layout/TopBar.astro`, `src/components/layout/SiteMark.astro`.
-- Modify: `src/layouts/BaseLayout.astro`, `public/favicon.svg`.
+- Modify: `src/layouts/BaseLayout.astro`, `public/favicon.svg`, `package.json` (`@lucide/astro` 1.75.0 or
+  newer, at least a week old, exact pin; moved here from Task 3).
 - Delete: `src/components/layout/SiteHeader.astro`.
 - Test: `tests/e2e/top-bar.spec.ts`.
 
