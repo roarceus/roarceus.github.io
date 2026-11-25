@@ -87,7 +87,7 @@ export async function getCluster(now: Date = new Date()) {
   return {
     nodes,
     unscheduled: unscheduledPods(projects),
-    selected: preselectedRole(sortByRecency(experience), nodes),
+    selected: preselectedRole(experience, nodes),
     rows: experienceRows(experience, nodes, now),
   };
 }
