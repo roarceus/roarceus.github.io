@@ -186,18 +186,22 @@ Certifications,Awards,Updates,Contact}*.astro`, `src/components/ui/{StatusPill,T
       `features.smartPunctuation: false`.
 - [x] Checked a preview-base build: feed links stay on production, page links use the preview path.
 
-### Task 7: Contact form (PR 5)
+### Task 7: Contact form (PR 5) — done
 
-**Files:** Create `src/lib/contact/{validate,submit}.ts` (+ tests), `src/components/plain/ContactForm.astro`,
-`src/scripts/contact-form.ts`, `tests/e2e/contact.spec.ts`. Modify `src/config/site.ts` (Web3Forms access key),
-CSP in `BaseLayout.astro`, `docs/runbooks/rotating-public-keys.md` if needed.
+**Files:** `src/lib/contact/{validate,submit}.ts` (+ tests), `src/components/plain/ContactForm.astro` (the
+script lives in the component; no new `src/scripts/` folder), `src/pages/contact/thanks/index.astro`,
+`tests/e2e/contact.spec.ts`; `site.contact` in `src/config/site.ts`; CSP in `BaseLayout.astro`;
+`expectedConsoleErrors` option in `tests/support/fixtures.ts`.
 
-- [ ] Failing unit tests: `validateContact({name,email,message})` → field errors (required, email format,
-      message 10–5000 chars, honeypot filled → silent drop); `toSubmitResult(response | error)` maps 200/4xx/
-      5xx/network to `'sent' | 'invalid' | 'server-error' | 'offline'`.
-- [ ] Failing e2e (network mocked with `page.route`): success, validation errors announced via `aria-live` and
-      focus moves to the first invalid field, server error, offline, double-submit blocked, JS-disabled post.
-- [ ] Implement; inputs labeled, ≥ 16px, keyboard-only flow works; CSP adds `https://api.web3forms.com`.
+- [x] Unit tests first: `validateContact` (trimming, all errors at once, email shape, 10 to 5000 characters,
+      name cap, honeypot = spam), `contactPayload`, and `toSubmitResult` (sent, invalid, server-error,
+      offline).
+- [x] E2E first, with Web3Forms mocked: sent and cleared, validation errors with focus on the first,
+      errors cleared once fixed, 400, 500 (with a mailto fallback), offline (message kept), double click
+      sends once, labels and axe, CSP, no-JS post (fields, access key, redirect), thank-you page.
+- [x] CSP adds only `https://api.web3forms.com` to `connect-src` and `form-action` (A6).
+- [x] Tests that cause a failed request opt in to the browser's own "Failed to load resource" console
+      error with an exact pattern; every other console error still fails the test.
 
 ### Task 8: SEO, sitemap, 404 (PR 6)
 
@@ -225,7 +229,7 @@ Modify `astro.config.mjs` (sitemap), `public/robots.txt` → `src/pages/robots.t
 | --- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
 | M11 | before PR 3 | Put the current resume at `public/resume.pdf`.                                                                                                | Done 2026-11-24  |
 | M12 | before PR 3 | Answer `docs/content-review.md` (dates, metrics, links) so the plain view ships with real facts; answers land in PR 2 or a `fix(content)` PR. | After PR 2 opens |
-| M13 | before PR 5 | Create a Web3Forms access key for your email at web3forms.com and paste it in chat (public-safe; goes in `src/config/site.ts`).               | Pending          |
+| M13 | before PR 5 | Create a Web3Forms access key for your email at web3forms.com and paste it in chat (public-safe; goes in `src/config/site.ts`).               | Done 2026-11-25  |
 
 ## Answers (2026-11-24)
 

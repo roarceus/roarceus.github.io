@@ -10,7 +10,8 @@ _Last updated: 2026-11-24_
 
 - **Done:** schemas and helpers (#41), content and review (#43), `/plain/` and home hero (#44). Release PR
   #42 (v0.2.0) stays open until the stage ends.
-- **In progress:** PR 4, project pages, updates, RSS (#37). **Next:** contact form (needs the Web3Forms key).
+- **Done:** project pages, updates, RSS (#45).
+- **In progress:** PR 5, contact form (#38). **Next:** SEO metadata, sitemap, 404 (#39).
 
 ## Stage 0 sign-off
 

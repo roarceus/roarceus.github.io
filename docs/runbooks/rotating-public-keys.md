@@ -14,10 +14,11 @@ The `release` workflow authenticates as the `roarceus-release-bot` GitHub App wi
 
 The App ID doesn't change. If the App itself is replaced, update `vars.RELEASE_APP_ID` too.
 
-## Public site keys (from Stage 1)
+## Public site keys
 
-Web3Forms (contact form) and GoatCounter (analytics) use **public** keys that ship in the site, stored in
-`src/config/` (never in components). Rotating one:
+The Web3Forms access key (contact form, `site.contact.accessKey` in `src/config/site.ts`) is **public**
+by design: it only lets a page send messages to Sohan's inbox. GoatCounter (analytics) joins it in
+Stage 6. Keys live in `src/config/`, never in components. Rotating one:
 
 1. Create the new key in the provider's dashboard.
 2. Update it in `src/config/site.ts` in a `fix(config): rotate <provider> key` PR; check the preview
