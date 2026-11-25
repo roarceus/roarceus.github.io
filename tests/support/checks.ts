@@ -20,7 +20,20 @@ export async function expectNoSeriousA11yViolations(page: Page): Promise<void> {
   const summary = serious.map(
     (v) => `${v.id}: ${v.help} (${v.nodes.map((n) => n.target.join(' ')).join(', ')})`,
   );
-  expect(summary).toEqual([]);
+  // On a contrast failure, say what axe measured and what the browser computed for each node, so a
+  // CI-only failure can be diagnosed from the log alone.
+  const details: string[] = [];
+  for (const node of serious.filter((v) => v.id === 'color-contrast').flatMap((v) => v.nodes)) {
+    const selector = node.target.join(' ');
+    const computed = await page.evaluate((target) => {
+      const element = document.querySelector(target);
+      if (!element) return 'not found';
+      const style = getComputedStyle(element);
+      return `color=${style.color} fill=${style.getPropertyValue('-webkit-text-fill-color')}`;
+    }, selector);
+    details.push(`${selector}: ${node.failureSummary ?? ''} [computed now: ${computed}]`);
+  }
+  expect(summary, details.join(' | ')).toEqual([]);
 }
 
 /** SPEC §4 touch targets: a visible link at least 44 by 44 CSS pixels. */

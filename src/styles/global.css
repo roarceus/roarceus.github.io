@@ -78,6 +78,9 @@
   }
 
   body {
+    /* Set again on body (not only html): WebKit on Linux intermittently reports inherited heading
+       text as black to axe when the color only comes from html. */
+    color: var(--text);
     min-height: 100dvh;
     margin: 0;
     overflow-wrap: anywhere;
