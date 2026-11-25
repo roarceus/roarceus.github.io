@@ -35,6 +35,8 @@ export const experienceSchema = z
     highlights: z.array(z.object({ text, metric: text.optional() })).default([]),
     tech: z.array(text).min(1),
     node: nodeName,
+    /** false keeps an older era off the cluster map; it stays in the plain view (SPEC §7). */
+    cluster: z.boolean().default(true),
   })
   .refine(rangeIsOrdered, rangeError);
 
@@ -48,6 +50,8 @@ export const educationSchema = z
     end: endDate,
     highlights: z.array(text).default([]),
     node: nodeName.optional(),
+    /** false keeps an older era off the cluster map; it stays in the plain view (SPEC §7). */
+    cluster: z.boolean().default(true),
   })
   .refine(rangeIsOrdered, rangeError);
 

@@ -5,6 +5,8 @@ interface ImportMetaEnv {
   readonly PUBLIC_VERSION?: string;
   /** Full commit SHA injected by CI. */
   readonly PUBLIC_COMMIT_SHA?: string;
+  /** Comma-separated feature flags to turn on in non-production builds (src/config/features.ts). */
+  readonly PUBLIC_ENABLED_FLAGS?: string;
 }
 
 interface ImportMeta {
