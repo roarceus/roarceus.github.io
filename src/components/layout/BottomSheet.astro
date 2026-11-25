@@ -1,0 +1,10 @@
+---
+// A static bottom sheet for phones (design doc §4.6): the detail panel in cluster mode, capped at half
+// the screen and scrolling inside itself, clear of the home indicator. From 768px it is just a
+// wrapper. Stage 5 adds drag to expand and dismiss.
+---
+
+<div class="max-md:-mx-4 max-md:max-h-[50dvh] max-md:overflow-y-auto max-md:rounded-t-2xl max-md:border-t max-md:border-border max-md:bg-surface-1 max-md:px-4 max-md:pt-2 max-md:pb-[max(1rem,env(safe-area-inset-bottom))]">
+  <div aria-hidden="true" class="mx-auto mb-2 h-1 w-10 rounded-full bg-border md:hidden"></div>
+  <slot />
+</div>

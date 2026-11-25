@@ -7,10 +7,12 @@ import FileText from '@lucide/astro/icons/file-text';
 import House from '@lucide/astro/icons/house';
 import LayoutList from '@lucide/astro/icons/layout-list';
 import Mail from '@lucide/astro/icons/mail';
+import Network from '@lucide/astro/icons/network';
 
 import { button, focusRing, target } from '@/components/ui/recipes';
 import StatusPill from '@/components/ui/StatusPill.astro';
 import { buildInfo } from '@/config/build-info';
+import { isEnabled } from '@/config/features';
 import { getProfile } from '@/lib/content/queries';
 import { url } from '@/lib/utils/url';
 
@@ -24,11 +26,14 @@ interface Props {
 const { view = 'page' } = Astro.props;
 const { data: profile } = await getProfile();
 
-// On the plain view the switch goes home; everywhere else it goes to the plain view. Task 7 turns
-// the plain view's link into "Cluster view" once the dashboard flag is on.
+// On the plain view the switch goes back to `/`: "Cluster view" once the dashboard is on, "Home"
+// while `/` is still the hero. Everywhere else it goes to the plain view.
+const homeLabel = isEnabled('clusterDashboard')
+  ? { full: 'Cluster view', short: 'Cluster', Icon: Network }
+  : { full: 'Home', short: 'Home', Icon: House };
 const viewLink =
   view === 'plain'
-    ? { href: url(), full: 'Home', short: 'Home', Icon: House }
+    ? { href: url(), ...homeLabel }
     : { href: url('plain/'), full: 'Plain view', short: 'Plain', Icon: LayoutList };
 
 // Compact padding below 640px so the three controls and the name fit at 320px.

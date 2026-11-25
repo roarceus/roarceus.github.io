@@ -149,6 +149,20 @@ describe('clusterNodes', () => {
     ]);
   });
 
+  it('treats only an explicit cluster: false as off the map', () => {
+    // Entries read before the field existed (or from a stale content cache) have no flag at all.
+    const legacy = EXPERIENCE.map(({ id, data }) => ({
+      id,
+      data: { ...data, cluster: undefined },
+    }));
+    expect(clusterNodes(legacy, [], PROJECTS).map((node) => node.name)).toEqual([
+      'northeastern',
+      'mastercontrol',
+      'capgemini',
+      'sparks-foundation',
+    ]);
+  });
+
   it('puts an ongoing role first', () => {
     const ongoing = [
       ...EXPERIENCE,

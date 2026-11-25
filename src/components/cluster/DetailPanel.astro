@@ -1,0 +1,33 @@
+---
+// The detail panel (design doc §4.6): `kubectl describe` for the selected node, opening on the
+// pre-selected role (SPEC §9). Built from content; Stage 4 swaps the selection as the map is used.
+import TagList from '@/components/ui/TagList.astro';
+import { formatRange } from '@/lib/utils/dates';
+import { url } from '@/lib/utils/url';
+
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  entry: CollectionEntry<'experience'>;
+}
+
+const { data } = Astro.props.entry;
+---
+
+<section
+  aria-label="Details"
+  class="flex flex-col gap-3 rounded-lg border border-border bg-surface-1 p-4 sm:p-5"
+>
+  <h2 class="font-mono text-sm font-normal text-text-muted">describe node/{data.node}</h2>
+  <h3 class="text-xl font-semibold text-text">
+    {data.role}, <span class="text-text-muted">{data.org}</span>
+  </h3>
+  <p class="font-mono text-sm text-text-muted">{formatRange(data.start, data.end)}</p>
+  <p class="text-text-muted">{data.summary}</p>
+  <TagList items={data.tech} label={`Tech used at ${data.org}`} />
+  <p class="font-mono text-sm">
+    <a href={url('plain/#experience')} class="link inline-flex min-h-11 items-center">
+      All experience
+    </a>
+  </p>
+</section>

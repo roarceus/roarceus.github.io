@@ -39,6 +39,10 @@ const TEXT_PAIRS: [string, string][] = [
   ...STATUSES.map((status): [string, string] => [`status-${status}`, `status-${status}-soft`]),
   ...STATUSES.flatMap((status) => SURFACES.map((bg): [string, string] => [`status-${status}`, bg])),
   ['on-accent', 'accent'],
+  // Node cards in the cluster scene carry text, links, and status pills.
+  ...['text', 'accent-soft'].flatMap((fg) =>
+    ['scene-bg', 'scene-platform', 'scene-platform-selected'].map((bg): [string, string] => [fg, bg]),
+  ),
 ];
 
 const UI_PAIRS: [string, string][] = [

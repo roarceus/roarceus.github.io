@@ -1,0 +1,55 @@
+---
+// The docked terminal (design doc §4.6). Stage 2 pre-renders `kubectl get experience` in real kubectl
+// form and links the command chips to the matching plain-view sections; Stage 3 adds the input and
+// turns chips into commands. No input yet: a disabled one would be a dead control. Below 768px only
+// the chips show.
+import Chip from '@/components/ui/Chip.astro';
+import Table from '@/components/ui/Table.astro';
+import type { ExperienceRow } from '@/lib/content/cluster';
+import { url } from '@/lib/utils/url';
+
+interface Props {
+  rows: readonly ExperienceRow[];
+}
+
+const { rows } = Astro.props;
+
+const columns = [
+  { key: 'name', label: 'Name' },
+  { key: 'role', label: 'Role' },
+  { key: 'node', label: 'Node' },
+  { key: 'status', label: 'Status' },
+  { key: 'age', label: 'Age' },
+];
+const cells = rows.map((row) => ({
+  ...row,
+  name: { text: row.name, href: url('plain/#experience') },
+}));
+
+const chips = [
+  { label: 'get pods -n projects', href: url('plain/#projects') },
+  { label: 'top skills', href: url('plain/#skills') },
+  { label: 'get certificates', href: url('plain/#certifications') },
+  { label: 'logs updates', href: url('plain/#updates') },
+  { label: 'help', href: url('plain/') },
+];
+---
+
+<section aria-label="Terminal" class="flex flex-col gap-4 rounded-lg border border-border bg-surface-2 p-4">
+  <div class="flex flex-col gap-2 max-md:hidden">
+    <p class="font-mono text-sm text-text">$ kubectl get experience</p>
+    <Table caption="kubectl get experience" columns={columns} rows={cells} />
+  </div>
+  <nav aria-label="Commands">
+    <ul
+      role="list"
+      class="flex gap-2 overflow-x-auto [scrollbar-width:none] md:flex-wrap md:overflow-visible"
+    >
+      {chips.map((chip) => (
+        <li class="shrink-0">
+          <Chip href={chip.href}>{chip.label}</Chip>
+        </li>
+      ))}
+    </ul>
+  </nav>
+</section>

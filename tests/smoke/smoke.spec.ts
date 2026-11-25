@@ -37,6 +37,17 @@ test('home page renders', async ({ page }) => {
   await expect(page.getByRole('heading', { level: 1, name: 'Sohan Patil' })).toBeVisible();
 });
 
+// SMOKE_EXPECT_DASHBOARD: 'false' for releases (the flag must stay off in production), 'true' for
+// PR previews (built with the flag). Unset: not checked.
+const expectDashboard = process.env.SMOKE_EXPECT_DASHBOARD;
+test('ships the cluster dashboard only where its flag is on', async ({ page }) => {
+  test.skip(expectDashboard === undefined, 'SMOKE_EXPECT_DASHBOARD not set');
+  await page.goto('./');
+  await expect(page.getByRole('region', { name: 'Cluster map' })).toHaveCount(
+    expectDashboard === 'true' ? 1 : 0,
+  );
+});
+
 test('every asset resolves under the base path', async ({ page, request, baseURL }) => {
   await page.goto('./');
   const base = new URL(baseURL ?? '');

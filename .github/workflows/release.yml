@@ -136,6 +136,7 @@ jobs:
           SMOKE_BASE_URL: https://roarceus.github.io/
           SMOKE_EXPECT_VERSION: ${{ needs.deploy.outputs.tag }}
           SMOKE_EXPECT_COMMIT: ${{ needs.deploy.outputs.commit }}
+          SMOKE_EXPECT_DASHBOARD: 'false'
         run: pnpm test:smoke
       - name: Upload report
         if: failure()

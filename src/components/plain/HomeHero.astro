@@ -1,0 +1,42 @@
+---
+// The pre-rendered hero on `/` (SPEC §4) while the cluster dashboard is behind its flag: who Sohan is,
+// the main actions, and a link to every plain-view section. Works without JavaScript.
+import Button from '@/components/ui/Button.astro';
+import StatusPill from '@/components/ui/StatusPill.astro';
+import { plainSections } from '@/config/sections';
+import { getProfile } from '@/lib/content/queries';
+import { url } from '@/lib/utils/url';
+
+const { data: profile } = await getProfile();
+---
+
+<div class="mx-auto flex min-h-[70dvh] max-w-3xl flex-col justify-center gap-6 px-4 py-16 sm:px-8">
+  <p class="font-mono text-[length:var(--text-sm-fluid)] text-text-muted">sohan-cluster</p>
+  <h1 class="text-[length:var(--text-display-fluid)] leading-tight font-semibold tracking-tight text-text">
+    {profile.name}
+  </h1>
+  <p class="text-lg text-text">{profile.title}</p>
+  <p class="max-w-prose text-[length:var(--text-base-fluid)] text-text-muted">{profile.tagline}</p>
+  <p class="flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-sm text-text-muted">
+    <span>{profile.location}</span>
+    {profile.openToWork && <StatusPill status="running" label="Open to work" />}
+  </p>
+  <div role="group" aria-label="Main actions" class="flex flex-wrap gap-3">
+    <Button variant="primary" href={url('plain/')}>
+      View portfolio
+    </Button>
+    <Button href={url(profile.resume)}>Resume</Button>
+    <Button href={url('plain/#contact')}>Contact</Button>
+  </div>
+  <nav aria-label="Portfolio sections">
+    <ul role="list" class="flex flex-wrap gap-x-1 font-mono text-sm">
+      {plainSections.map(({ id, label }) => (
+        <li>
+          <a href={url(`plain/#${id}`)} class="link inline-flex min-h-11 items-center px-2 first:-ml-2">
+            {label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+</div>

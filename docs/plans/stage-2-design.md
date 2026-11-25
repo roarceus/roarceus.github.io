@@ -199,6 +199,10 @@ location and open-to-work pill, tagline, actions (View portfolio, Resume, Contac
   - The static fill is built from content: node cards with their pods (project slugs from content), plus
     the status legend. Nothing is hardcoded. Each node links to its plain-view section, so it works
     without JS.
+- **As built (PR 7):** the stage keeps its footprint with a minimum height (24rem, 28rem from 1024px)
+  rather than an aspect ratio, because node cards would overflow a fixed ratio; Lighthouse measured CLS
+  at 0.022 or less. The terminal dock is not collapsible yet: with only a static table there is nothing
+  worth collapsing, so collapse arrives with the real terminal in Stage 3.
 - **Detail panel:** the pre-selected role (see 4.12; MasterControl today), as SPEC §9 asks, built from content. The header is
   `describe node/<node>`.
 - **Terminal dock:**

@@ -1,4 +1,6 @@
 dist/
+dist-dashboard/
+dist-base-check/
 .astro/
 coverage/
 playwright-report/
