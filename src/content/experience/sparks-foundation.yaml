@@ -1,0 +1,12 @@
+org: The Sparks Foundation
+role: Web Development Intern
+type: work
+location: TODO(sohan)
+start: 2020-08
+end: 2020-09
+summary: >-
+  Worked on the front end and back end of a credit management system, integrating third-party
+  services and moving data processing into cloud functions.
+highlights: []
+tech: [React, Node.js, Express.js, PHP, MySQL, Bootstrap, Material UI, Heroku]
+node: sparks-foundation

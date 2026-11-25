@@ -1,0 +1,10 @@
+school: University of Mumbai
+degree: Bachelor of Engineering
+field: Computer Engineering
+location: Mumbai, India
+start: 2016-08
+end: 2020-10
+highlights:
+  - Coursework in web development, data structures and algorithms, object-oriented programming,
+    machine learning, and NLP.
+node: mumbai

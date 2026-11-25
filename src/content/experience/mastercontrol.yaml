@@ -1,0 +1,17 @@
+org: MasterControl
+role: DevOps Engineer (Co-op)
+type: work
+location: TODO(sohan)
+start: 2025-06
+end: 2025-12
+summary: >-
+  Worked across DevOps, platform engineering, and developer productivity: CI/CD pipelines, build
+  systems, Kubernetes environments shared by several development teams, and internal tooling that
+  simplified deployments.
+highlights:
+  - text: Built an AI agent framework for Gradle rollouts with LangGraph and Claude Code (BoringBot).
+  - text: Built a GitOps deployment bot as a GitHub App on Probot (PromotionBot).
+  - text: Designed and maintained CI/CD pipelines and optimized build systems across repositories.
+  - text: Managed Kubernetes-based environments used by multiple development teams.
+tech: [Kubernetes, Docker, Argo CD, Helm, Jenkins, Artifactory, GitHub, TypeScript, Gradle, LangGraph]
+node: mastercontrol

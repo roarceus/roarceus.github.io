@@ -1,0 +1,20 @@
+org: Capgemini
+role: Software Engineer
+type: work
+location: India
+start: 2021-05
+end: 2023-10
+summary: >-
+  Built web applications for an optical coherence tomography (OCT) medical imaging system used in
+  heart procedures: Node.js APIs and React dashboards for patient and physician data, heart imaging
+  data, and DICOM images, including a real-time monitoring dashboard.
+highlights:
+  - text: Sped up data retrieval with Redis caching and PostgreSQL indexing.
+    metric: ~40% faster
+  - text: Cut API latency by sending only new readings with smaller per-update payloads.
+    metric: ~25% lower
+  - text: Kept large images in object storage, with metadata and pointers in the database.
+  - text: Built CI/CD and deployment workflows with Jenkins, Git, and Terraform for Dockerized services.
+  - text: Automated infrastructure and testing with Bash, Python, and Cypress.
+tech: [React, Node.js, Express.js, Python, PostgreSQL, Redis, Jenkins, Terraform, Docker, Cypress]
+node: capgemini

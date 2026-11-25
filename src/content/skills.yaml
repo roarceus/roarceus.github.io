@@ -1,1 +1,59 @@
-[]
+# kubectl top skills reads these. Levels (1–5) are optional: TODO(sohan) in docs/content-review.md.
+- id: languages
+  category: Languages
+  order: 1
+  items:
+    - name: TypeScript
+    - name: Python
+    - name: JavaScript
+    - name: Java
+    - name: Go
+    - name: Bash
+    - name: SQL
+- id: cloud-devops
+  category: Cloud and DevOps
+  order: 2
+  items:
+    - name: Kubernetes
+    - name: Docker
+    - name: Helm
+    - name: Argo CD
+    - name: Terraform
+    - name: AWS
+    - name: GCP
+    - name: Jenkins
+    - name: GitHub Actions
+    - name: Artifactory
+    - name: Gradle
+    - name: Kafka
+- id: backend-data
+  category: Back end and data
+  order: 3
+  items:
+    - name: Node.js
+    - name: Express.js
+    - name: PostgreSQL
+    - name: Redis
+    - name: MySQL
+    - name: MongoDB
+    - name: PHP
+- id: frontend
+  category: Front end
+  order: 4
+  items:
+    - name: React
+    - name: Next.js
+    - name: HTML
+    - name: CSS
+    - name: Sass
+    - name: Tailwind CSS
+    - name: Bootstrap
+- id: ai-tooling
+  category: AI and tooling
+  order: 5
+  items:
+    - name: LangGraph
+    - name: Claude Code
+    - name: RAG
+    - name: Git
+    - name: Cypress

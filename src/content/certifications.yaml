@@ -1,1 +1,8 @@
-[]
+- id: cka
+  name: Certified Kubernetes Administrator (CKA)
+  issuer: The Linux Foundation
+  status: in-progress
+- id: ckad
+  name: Certified Kubernetes Application Developer (CKAD)
+  issuer: The Linux Foundation
+  status: in-progress
