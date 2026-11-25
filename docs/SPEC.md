@@ -184,6 +184,12 @@ Mobile is a first-class target, not an afterthought. Build mobile-first and scal
 Dark only. Clean, credible, "real tool" look (think Lens, Grafana, k9s), not hacker-movie neon.
 No glow effects, no heavy gradients. One accent color, used with restraint.
 
+**The UI is the tool, the cluster is the game** ([ADR 0002](adr/0002-design-direction-tool-and-game.md)).
+Everything above applies to the chrome: top bar, panels, tables, terminal, plain view, forms, and content
+pages. Flair is allowed only inside the cluster scene (`src/components/cluster/`, `src/components/game/`).
+That means subtle status-driven glow on pods and packets, motion, 3D (Stage 8), and game mechanics. It
+uses the `--scene-*` tokens, and a test keeps them and glow effects out of everything else.
+
 **Starting palette** (tune freely, but every text/background pair must pass WCAG AA; document final values):
 
 | Token | Value | Use |
@@ -259,8 +265,10 @@ Collections (adjust fields as needed, but keep this shape):
 
 ### Mapping
 - **Cluster** = Sohan's career. Name: `sohan-cluster`.
-- **Nodes** = organizations/eras: `capgemini`, `northeastern`, `mastercontrol`, `mumbai` (Bachelor's era), `sparks-foundation` (2020 internship) (labels: `role=work|education|teaching`).
-  A node is declared by the `node` field of an experience or education entry.
+- **Nodes** = organizations/eras on the map: `capgemini`, `northeastern`, `mastercontrol` (labels: `role=work|education|teaching`).
+  A node is declared by the `node` field of an experience or education entry. Older eras (`mumbai` for the
+  Bachelor's, `sparks-foundation` for the 2020 internship) set `cluster: false`: they stay in the plain view
+  but not on the map or in `kubectl get nodes`, and their projects appear only in the plain view.
 - **Pods** = projects, scheduled on the node where they were built. Pod status mirrors project status.
 - **Namespaces** = sections: `career`, `projects`, `skills`, `updates`.
 - Real achievements = `achievements` resource. Game unlocks = **badges** (different word on purpose).
@@ -590,3 +598,19 @@ Self-healing, chaos mode, badges, easter eggs (section 8), GoatCounter command e
 ### Stage 7 — Hardening → v1.0.0
 Full accessibility audit, performance pass, cross-browser check (Chrome, Firefox, Safari, mobile Safari),
 content final review with Sohan, docs pass, release `1.0.0`.
+
+### Post-1.0 stages ([ADR 0002](adr/0002-design-direction-tool-and-game.md))
+Each ships behind a feature flag, off in production until approved.
+
+### Stage 8 — 3D cluster view → v1.1.0
+React Three Fiber + drei, as progressive enhancement over the 2D map: same data and state, lazy-loaded only
+when the cluster view opens, desktop/capable devices only, WebGL detection with automatic 2D fallback, a
+2D/3D toggle, low-poly instanced meshes, render-on-demand, capped pixel ratio, paused when hidden. Includes
+a 3D boot sequence, camera glide on node click, physical chaos mode, and a visible `kubectl scale`.
+
+### Stage 9 — Missions → v1.2.0
+A guided tour ("Take the 60-second tour"), visitor rank (Intern to Cluster Admin), and XP.
+
+### Stage 10 — Incidents → v1.3.0
+A timed incident mini-game (best time stored locally), a hidden `kube-system` namespace, and optional sound
+effects (off by default).
