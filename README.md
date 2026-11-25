@@ -13,10 +13,10 @@ switch to a plain, recruiter-friendly view.
 
 ## Status
 
-**Stage 1 — Content and plain view (done, releasing as v0.2.0).** Live is still the v0.1.0 placeholder until
-the release PR merges. Stage 1 adds the content, the full plain portfolio at `/plain/`, a home hero, project
-pages, updates and an RSS feed, a contact form, and search and share metadata (sitemap, share image, themed
-404 page). Next: Stage 2, the design system and layout. Progress:
+**v0.2.0 is live: Stage 1 (content and plain view) is done.** It added the content, the full plain portfolio
+at `/plain/`, a home hero, project pages, updates and an RSS feed, a contact form, and search and share
+metadata. Now planning Stage 2, the design system and layout shell, under the direction in
+[ADR 0002](docs/adr/0002-design-direction-tool-and-game.md): the UI is the tool, the cluster is the game. Progress:
 [`docs/STATUS.md`](docs/STATUS.md) · [project board](https://github.com/users/roarceus/projects/1) ·
 [changelog](CHANGELOG.md) (from v0.1.0).
 
@@ -96,7 +96,7 @@ Build the way a PR preview does: `BASE_PATH=/pr-preview/pr-0/ pnpm build` (Git B
 | `pnpm test` / `pnpm test:watch`            | Unit tests (Vitest), including the hardcoded root path check                                      |
 | `pnpm test:coverage`                       | Unit tests with coverage thresholds (`src/lib` ≥ 90%, overall ≥ 80%)                              |
 | `pnpm test:e2e`                            | Playwright + axe on the built site; one engine: `--project="chromium-*"`                          |
-| `pnpm test:visual`                         | Visual regression (baselines arrive in Stage 2)                                                   |
+| `pnpm test:visual`                         | Visual regression (baselines revisited in Stage 7)                                                |
 | `pnpm test:smoke`                          | Smoke tests against a deployed URL: `SMOKE_BASE_URL=https://…/ pnpm test:smoke`                   |
 | `pnpm lhci`                                | Lighthouse CI against `dist/` (home, plain view, a project, updates, 404) with the mobile budgets |
 | `pnpm check`                               | Format check, lint, typecheck, knip, depcruise, tests with coverage, build                        |
@@ -122,7 +122,7 @@ tests/
   e2e/          Playwright specs (fail on any console error)
   smoke/        post-deploy checks against a live URL
   static/       repo-wide checks (hardcoded root paths)
-  visual/       screenshot baselines (Stage 2)
+  visual/       screenshot baselines (revisited in Stage 7)
 ```
 
 Target layout for later stages: [SPEC §3](docs/SPEC.md).

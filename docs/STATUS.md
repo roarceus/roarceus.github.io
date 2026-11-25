@@ -4,10 +4,12 @@ _Last updated: 2026-11-25_
 
 ## Current stage
 
-**Stage 1 — Content and plain view: done, ready to release as v0.2.0.** Production still serves v0.1.0
-until release PR #42 merges. Plan: [`plans/stage-1.md`](plans/stage-1.md) ·
-[milestone](https://github.com/roarceus/roarceus.github.io/milestone/2) (#32–#40) ·
-[board](https://github.com/users/roarceus/projects/1). **Next:** Stage 2 planning (design system and layout).
+**Stage 2 — Design system and layout shell: planning.** v0.2.0 is live. Design direction accepted in
+[ADR 0002](adr/0002-design-direction-tool-and-game.md) ("the UI is the tool, the cluster is the game").
+Design: [`plans/stage-2-design.md`](plans/stage-2-design.md) (approved 2026-11-25). Plan:
+[`plans/stage-2.md`](plans/stage-2.md) (waiting for approval) ·
+[milestone](https://github.com/roarceus/roarceus.github.io/milestone/3) (#49–#56). Post-1.0 Stages 8 to 10
+are on the roadmap (SPEC §11).
 
 ## Stage 1 sign-off
 
@@ -37,23 +39,20 @@ until release PR #42 merges. Plan: [`plans/stage-1.md`](plans/stage-1.md) ·
 
 ## Next steps
 
-1. Sohan: merge release PR #42 (v0.2.0) once this PR is in, then watch Actions → Release (deploy, smoke).
-2. After v0.2.0: submit the sitemap in Google Search Console; check the share card in a link inspector
+1. Sohan: approve the Stage 2 plan; then PRs 2 to 8 in order (`plans/stage-2.md`).
+2. Since v0.2.0 shipped: submit the sitemap in Google Search Console; check the share card in a link inspector
    (runbook: `docs/runbooks/share-image.md`); set up the uptime monitor (M10).
-3. Stage 2 planning: a design-direction ADR first (see open questions), then `plans/stage-2.md`.
-4. Decide on Renovate's queued TypeScript 7 PR (fails until `typescript-eslint` supports TS 7).
+3. Decide on Renovate's queued TypeScript 7 PR (fails until `typescript-eslint` supports TS 7).
 
 ## Open questions
 
-- Plain view length: Sohan checked it on iOS Safari (no clipping) but finds it long. Revisit at Stage 2
-  (summary-first layout or collapsible sections), keeping it complete and printable.
-- Design direction: Sohan wants real flair (3D, gamey, fun, many components), not a generic terminal
-  look. That conflicts with SPEC §5's "real tool look"; explore options at Stage 2 planning and update
-  SPEC §5 via an ADR once a direction is chosen. Keep the mobile perf budget, plain view, and a11y.
 - Older project dates and eras are still open in `docs/content-review.md`.
 - Global `~/.npmrc` uses `registry=http://`; switching it to `https://` is Sohan's call (repo is pinned).
 
 ## Known issues
+
+- One WebKit (iPhone 15) axe run on main misread the plain view h1 color as black (7cc043d); a rerun
+  passed and the screenshot showed correct colors. Watch for a repeat before treating it as flaky.
 
 - GitHub Pages serves only the root `404.html`, so a missing page under a PR preview shows production's
   404 page.
