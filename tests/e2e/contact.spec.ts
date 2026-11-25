@@ -158,7 +158,14 @@ test.describe('contact form failure: offers email when the service fails', () =>
 });
 
 test.describe('contact form failure: keeps the message when the visitor is offline', () => {
-  test.use({ expectedConsoleErrors: [/^Failed to load resource: net::ERR_INTERNET_DISCONNECTED$/] });
+  test.use({
+    expectedConsoleErrors: [
+      // Chromium and WebKit
+      /^Failed to load resource: net::ERR_INTERNET_DISCONNECTED$/,
+      // Firefox reports a dropped request as a CORS failure with no status.
+      /^\[JavaScript Error: "Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at https:\/\/api\.web3forms\.com\/submit\. \(Reason: CORS request did not succeed\)\. Status code: \(null\)\."\]$/,
+    ],
+  });
 
   test.beforeEach(async ({ page }) => {
     await page.goto('./plain/#contact');
