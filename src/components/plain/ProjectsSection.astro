@@ -4,6 +4,7 @@ import StatusPill from '@/components/ui/StatusPill.astro';
 import TagList from '@/components/ui/TagList.astro';
 import { getProjects } from '@/lib/content/queries';
 import { formatRange } from '@/lib/utils/dates';
+import { url } from '@/lib/utils/url';
 
 import Section from './Section.astro';
 
@@ -15,7 +16,7 @@ const linkClass = 'inline-flex min-h-11 items-center';
 <Section id="projects" title="Projects">
   <h3 class="sr-only">Featured projects</h3>
   <ul role="list" aria-label="Featured projects" class="grid gap-4">
-    {featured.map(({ data }) => (
+    {featured.map(({ id, data }) => (
       <li class="flex flex-col gap-3 rounded-lg border border-border bg-surface-1 p-4 sm:p-5">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <h4 class="text-lg font-semibold text-text">{data.name}</h4>
@@ -24,27 +25,28 @@ const linkClass = 'inline-flex min-h-11 items-center';
         <p class="text-text-muted">{data.tagline}</p>
         {data.start && <p class="font-mono text-sm text-text-muted">{formatRange(data.start, data.end)}</p>}
         <TagList items={data.tech} label={`Tech used in ${data.name}`} />
-        {(data.links.repo || data.links.demo) && (
-          <p class="flex flex-wrap gap-x-5 font-mono text-sm">
-            {data.links.repo && (
-              <ExternalLink href={data.links.repo} class={linkClass}>
-                Source<span class="sr-only"> for {data.name}</span>
-              </ExternalLink>
-            )}
-            {data.links.demo && (
-              <ExternalLink href={data.links.demo} class={linkClass}>
-                Demo<span class="sr-only"> of {data.name}</span>
-              </ExternalLink>
-            )}
-          </p>
-        )}
+        <p class="flex flex-wrap gap-x-5 font-mono text-sm">
+          <a href={url(`projects/${id}/`)} class:list={['link', linkClass]}>
+            Details<span class="sr-only"> on {data.name}</span>
+          </a>
+          {data.links.repo && (
+            <ExternalLink href={data.links.repo} class={linkClass}>
+              Source<span class="sr-only"> for {data.name}</span>
+            </ExternalLink>
+          )}
+          {data.links.demo && (
+            <ExternalLink href={data.links.demo} class={linkClass}>
+              Demo<span class="sr-only"> of {data.name}</span>
+            </ExternalLink>
+          )}
+        </p>
       </li>
     ))}
   </ul>
 
   <h3 class="mt-10 mb-4 font-mono text-base font-semibold text-text">More projects</h3>
   <ul role="list" aria-label="More projects" class="flex flex-col divide-y divide-border">
-    {more.map(({ data }) => (
+    {more.map(({ id, data }) => (
       <li class="flex flex-col gap-1 py-3">
         <p class="flex flex-wrap items-baseline gap-x-3">
           <span class="font-semibold text-text">{data.name}</span>
@@ -53,13 +55,16 @@ const linkClass = 'inline-flex min-h-11 items-center';
           )}
         </p>
         <p class="text-text-muted">{data.tagline}</p>
-        {data.links.repo && (
-          <p class="font-mono text-sm">
+        <p class="flex flex-wrap gap-x-5 font-mono text-sm">
+          <a href={url(`projects/${id}/`)} class:list={['link', linkClass]}>
+            Details<span class="sr-only"> on {data.name}</span>
+          </a>
+          {data.links.repo && (
             <ExternalLink href={data.links.repo} class={linkClass}>
               Source<span class="sr-only"> for {data.name}</span>
             </ExternalLink>
-          </p>
-        )}
+          )}
+        </p>
       </li>
     ))}
   </ul>

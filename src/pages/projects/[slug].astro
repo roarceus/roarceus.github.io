@@ -1,0 +1,63 @@
+---
+import ExternalLink from '@/components/ui/ExternalLink.astro';
+import StatusPill from '@/components/ui/StatusPill.astro';
+import TagList from '@/components/ui/TagList.astro';
+import { site } from '@/config/site';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getNodeLabel, getProjects, renderEntry } from '@/lib/content/queries';
+import { formatRange } from '@/lib/utils/dates';
+import { url } from '@/lib/utils/url';
+
+import type { GetStaticPaths } from 'astro';
+
+export const getStaticPaths = (async () => {
+  const projects = await getProjects();
+  return projects.map((project) => ({ params: { slug: project.id }, props: { project } }));
+}) satisfies GetStaticPaths;
+
+const { project } = Astro.props;
+const { data } = project;
+const { Content } = await renderEntry(project);
+const builtAt = data.node ? await getNodeLabel(data.node) : undefined;
+const linkClass = 'inline-flex min-h-11 items-center';
+---
+
+<BaseLayout title={`${data.name} | ${site.name}`} description={data.tagline}>
+  <main id="main" class="mx-auto flex max-w-3xl flex-col gap-5 px-4 py-10 sm:px-8">
+    <a
+      href={url('plain/#projects')}
+      class="link inline-flex min-h-11 items-center self-start font-mono text-sm"
+    >
+      All projects
+    </a>
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <h1 class="text-[length:var(--text-display-fluid)] leading-tight font-semibold tracking-tight">
+        {data.name}
+      </h1>
+      <StatusPill status={data.status} />
+    </div>
+    <p class="text-[length:var(--text-base-fluid)] text-text-muted">{data.tagline}</p>
+    <p class="flex flex-wrap gap-x-4 gap-y-1 font-mono text-sm text-text-muted">
+      {data.start && <span>{formatRange(data.start, data.end)}</span>}
+      {builtAt && <span>Built at {builtAt}</span>}
+    </p>
+    <TagList items={data.tech} label={`Tech used in ${data.name}`} />
+    {(data.links.repo || data.links.demo) && (
+      <p class="flex flex-wrap gap-x-5 font-mono text-sm">
+        {data.links.repo && (
+          <ExternalLink href={data.links.repo} class={linkClass}>
+            Source<span class="sr-only"> for {data.name}</span>
+          </ExternalLink>
+        )}
+        {data.links.demo && (
+          <ExternalLink href={data.links.demo} class={linkClass}>
+            Demo<span class="sr-only"> of {data.name}</span>
+          </ExternalLink>
+        )}
+      </p>
+    )}
+    <div class="prose border-t border-border pt-6">
+      <Content />
+    </div>
+  </main>
+</BaseLayout>

@@ -1,25 +1,30 @@
 ---
 import { getUpdates } from '@/lib/content/queries';
-import { formatYearMonth } from '@/lib/utils/dates';
+import { url } from '@/lib/utils/url';
 
 import Section from './Section.astro';
+import UpdateDate from './UpdateDate.astro';
 
-// The latest few; the full list and per-update pages arrive with /updates/ (Stage 1 PR 4).
+// The latest few; the full list lives at /updates/.
 const LATEST = 5;
 const updates = (await getUpdates()).slice(0, LATEST);
-const isoDate = (date: Date) => date.toISOString().slice(0, 10);
 ---
 
 <Section id="updates" title="Updates">
   <ol role="list" class="flex flex-col gap-5">
-    {updates.map(({ data }) => (
+    {updates.map(({ id, data }) => (
       <li class="flex flex-col gap-1">
-        <time datetime={isoDate(data.date)} class="font-mono text-sm text-text-muted">
-          {formatYearMonth(isoDate(data.date).slice(0, 7))}
-        </time>
-        <p class="font-semibold text-text">{data.title}</p>
+        <UpdateDate date={data.date} />
+        <a href={url(`updates/${id}/`)} class="link self-start font-semibold">
+          {data.title}
+        </a>
         <p class="text-text-muted">{data.summary}</p>
       </li>
     ))}
   </ol>
+  <p class="mt-4 font-mono text-sm">
+    <a href={url('updates/')} class="link inline-flex min-h-11 items-center">
+      All updates
+    </a>
+  </p>
 </Section>
