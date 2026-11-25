@@ -1,6 +1,8 @@
 ---
 // Search and share metadata (SPEC §2, plan D6). Canonical and share URLs always point at
-// production, even on PR previews; previews and the 404 page are noindex.
+// production, even on PR previews. Previews and noindex pages (404, thank-you) are kept out of
+// search; noindex pages also skip the canonical, which would contradict it (and on the 404 page
+// name a URL that doesn't exist).
 import { site } from '@/config/site';
 import { getProfile } from '@/lib/content/queries';
 import { isPreviewBase, jsonLdScript, personJsonLd } from '@/lib/seo/meta';
@@ -42,12 +44,12 @@ if (person) {
 <title>{title}</title>
 <meta name="description" content={description} />
 {(noindex || isPreviewBase(base)) && <meta name="robots" content="noindex" />}
-<link rel="canonical" href={canonical} />
+{!noindex && <link rel="canonical" href={canonical} />}
 <meta property="og:type" content={type} />
 <meta property="og:site_name" content={site.name} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
-<meta property="og:url" content={canonical} />
+{!noindex && <meta property="og:url" content={canonical} />}
 <meta property="og:locale" content="en_US" />
 <meta property="og:image" content={image} />
 <meta property="og:image:type" content="image/png" />

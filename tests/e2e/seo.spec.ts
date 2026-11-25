@@ -5,6 +5,8 @@ import type { Page } from '@playwright/test';
 
 const ORIGIN = 'https://roarceus.github.io';
 const PAGES = ['', 'plain/', 'updates/', 'projects/asktrace/', 'contact/thanks/'];
+// Only reached after sending a message, so it stays out of search (noindex, no canonical).
+const NOINDEX = new Set(['contact/thanks/']);
 
 async function meta(page: Page, selector: string): Promise<string | null> {
   return page.locator(selector).first().getAttribute('content');
@@ -23,17 +25,22 @@ test.describe('page metadata', () => {
       titles.add(title);
       descriptions.add(description ?? '');
 
-      const canonical = `${ORIGIN}/${path}`;
-      await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', canonical);
-      expect(await meta(page, 'meta[property="og:url"]')).toBe(canonical);
+      if (NOINDEX.has(path)) {
+        await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
+        await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
+        await expect(page.locator('meta[property="og:url"]')).toHaveCount(0);
+      } else {
+        const canonical = `${ORIGIN}/${path}`;
+        await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
+        await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', canonical);
+        expect(await meta(page, 'meta[property="og:url"]')).toBe(canonical);
+      }
       expect(await meta(page, 'meta[property="og:title"]')).toBe(title);
       expect(await meta(page, 'meta[property="og:description"]')).toBe(description);
       expect(await meta(page, 'meta[property="og:site_name"]')).toBe('Sohan Patil');
       expect(await meta(page, 'meta[property="og:image"]')).toBe(`${ORIGIN}/og-image.png`);
       expect(await meta(page, 'meta[property="og:image:alt"]')).toBeTruthy();
       expect(await meta(page, 'meta[name="twitter:card"]')).toBe('summary_large_image');
-      // The thank-you page is only reached after sending a message, so it stays out of search.
-      await expect(page.locator('meta[name="robots"]')).toHaveCount(path === 'contact/thanks/' ? 1 : 0);
     }
     expect(titles.size).toBe(PAGES.length);
     expect(descriptions.size).toBe(PAGES.length);
@@ -109,6 +116,8 @@ test.describe('404 page', () => {
       main.getByText('Error from server (NotFound): page "/no/such/page/" not found'),
     ).toBeVisible();
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
+    // A canonical here would name /404/, which doesn't exist.
+    await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
     await expectTappable(main, 'Home');
     await expectTappable(main, 'Plain view');
     await expectTappable(main, 'Updates');
