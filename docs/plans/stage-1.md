@@ -146,27 +146,28 @@ SPEC §6 (CKAD) and §7 (nodes).
 - [x] Verified with a throwaway page: every query loads in the expected order, and a project on an unknown
       node fails the build with the integrity message.
 
-### Task 4: Plain view sections (PR 3)
+### Task 4: Plain view sections (PR 3) — done
 
-**Files:** Create `src/components/plain/{Hero,About,Experience,Education,Projects,Skills,Certifications,
-Achievements,Updates,Contact}Section.astro`, `src/components/layout/{SiteHeader,
-SiteFooter}.astro`, `src/pages/plain/index.astro`, `tests/e2e/plain.spec.ts`. Modify `BaseLayout.astro`.
+**Files:** `src/components/plain/{Intro,SectionNav,Section,Experience,Projects,Skills,Education,
+Certifications,Awards,Updates,Contact}*.astro`, `src/components/ui/{StatusPill,TagList,ExternalLink}.astro`,
+`src/components/layout/{SiteHeader,SiteFooter}.astro`, `src/config/sections.ts`, `src/pages/plain/index.astro`,
+`tests/e2e/plain.spec.ts`, `tests/support/checks.ts`; `renderEntry()` in `lib/content/queries.ts`.
 
-- [ ] Failing e2e: every section has a heading and landmark; in-page nav links reach each `id`; header shows
-      name, Resume, Contact on every width; no horizontal overflow at all 12 projects; axe clean; print
-      stylesheet hides nav.
-- [ ] Simple header/footer (name, Plain/Cluster links, Resume, Contact; footer with version via build-info).
-      Stage 2 replaces them with the real top bar.
-- [ ] Sections render from helpers only; project cards link to `/projects/<slug>/`; dates via `formatRange`.
-- [ ] Resume link → `url('resume.pdf')`; commit Sohan's `public/resume.pdf` (A7).
+- [x] Failing e2e first: every section has a heading, a `section#id`, and an on-this-page link; header
+      controls are tappable (44px); no overflow; axe clean; print hides header and nav; resume serves a PDF;
+      external links are `noopener noreferrer`; no `TODO(sohan)` and no AI-style punctuation in the page.
+- [x] Header (name, Resume, Contact) and footer (version, source). No Plain/Cluster toggle until the
+      cluster view exists (no dead links). Stage 2 replaces both.
+- [x] Sections render from helpers only; dates via `formatRange`. Project detail links wait for PR 4.
+- [x] `public/resume.pdf` committed (A7). Print stylesheet: light, one column, link URLs printed.
+- [x] Found and fixed: Astro's Markdown smart quotes turned `'` into curly quotes; `smartypants` is off and
+      the rendered page is checked. White on the accent fill (`--on-accent`) for AA contrast.
 
-### Task 5: Home hero (PR 3)
+### Task 5: Home hero (PR 3) — done
 
-**Files:** Modify `src/pages/index.astro`, replace `tests/e2e/placeholder.spec.ts` with `tests/e2e/home.spec.ts`.
-
-- [ ] Failing e2e: with JS disabled, `/` shows name, title, tagline, links to every `/plain/#section`, Resume,
-      Contact, and the version line (smoke still finds `data-testid="build-version"`).
-- [ ] Implement (D4).
+- [x] `/` shows name, title, tagline, location, open-to-work, the main actions (View portfolio, Resume,
+      Contact), and links to every `/plain/` section; works without JS. The version line moved to the
+      footer on every page (smoke still finds `build-version`).
 
 ### Task 6: Project pages, updates, RSS (PR 4)
 

@@ -9,12 +9,13 @@ switch to a plain, recruiter-friendly view.
 
 **Live:** https://roarceus.github.io/
 
-![The current placeholder page: "Sohan Patil, site under construction" with the build version](docs/assets/screenshot.png)
+![The plain view: name, title, location, open-to-work status, links, and an on-this-page sidebar](docs/assets/screenshot.png)
 
 ## Status
 
 **Stage 1 — Content and plain view (in progress, → v0.2.0).** Live is still the v0.1.0 placeholder.
-Done so far: content schemas, query helpers, and the content itself. Next: `/plain/` and the home hero. Progress:
+Done so far: content, the full plain portfolio at `/plain/`, and a home hero. Next: project pages,
+updates, and RSS. Progress:
 [`docs/STATUS.md`](docs/STATUS.md) · [project board](https://github.com/users/roarceus/projects/1) ·
 [changelog](CHANGELOG.md) (from v0.1.0).
 
@@ -107,6 +108,7 @@ Build the way a PR preview does: `BASE_PATH=/pr-preview/pr-0/ pnpm build` (Git B
 docs/           SPEC, STATUS, plans, ADRs, runbooks, postmortems, content guide
 public/         served as-is: favicon, robots.txt, .nojekyll
 src/
+  components/   layout/ (header, footer), plain/ (plain view sections), ui/ (status pill, tags, links)
   config/       site metadata, build info (version + commit), feature flags
   content/      portfolio content (YAML + Markdown); schemas registered in content.config.ts
   layouts/      page layouts (BaseLayout sets meta tags and the CSP)
