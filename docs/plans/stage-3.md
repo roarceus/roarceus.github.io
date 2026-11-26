@@ -329,7 +329,7 @@ export function readRunParam(search: string): string | undefined; // ≤ 200, pa
 export function runHref(input: string, location: { pathname: string }): string; // `${pathname}?run=...`
 ```
 
-- [ ] **Tests first:**
+- [x] **Tests first:**
   - `runCommand('get nodes','input')` appends one entry, pushes history, sets `announcement` to
     `summarize(entry)`; the 51st run drops the oldest entry and `announcement` still names only the newest.
   - Blank input appends a bare-prompt entry and announces nothing; history skips blanks and consecutive
@@ -344,9 +344,9 @@ export function runHref(input: string, location: { pathname: string }): string; 
     `?run=logs+updates+-f`, `?run=delete+pod+x`, `?run=<script>`, 201 characters, `%00`, missing → `undefined`.
   - `runHref('kubectl describe pod asktrace', { pathname: '/pr-preview/pr-9/' })` →
     `/pr-preview/pr-9/?run=kubectl+describe+pod+asktrace`.
-- [ ] Implement `runCommand` as the single place that parses, executes, records `source`, and updates both
+- [x] Implement `runCommand` as the single place that parses, executes, records `source`, and updates both
       stores (a comment marks it as the Stage 6 analytics hook).
-- [ ] `pnpm check`; commit `feat(terminal): add shared store, run path, and deep links`.
+- [x] `pnpm check`; commit `feat(terminal): add shared store, run path, and deep links`.
 
 ### Task 6: Terminal island (PR 6)
 

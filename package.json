@@ -47,6 +47,7 @@
     "@fontsource-variable/jetbrains-mono": "5.3.0",
     "@lucide/astro": "1.75.0",
     "astro": "7.4.13",
+    "nanostores": "1.5.5",
     "react": "19.3.1",
     "react-dom": "19.3.1"
   },

@@ -16,7 +16,8 @@ export interface Line {
   tone?: 'muted' | 'error' | 'ok';
 }
 
-interface Selection {
+/** What the detail panel shows (design doc §5.3). */
+export interface Selection {
   kind: 'node' | 'pod';
   name: string;
 }

@@ -3,7 +3,7 @@ import type { ParsedCommand } from '@/lib/parser/parse';
 import { error, errorWithMatch } from './format';
 import { PROGRAM_ONLY, registry } from './registry';
 
-import type { CommandContext, CommandResult } from './types';
+import type { Command, CommandContext, CommandResult } from './types';
 
 /**
  * Runs a parsed command against the registry (design doc stage-3 §5.2). Pure apart from the lazy
@@ -12,11 +12,19 @@ import type { CommandContext, CommandResult } from './types';
 
 const VERBS = [...registry.keys()].filter((verb) => !PROGRAM_ONLY.has(verb));
 
+const verbOf = (cmd: ParsedCommand): string =>
+  (cmd.program === 'kubectl' ? (cmd.flags.help === undefined ? cmd.verb : 'help') : cmd.program) ?? 'help';
+
+/** The registry entry a parsed command runs, or undefined for an unknown verb. */
+export function commandFor(cmd: ParsedCommand): Command | undefined {
+  const verb = verbOf(cmd);
+  return cmd.program === 'kubectl' && PROGRAM_ONLY.has(verb) ? undefined : registry.get(verb);
+}
+
 export async function execute(cmd: ParsedCommand, ctx: CommandContext): Promise<CommandResult> {
-  const verb = cmd.program === 'kubectl' ? (cmd.flags.help === undefined ? cmd.verb : 'help') : cmd.program;
-  const command = registry.get(verb ?? 'help');
-  if (!command || (cmd.program === 'kubectl' && PROGRAM_ONLY.has(verb ?? ''))) {
-    const word = verb ?? '';
+  const command = commandFor(cmd);
+  if (!command) {
+    const word = verbOf(cmd);
     return errorWithMatch(`error: unknown command "${word}" for "kubectl"`, word, VERBS, (match) =>
       ['kubectl', match, ...cmd.args].join(' '),
     );
