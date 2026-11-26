@@ -26,7 +26,7 @@ test.describe('project pages', () => {
     // Most projects sit in the closed "more projects" expander: in the page, not on screen.
     const details = page.locator('#projects').getByRole('link', { name: /^Details/, includeHidden: true });
     const hrefs = await details.evaluateAll((links) => links.map((a) => a.getAttribute('href')));
-    expect(hrefs.length).toBe(16);
+    expect(hrefs.length).toBe(18);
     for (const href of hrefs) {
       const response = await page.request.get(new URL(href ?? '', page.url()).toString());
       expect(response.status(), href ?? '').toBe(200);

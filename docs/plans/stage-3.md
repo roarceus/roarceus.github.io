@@ -289,6 +289,14 @@ namespace.`
 127.0.0.1 -> <host>` line; anything else → NotFound with suggestion.
   - `help` and `kubectl --help` and bare `kubectl` → lines listing every command, each with `run`.
   - Unknown verb → `error: unknown command "x" for "kubectl"` + `suggestion`; `clear` → `action: 'clear'`.
+- [ ] **Review follow-ups (approved 2026-11-26), tests first:**
+  - ROLE in `get experience` uses `kubeRole(role)`: `toKubeName` of the title before the first `,` or `(`
+    (`teaching-assistant`, `devops-engineer`, `software-engineer`); the full title stays in `describe`.
+    The SSR table in `TerminalDock` uses the same helper.
+  - A table test with 120-character names and roles: rows render, no cell is longer than the input, and
+    `ResultTable` (Task 6) keeps the overflow inside its box.
+  - Node role: when a degree declares a node, the node is `role=education` (Northeastern), and the TA
+    row still sits on it (`clusterNodes` in `cluster.ts`, with a test).
 - [ ] Implement; `pnpm test src/lib/commands` → PASS; `src/lib` coverage ≥ 90%.
 - [ ] Commit `feat(commands): add command registry and v1 commands`.
 
@@ -360,6 +368,18 @@ export function runHref(input: string, location: { pathname: string }): string; 
       `LiveRegion` changes only when `announcement` changes; the error state shows a `Retry` button that calls
       `loadSnapshot` again; Collapse toggles `aria-expanded` at 768 to 1023px; a `stream` result reveals lines one by one,
       and all at once under `prefers-reduced-motion`.
+- [ ] **One-screen desktop layout (approved 2026-11-26):** from 1024px wide and 700px tall, the dashboard
+      fills the window under the top bar with no page scroll: map and detail panel on top, the terminal docked
+      at the bottom with a Collapse button (all desktop widths), and each part scrolling inside its own box.
+      The footer's content (version, source link) becomes a slim status line inside the dashboard there.
+      Below 700px tall, or below 1024px wide, the page scrolls as today.
+  - Every box that scrolls inside (map, detail panel, terminal output) is keyboard reachable: `tabindex="0"`,
+    an accessible name, and the visible focus ring.
+  - Terminal tables size columns to their content with kubectl spacing (`w-auto`, `3ch` gaps), not full
+    width; plain-view tables don't change.
+  - e2e: at 1280×800 and 1920×1080 the page doesn't scroll, the map and the terminal input are both in the
+    viewport, each scroll box takes focus with Tab and scrolls with the arrow keys; at 1280×650 the page
+    scrolls normally and nothing is clipped.
 - [ ] Static test: no `innerHTML`, `dangerouslySetInnerHTML`, `eval(`, `new Function` in `src/`.
 - [ ] Budgets script (node, no deps): from `dist-dashboard/index.html`, collect island component and
       renderer URLs and their static `import` graph (skip `import(`), gzip each; report island code (excluding
