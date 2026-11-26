@@ -151,8 +151,12 @@ The cluster experience on mobile is tap-first; typing is optional.
 
 **One playground:** with JavaScript on, the cluster view never sends visitors to another page. Command chips,
 table names, map nodes, and pods run their command in place: output in the terminal, details in the detail
-panel (the bottom sheet on phones). The URL follows along (for example `#pod/<slug>`) through the History API,
-so Back and Forward step through what was viewed and links can be shared. Only the `Plain view` toggle and
+panel (the bottom sheet on phones). The URL follows along as `?run=<command>` (for example
+`/?run=kubectl+describe+pod+asktrace`) through the History API, so Back and Forward step through what was
+viewed and links can be shared. A query string, not a hash, because phones use `#cluster` for cluster mode.
+`?run=` accepts only read-only commands (`get`, `describe`, `top`, `logs` without `-f`, `version`, `help`,
+`cluster-info`) up to 200 characters; anything else is ignored and the page loads normally. While
+`clusterDashboard` is off, `?run=` is ignored. Only the `Plain view` toggle and
 `kubectl config use-context plain` go to `/plain/`, plus real outbound links (`port-forward`, Resume). Chips
 and names stay real links underneath, so without JavaScript they still reach the plain view.
 
@@ -421,7 +425,7 @@ blocked behind the animation. After boot, auto-select the most recent role so pa
   - **Visual regression:** Playwright screenshot comparisons for key pages at mobile, tablet, and desktop widths,
     with baselines committed. Intentional UI changes update baselines in the same PR.
   - **Runtime errors fail tests:** every e2e test fails on any uncaught exception or `console.error`.
-- **Component tests**: Vitest + React Testing Library (jsdom) for the islands: terminal input, history, autocomplete,
+- **Component tests**: Vitest + React Testing Library (happy-dom) for the islands: terminal input, history, autocomplete,
   output rendering, chips, map selection, detail panel, bottom sheet, contact form validation and error states.
   Query by role and label (as a user would), not by class names.
 - **Content tests**: schema validation runs at build, plus tests that every project's `node` points to a real

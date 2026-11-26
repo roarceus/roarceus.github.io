@@ -17,12 +17,13 @@ Coming next, already in PR previews behind a flag: the cluster dashboard on `/`.
 
 ## Status
 
-**Stage 2 (design system and layout shell) is done and ships as v0.3.0.** It added the design tokens
+**v0.3.0 is live: Stage 2 (design system and layout shell) is done.** It added the design tokens
 (AA-checked), UI components, a top bar on every page, a shorter plain view (jump chips and expanders), and
 the cluster dashboard shell on `/` (map placeholder, detail panel, terminal dock, phone cluster mode). The
 dashboard stays behind the `clusterDashboard` flag, on in PR previews and off in production, until the
 terminal (Stage 3) and the map (Stage 4) make it real. Direction: [ADR 0002](docs/adr/0002-design-direction-tool-and-game.md),
-the UI is the tool, the cluster is the game. Progress:
+the UI is the tool, the cluster is the game. Next: Stage 3, the terminal engine
+([design](docs/plans/stage-3-design.md), [plan](docs/plans/stage-3.md)). Progress:
 [`docs/STATUS.md`](docs/STATUS.md) · [project board](https://github.com/users/roarceus/projects/1) ·
 [changelog](CHANGELOG.md) (from v0.1.0).
 
