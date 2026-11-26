@@ -34,6 +34,14 @@ test.describe('cluster dashboard @dashboard', () => {
     }
   });
 
+  test('shows the open to work status next to the name from 768px', async ({ page }) => {
+    test.skip(isMobile(page), 'the phone layout shows it in its own header');
+    const heading = page.getByRole('heading', { level: 1, name: 'Sohan Patil' });
+    await expect(heading).toBeVisible();
+    const status = page.locator('.cluster-view').getByText('Open to work', { exact: true });
+    await expect(status).toBeVisible();
+  });
+
   test('draws the nodes from content and counts them in the header', async ({ page }) => {
     test.skip(isMobile(page), 'covered by the cluster mode test');
     const stage = page.getByRole('region', { name: 'Cluster map' });

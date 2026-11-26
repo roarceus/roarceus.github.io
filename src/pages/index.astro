@@ -100,8 +100,11 @@ const roles = dashboard ? (await getExperience()).filter(({ data }) => onMap.has
           <h1 class="text-[length:var(--text-h2-fluid)] leading-tight font-semibold text-text">
             {profile.name}
           </h1>
-          <p class="text-text-muted">
-            {profile.title}, {profile.location}
+          <p class="flex flex-wrap items-center gap-x-3 gap-y-2 text-text-muted">
+            <span>
+              {profile.title}, {profile.location}
+            </span>
+            {profile.openToWork && <StatusPill status="running" label="Open to work" />}
           </p>
         </div>
         <ClusterStage
