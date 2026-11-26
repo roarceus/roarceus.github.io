@@ -47,7 +47,7 @@ Everything stays reachable without typing (clickable map, command chips, plain v
 
 ## Tech stack
 
-Astro 7 (static output) · React 19 islands · TypeScript 6 (strict) · Tailwind CSS 4 with CSS-variable
+Astro 7 (static output) · React 19 islands · nanostores for shared island state · TypeScript 6 (strict) · Tailwind CSS 4 with CSS-variable
 design tokens · self-hosted Inter and JetBrains Mono (Fontsource) · Lucide icons · Vitest 5 · Playwright 1.65 + axe ·
 Lighthouse CI · GitHub Pages. Choices and version pins: [ADR-0001](docs/adr/0001-stack-and-tooling.md).
 
@@ -134,6 +134,8 @@ src/
   lib/commands/  terminal commands (registry, get/describe/top/logs and friends, Tab completion, a small
                 YAML writer); each returns plain data the terminal renders, never HTML
   lib/parser/   terminal command parser (pure: tokens, flags, kubectl-style errors)
+  lib/state/    shared terminal state (nanostores): output, history, selection, the snapshot loader, the one
+                run path, and ?run= deep links
   lib/seo/      share metadata and JSON-LD helpers
   lib/utils/    framework-free helpers: url() for the base path, dates, contrast ratios, kubectl ages and names,
                 flags, did-you-mean suggestions
