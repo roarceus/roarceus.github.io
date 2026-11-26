@@ -4,10 +4,12 @@ _Last updated: 2026-11-25_
 
 ## Current stage
 
-**Stage 2 — Design system and layout shell: done.** It ships as v0.3.0 when Sohan merges the release PR
-(#59). Next is Stage 3, the terminal engine. Direction: [ADR 0002](adr/0002-design-direction-tool-and-game.md)
-("the UI is the tool, the cluster is the game"). Design: [`plans/stage-2-design.md`](plans/stage-2-design.md).
-Plan: [`plans/stage-2.md`](plans/stage-2.md), all tasks ticked. Post-1.0 Stages 8 to 10 are on the roadmap (SPEC §11).
+**Stage 3 — Terminal engine: planning.** v0.3.0 is live. Design:
+[`plans/stage-3-design.md`](plans/stage-3-design.md) (approved with changes 2026-11-25). Plan:
+[`plans/stage-3.md`](plans/stage-3.md) (waiting for approval) ·
+[milestone](https://github.com/roarceus/roarceus.github.io/milestone/4) (#68 to #76). Store:
+[ADR 0003](adr/0003-nanostores-for-island-state.md). The dashboard stays behind `clusterDashboard` until
+Stage 4.
 
 ## Stage 2 sign-off
 
@@ -39,9 +41,8 @@ Plan: [`plans/stage-2.md`](plans/stage-2.md), all tasks ticked. Post-1.0 Stages 
 
 ## Next steps
 
-1. Sohan: merge the release PR (#59) for v0.3.0, then check production (dashboard must stay off).
-2. Stage 3 plan: the terminal engine, following "One playground" (SPEC §4, §7).
-3. Carried over: submit the sitemap in Google Search Console; check the share card in a link inspector
+1. Sohan: approve the Stage 3 plan; then PRs 2 to 9 in order (`plans/stage-3.md`).
+2. Carried over: submit the sitemap in Google Search Console; check the share card in a link inspector
    (runbook: `docs/runbooks/share-image.md`); set up the uptime monitor (M10); decide on Renovate's
    queued TypeScript 7 PR.
 
