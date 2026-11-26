@@ -9,14 +9,20 @@ switch to a plain, recruiter-friendly view.
 
 **Live:** https://roarceus.github.io/
 
-![The plain view: name, title, location, open-to-work status, links, and an on-this-page sidebar](docs/assets/screenshot.png)
+![The plain view: the top bar, name, title, location, open-to-work status, links, and an on-this-page sidebar](docs/assets/screenshot.png)
+
+Coming next, already in PR previews behind a flag: the cluster dashboard on `/`.
+
+![The cluster dashboard: three career nodes with their project pods, unscheduled pods, and the details of the selected role](docs/assets/screenshot-dashboard.png)
 
 ## Status
 
-**v0.2.0 is live: Stage 1 (content and plain view) is done.** It added the content, the full plain portfolio
-at `/plain/`, a home hero, project pages, updates and an RSS feed, a contact form, and search and share
-metadata. Now planning Stage 2, the design system and layout shell, under the direction in
-[ADR 0002](docs/adr/0002-design-direction-tool-and-game.md): the UI is the tool, the cluster is the game. Progress:
+**Stage 2 (design system and layout shell) is done and ships as v0.3.0.** It added the design tokens
+(AA-checked), UI components, a top bar on every page, a shorter plain view (jump chips and expanders), and
+the cluster dashboard shell on `/` (map placeholder, detail panel, terminal dock, phone cluster mode). The
+dashboard stays behind the `clusterDashboard` flag, on in PR previews and off in production, until the
+terminal (Stage 3) and the map (Stage 4) make it real. Direction: [ADR 0002](docs/adr/0002-design-direction-tool-and-game.md),
+the UI is the tool, the cluster is the game. Progress:
 [`docs/STATUS.md`](docs/STATUS.md) · [project board](https://github.com/users/roarceus/projects/1) ·
 [changelog](CHANGELOG.md) (from v0.1.0).
 
@@ -28,7 +34,7 @@ Planned per stage ([SPEC §11](docs/SPEC.md)):
 | ---------------------------- | ------- | ------------------------------------------------------------------------------------------------------------- |
 | 0 — Foundation               | 0.1.0   | Scaffold, quality gates, CI, PR previews, releases, placeholder page                                          |
 | 1 — Content and plain view   | 0.2.0   | Schema-validated content, full plain portfolio, project pages, updates + RSS, contact form, SEO, sitemap, 404 |
-| 2 — Design system and layout | 0.3.0   | Tokens, components, dashboard layout, mobile layout                                                           |
+| 2 — Design system and layout | 0.3.0   | Tokens, components, top bar, shorter plain view, dashboard shell (flagged), mobile cluster mode               |
 | 3 — Terminal engine          | 0.4.0   | `kubectl`-style commands, autocomplete, history, clickable output                                             |
 | 4 — Cluster visualization    | 0.5.0   | Interactive map of nodes (roles) and pods (projects), synced with the terminal                                |
 | 5 — Boot sequence and polish | 0.6.0   | Boot animation, transitions, OG images, tap-first mobile cluster                                              |
@@ -52,10 +58,12 @@ flowchart LR
     pages["pages/<br/>routes"] --> layouts["layouts/"]
     pages --> components["components/<br/>Astro + React islands"]
     layouts --> components
-    components --> lib["lib/<br/>framework-free TS<br/>(url, content, commands)"]
+    components --> recipes["components/ui/recipes.ts<br/>shared class recipes"]
+    components --> lib["lib/<br/>framework-free TS<br/>(url, content, cluster data, kubectl helpers)"]
     layouts --> lib
     lib --> types["types/"]
-    config["config/<br/>site, build info, flags"]
+    config["config/<br/>site, build info, feature flags"]
+    styles["styles/<br/>tokens.css (design tokens)"] -.->|CSS variables| components
     pages --> config
     layouts --> config
   end
@@ -114,21 +122,22 @@ an unknown flag name fails the build.
 docs/           SPEC, STATUS, plans, ADRs, runbooks, postmortems, content guide
 public/         served as-is: favicon, resume, share image (og-image.png), .nojekyll
 src/
-  components/   layout/ (top bar and site mark, footer, SEO head tags), plain/ (plain view sections), ui/ (button, chip, panel,
+  components/   cluster/ (dashboard stage and detail panel), layout/ (top bar and site mark, footer, bottom sheet, SEO head
+                tags), plain/ (plain view sections and jump chips), terminal/ (terminal dock), ui/ (button, chip, panel,
                 kubectl table, expander, status pill, tags, links; shared class recipes in recipes.ts)
   config/       site metadata, build info (version + commit), feature flags
   content/      portfolio content (YAML + Markdown); schemas registered in content.config.ts
   layouts/      page layouts (BaseLayout sets meta tags and the CSP)
-  lib/content/  Zod schemas, query helpers, integrity check (how components read content)
+  lib/content/  Zod schemas, query helpers, integrity check, cluster data (nodes, pods, kubectl rows)
   lib/seo/      share metadata and JSON-LD helpers
-  lib/utils/    framework-free helpers: url() for the base path, date formatting, contrast ratios
+  lib/utils/    framework-free helpers: url() for the base path, dates, contrast ratios, kubectl ages and names, flags
   pages/        routes (plus rss.xml, robots.txt, and the 404 page)
   styles/       tokens.css (design tokens, AA-checked by tokens.test.ts; --scene-* only for the cluster
                 scene, ADR 0002) and global.css
 tests/
   e2e/          Playwright specs (fail on any console error)
   smoke/        post-deploy checks against a live URL
-  static/       repo-wide checks (hardcoded root paths)
+  static/       repo-wide checks (hardcoded root paths, scene tokens only in the cluster and game folders)
   visual/       screenshot baselines (revisited in Stage 7)
 ```
 

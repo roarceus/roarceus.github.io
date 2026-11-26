@@ -32,7 +32,7 @@ Vitest, Playwright and axe, Lighthouse CI.
 - `docs/SPEC.md` §3 (structure), §4 (IA, responsive), §5, §7 (nodes), §9 (pre-selected role), §11 Stage 2.
 - Rules: `CLAUDE.md`.
 
-**Status:** draft. It waits for Sohan's approval before any code. Issues #49 to #56 are on milestone Stage 2.
+**Status:** done (2026-11-25). PRs #57, #58, #60 to #66 merged; this wrap-up closes #56. v0.3.0 ships with release PR #59.
 
 ## Global Constraints
 
@@ -416,8 +416,8 @@ import.meta.env.PUBLIC_ENABLED_FLAGS)`. `isEnabled` stays the same.
 
 ### Task 8: Stage 2 wrap-up (PR 8)
 
-- [ ] README: features, the architecture diagram (tokens, recipes, cluster helpers), the flags section
+- [x] README: features, the architecture diagram (tokens, recipes, cluster helpers), the flags section
       (`PUBLIC_ENABLED_FLAGS`), the status line.
-- [ ] STATUS: sign-off with screenshots and links, plus a retrospective. Close the remaining stage
+- [x] STATUS: sign-off with screenshots and links, plus a retrospective. Close the remaining stage
       questions.
-- [ ] This plan ticked; then Sohan merges the release PR for v0.3.0.
+- [x] This plan ticked; then Sohan merges the release PR for v0.3.0.
