@@ -350,6 +350,10 @@ export function runHref(input: string, location: { pathname: string }): string; 
 
 ### Task 6: Terminal island (PR 6)
 
+> Split into three PRs (approved 2026-11-26): **6a** the terminal island (component tests, static test,
+> terminal e2e), **6b** the one-screen desktop layout, **6c** budgets and `react-runtime` chunking. The
+> CSP switch the island needs went first ([ADR 0004](../adr/0004-astro-hashed-csp.md)).
+
 **Files:**
 
 - Create: `src/components/terminal/Terminal.tsx`, `TerminalInput.tsx`, `ResultView.tsx` (shared with the
@@ -362,7 +366,7 @@ export function runHref(input: string, location: { pathname: string }): string; 
 
 **Interfaces:** Consumes Tasks 4 and 5. Produces `<ResultView result={CommandResult} />` for Task 7.
 
-- [ ] **Component tests first:** Enter runs via `runCommand(…,'input')`; Up/Down walk history; Tab with one
+- [x] **Component tests first:** Enter runs via `runCommand(…,'input')`; Up/Down walk history; Tab with one
       match completes, two Tabs list matches; Ctrl+L clears; Ctrl+C prints `^C` and empties the line; a chip
       click calls `runCommand(label,'chip')` and `preventDefault`s the link; table names run their `run`;
       `ResultView` renders every result kind as elements (a `<script>` string shows as text);
@@ -381,13 +385,13 @@ export function runHref(input: string, location: { pathname: string }): string; 
   - e2e: at 1280×800 and 1920×1080 the page doesn't scroll, the map and the terminal input are both in the
     viewport, each scroll box takes focus with Tab and scrolls with the arrow keys; at 1280×650 the page
     scrolls normally and nothing is clipped.
-- [ ] Static test: no `innerHTML`, `dangerouslySetInnerHTML`, `eval(`, `new Function` in `src/`.
+- [x] Static test: no `innerHTML`, `dangerouslySetInnerHTML`, `eval(`, `new Function` in `src/`.
 - [ ] Budgets script (node, no deps): from `dist-dashboard/index.html`, collect island component and
       renderer URLs and their static `import` graph (skip `import(`), gzip each; report island code (excluding
       `react-runtime-*`) and the startup total; fail over `.github/budgets.json` limits (island 61440 bytes;
       startup set from this PR's measurement + 5%). Also total scripts of `dist/index.html` and
       `dist/plain/index.html` must not exceed their recorded v0.3.0 values. Runs in the build job.
-- [ ] e2e `@dashboard`: type `kubectl get nodes` + Enter → table appears; `k get pods -n projects`,
+- [x] e2e `@dashboard`: type `kubectl get nodes` + Enter → table appears; `k get pods -n projects`,
       `top skills`, `help` work; every chip and table name click keeps `page.url()` on `/` (no `framenavigated`
       to another path); `getx nodes` shows `Did you mean this?`; `clear` empties output; axe, no overflow, no
       console errors at every project size; a routed failure of `cluster.*.json` shows the error and Retry

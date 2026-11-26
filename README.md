@@ -22,7 +22,8 @@ Coming next, already in PR previews behind a flag: the cluster dashboard on `/`.
 the cluster dashboard shell on `/` (map placeholder, detail panel, terminal dock, phone cluster mode). The
 dashboard stays behind the `clusterDashboard` flag, on in PR previews and off in production, until the
 terminal (Stage 3) and the map (Stage 4) make it real. Direction: [ADR 0002](docs/adr/0002-design-direction-tool-and-game.md),
-the UI is the tool, the cluster is the game. Next: Stage 3, the terminal engine
+the UI is the tool, the cluster is the game. In progress: Stage 3, the terminal engine. On previews the
+terminal already runs commands in place: type them, or click chips and names
 ([design](docs/plans/stage-3-design.md), [plan](docs/plans/stage-3.md)). Progress:
 [`docs/STATUS.md`](docs/STATUS.md) · [project board](https://github.com/users/roarceus/projects/1) ·
 [changelog](CHANGELOG.md) (from v0.1.0).
@@ -124,7 +125,8 @@ docs/           SPEC, STATUS, plans, ADRs, runbooks, postmortems, content guide
 public/         served as-is: favicon, resume, share image (og-image.png), .nojekyll
 src/
   components/   cluster/ (dashboard stage and detail panel), layout/ (top bar and site mark, footer, bottom sheet, SEO head
-                tags), plain/ (plain view sections and jump chips), terminal/ (terminal dock), ui/ (button, chip, panel,
+                tags), plain/ (plain view sections and jump chips), terminal/ (the terminal island: input, output
+                renderer shared with the detail panel, live region), ui/ (button, chip, panel,
                 kubectl table, expander, status pill, tags, links; shared class recipes in recipes.ts)
   config/       site metadata, build info (version + commit), feature flags
   content/      portfolio content (YAML + Markdown); schemas registered in content.config.ts

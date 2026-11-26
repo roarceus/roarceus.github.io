@@ -42,7 +42,7 @@ so islands load without `'unsafe-inline'`; CI audits every built page.
 
 ## Next steps
 
-1. Review the CSP PR, then Task 6 in three PRs (terminal island, one-screen layout, budgets), then Tasks 7
+1. Review the CSP PR and the terminal island PR (6a), then 6b and 6c (one-screen layout, budgets), then Tasks 7
    to 9 (`plans/stage-3.md`).
 2. Carried over: submit the sitemap in Google Search Console; check the share card in a link inspector
    (runbook: `docs/runbooks/share-image.md`); set up the uptime monitor (M10); decide on Renovate's
