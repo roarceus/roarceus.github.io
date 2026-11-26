@@ -4,45 +4,46 @@ _Last updated: 2026-11-25_
 
 ## Current stage
 
-**Stage 2 — Design system and layout shell: planning.** v0.2.0 is live. Design direction accepted in
-[ADR 0002](adr/0002-design-direction-tool-and-game.md) ("the UI is the tool, the cluster is the game").
-Design: [`plans/stage-2-design.md`](plans/stage-2-design.md) (approved 2026-11-25). Plan:
-[`plans/stage-2.md`](plans/stage-2.md) (waiting for approval) ·
-[milestone](https://github.com/roarceus/roarceus.github.io/milestone/3) (#49–#56). Post-1.0 Stages 8 to 10
-are on the roadmap (SPEC §11).
+**Stage 2 — Design system and layout shell: done.** It ships as v0.3.0 when Sohan merges the release PR
+(#59). Next is Stage 3, the terminal engine. Direction: [ADR 0002](adr/0002-design-direction-tool-and-game.md)
+("the UI is the tool, the cluster is the game"). Design: [`plans/stage-2-design.md`](plans/stage-2-design.md).
+Plan: [`plans/stage-2.md`](plans/stage-2.md), all tasks ticked. Post-1.0 Stages 8 to 10 are on the roadmap (SPEC §11).
 
-## Stage 1 sign-off
+## Stage 2 sign-off
 
-- **Shipped:** content schemas, query helpers, and integrity checks (#41); all portfolio content with a
-  content review (#43); the plain portfolio at `/plain/` and the home hero (#44); 16 project pages, updates,
-  and an RSS feed (#45); a contact form through Web3Forms that also works without JavaScript (#46); page
-  metadata, a share image, JSON-LD, a production-only sitemap, robots.txt, and the kubectl 404 page (#47);
-  Lighthouse on every page type and this sign-off (#48).
-- **Checks:** Lighthouse mobile 100/100/100/100 on `/`, `/plain/`, a project page, and `/updates/`; the 404
-  page 100/100/100 (SEO is 63 by design: it's noindex). No sideways scroll on 7 page types at 320, 375, 768,
-  1280, and 1920px. e2e passes on Chromium, Firefox, and WebKit across phone, tablet, and desktop sizes.
-  Sohan checked the plain view on iOS Safari. No `TODO(sohan)` left in `src/`.
-- **Links:** last preview https://roarceus.github.io/pr-preview/pr-47/ · release PR #42 (v0.2.0).
+- **Shipped:** the design direction ADR (#57); design tokens with AA contrast and scene-scope checks (#58);
+  UI components (#60); the top bar, site mark, and Lucide icons (#61); a shorter plain view with jump chips
+  and expanders (#62); cluster data helpers and feature flags (#64); the dashboard shell on `/` behind the
+  `clusterDashboard` flag (#65), widened to 1920px with the top bar lined up (#66); a WebKit heading
+  contrast fix (#63).
+- **Checks:** Lighthouse mobile 100/100/100/100 on `/` (both builds), `/plain/`, a project page, and
+  `/updates/`; the 404 page 100/100/100 (SEO 63 by design: noindex). e2e passes on Chromium, Firefox, and
+  WebKit at phone, tablet, and desktop sizes, plus the `@dashboard` specs against the flag build and a width
+  check at 1280, 1920, and 2560px. Previews checked at 375 and 1920px.
+- **Spec updates:** "One playground" (SPEC §4): the cluster view never leaves the page; chips and names run
+  in place from Stage 3. Stage 4 replaces the placeholder cards with nodes sized to their pods.
+- **Links:** last preview https://roarceus.github.io/pr-preview/pr-66/ · release PR #59 (v0.3.0) ·
+  screenshots in `assets/`.
 
 ## Retrospective
 
-- **Went well:** tests first caught real bugs before review (the hidden live region, the 404 canonical);
-  the content review with Sohan meant no invented facts; a static test keeps AI-style punctuation out of the
-  copy; local preview-base builds proved canonical, RSS, and sitemap stay on production.
-- **Didn't:** one push went out with a failing local test (`ec38b8f`), fixed in the next commit. Changing
-  site-wide head tags broke two CI consumers no unit test covers (the smoke asset check and Lighthouse's
-  SEO score on noindex pages). Firefox logs failed requests differently from Chromium. Astro 7's new
-  Markdown processor silently ignores rehype plugins. Internal tool names once reached a PR body.
-- **Change next stage:** only push when `pnpm check` and the affected e2e exit 0 in the same command; when
-  changing `<head>` or routes, run smoke against a local preview-base build and `pnpm lhci` before pushing;
-  check PR bodies against the public-names rule before posting.
+- **Went well:** the design proposal and review before code meant no layout rework; the contrast test caught
+  two failing pairs (primary hover, selected scene) before review; building a second, flagged site in CI let
+  the dashboard ship to previews without touching production.
+- **Didn't:** the WebKit heading flake failed 19 of 20 CI runs, hidden by retries, before anyone looked.
+  Phone smoke failed only on the preview because the test counted a hidden region as missing. The new
+  `dist-dashboard` folder got scanned by lint and typecheck. A width cap left wide empty gutters at 1920px,
+  found by Sohan, not by tests.
+- **Change next stage:** read retried test logs, not just the green check; run smoke against a local flag
+  build when changing what it checks; check layouts at 1920 and 2560px before opening a UI PR.
 
 ## Next steps
 
-1. Sohan: approve the Stage 2 plan; then PRs 2 to 8 in order (`plans/stage-2.md`).
-2. Since v0.2.0 shipped: submit the sitemap in Google Search Console; check the share card in a link inspector
-   (runbook: `docs/runbooks/share-image.md`); set up the uptime monitor (M10).
-3. Decide on Renovate's queued TypeScript 7 PR (fails until `typescript-eslint` supports TS 7).
+1. Sohan: merge the release PR (#59) for v0.3.0, then check production (dashboard must stay off).
+2. Stage 3 plan: the terminal engine, following "One playground" (SPEC §4, §7).
+3. Carried over: submit the sitemap in Google Search Console; check the share card in a link inspector
+   (runbook: `docs/runbooks/share-image.md`); set up the uptime monitor (M10); decide on Renovate's
+   queued TypeScript 7 PR.
 
 ## Open questions
 
@@ -51,9 +52,7 @@ are on the roadmap (SPEC §11).
 
 ## Known issues
 
-- WebKit on the Linux CI runners kept flagging page `h1`s for contrast (axe read the inherited text as
-  black) in 19 of 20 runs; retries hid it. `fix/webkit-heading-contrast-flake` gives headings an explicit
-  color and makes contrast failures print the measured and computed colors.
+- The no-JS contact form post flaked once on WebKit at 320px (not seen in 25 runs before). Watching it.
 - GitHub Pages serves only the root `404.html`, so a missing page under a PR preview shows production's
   404 page.
 - Scorecard shows 8 findings (repo age, solo reviews, fuzzing, best-practices badge, early commits without

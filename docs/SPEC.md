@@ -149,6 +149,13 @@ The cluster experience on mobile is tap-first; typing is optional.
 
 **No-JS:** `/` must show the hero and links to all sections without JavaScript.
 
+**One playground:** with JavaScript on, the cluster view never sends visitors to another page. Command chips,
+table names, map nodes, and pods run their command in place: output in the terminal, details in the detail
+panel (the bottom sheet on phones). The URL follows along (for example `#pod/<slug>`) through the History API,
+so Back and Forward step through what was viewed and links can be shared. Only the `Plain view` toggle and
+`kubectl config use-context plain` go to `/plain/`, plus real outbound links (`port-forward`, Resume). Chips
+and names stay real links underneath, so without JavaScript they still reach the plain view.
+
 ### Responsive and mobile requirements
 Mobile is a first-class target, not an afterthought. Build mobile-first and scale up.
 
@@ -304,6 +311,8 @@ Collections (adjust fields as needed, but keep this shape):
 - Clickable output: names in tables open details; links are real links.
 - Command chips under the input (`get experience`, `get pods -n projects`, `top skills`, `help`); clicking runs the command visibly.
 - Clicking anything on the map types and runs the equivalent command in the terminal (shows visitors the CLI).
+- Nothing in the terminal or on the map loads a new page (see "One playground" in section 4); an e2e test
+  fails if clicking a chip, a table name, a node, or a pod navigates away.
 - Output region uses `aria-live="polite"`; input is a real labeled `<input>`; full keyboard support.
 
 ### Architecture
@@ -583,11 +592,14 @@ mobile layout. **Done when:** layout matches section 4 and 5 at desktop and mobi
 
 ### Stage 3 — Terminal engine → v0.4.0
 Parser, registry, all v1 commands (section 7), structured output renderer, history, autocomplete,
-chips, accessibility. **Done when:** every command works and is unit-tested; e2e covers the core ones.
+chips, accessibility. **Done when:** every command works and is unit-tested; e2e covers the core ones; chips
+and table names run in place without leaving `/` (section 4, "One playground").
 
 ### Stage 4 — Cluster visualization → v0.5.0
 SVG map of nodes and pods from content data, status colors, hover/selection, detail panel, two-way sync
-between map and terminal. **Done when:** everything in the map is clickable and keyboard reachable, and clicks echo commands in the terminal.
+between map and terminal. The map replaces the Stage 2 placeholder cards: each node is sized to its pods and
+the layout uses the space it has, so there are no empty boxes at any width from 768px to 2560px (a node
+with no pods is drawn small). **Done when:** everything in the map is clickable and keyboard reachable, and clicks echo commands in the terminal.
 
 ### Stage 5 — Boot sequence and polish → v0.6.0
 Boot animation (section 9), transitions, empty/loading/error states, OG images, mobile tap-first cluster mode.
