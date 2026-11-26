@@ -13,6 +13,38 @@ Sohan's answers (2026-11-25). Nothing is invented: unknowns stay `TODO(sohan)` o
       `mumbai` node (assumed Bachelor's era); Book Review System and Meeting Notes (React) have no node.
       Fine as is, or do you know any of them?
 
+- [ ] **Capgemini project dates (TODO(sohan)):** "OCT imaging dashboard" and "OCT data API" start in
+      2021; the content uses 2021-05 (when the Capgemini role started) and leaves the end out until you
+      confirm both months.
+- [ ] **Project names:** each project has one display name (prose, project pages, the plain view) and
+      one slug (its URL `/projects/<slug>/` and its name in `kubectl get pods`). Check the names against
+      your resume. Changing a slug changes the project's URL, so slugs stay unless you say otherwise.
+
+      | Display name                     | Slug                       | Node              |
+      | -------------------------------- | -------------------------- | ----------------- |
+      | AI migration agent framework     | `ai-migration-agents`      | mastercontrol     |
+      | Deployment gating bot            | `deployment-gating-bot`    | mastercontrol     |
+      | OCT imaging dashboard            | `oct-imaging-dashboard`    | capgemini         |
+      | OCT data API                     | `oct-data-api`             | capgemini         |
+      | askTRACE                         | `asktrace`                 | northeastern      |
+      | AWS infrastructure for a web app | `aws-iaas`                 | northeastern      |
+      | HuskyHub                         | `huskyhub`                 | northeastern      |
+      | Grade Calculator                 | `neu-grade-calculator`     | northeastern      |
+      | SafeHaven                        | `safehaven`                | northeastern      |
+      | This portfolio                   | `roarceus-github-io`       | unscheduled       |
+      | Book Review System               | `book-review-system`       | unscheduled       |
+      | Meeting Notes (React)            | `meeting-notes-react`      | unscheduled       |
+      | Credit Management System         | `credit-management-system` | sparks-foundation |
+      | Analog Clock                     | `analog-clock`             | mumbai            |
+      | Kounsellor                       | `kounsellor`               | mumbai            |
+      | Maps Clone                       | `google-maps-clone`        | mumbai            |
+      | Meeting Notes                    | `meeting-notes`            | mumbai            |
+      | Travel Website                   | `travel-website`           | mumbai            |
+
+      Names that read differently from their slug: "Maps Clone" (`google-maps-clone`), "AWS
+      infrastructure for a web app" (`aws-iaas`), "Grade Calculator" (`neu-grade-calculator`), and "This
+      portfolio" (`roarceus-github-io`). The MasterControl names stay generic (answered 2026-11-26).
+
 ## Answered (2026-11-25)
 
 - [x] Northeastern: Jan 2024 to Apr 2026, Master of Science in Information Systems. Bachelor of
