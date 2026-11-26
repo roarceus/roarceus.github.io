@@ -1,4 +1,9 @@
-import { expectNoHorizontalOverflow, expectNoSeriousA11yViolations, expectTappable } from '../support/checks';
+import {
+  expectNoHorizontalOverflow,
+  expectNoSeriousA11yViolations,
+  expectTappable,
+  MIN_TARGET,
+} from '../support/checks';
 import { expect, test } from '../support/fixtures';
 
 import type { Page } from '@playwright/test';
@@ -25,7 +30,7 @@ for (const { path, view, viewHref } of PAGES) {
       await expect(home).toHaveAccessibleName(isNarrow(page) ? 'sohan' : 'sohan-cluster');
       expect(await home.getAttribute('href')).toMatch(/\/$/);
       const box = await home.boundingBox();
-      expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
+      expect(box?.height ?? 0).toBeGreaterThanOrEqual(MIN_TARGET);
     });
 
     test('keeps the view switch, Resume, and Contact visible and tappable', async ({ page }) => {

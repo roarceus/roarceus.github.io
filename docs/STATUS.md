@@ -9,7 +9,7 @@ _Last updated: 2026-11-26_
 [`plans/stage-3.md`](plans/stage-3.md) (approved) ·
 [milestone](https://github.com/roarceus/roarceus.github.io/milestone/4) (#68 to #76). Store:
 [ADR 0003](adr/0003-nanostores-for-island-state.md). The dashboard stays behind `clusterDashboard` until
-Stage 4. The CSP now comes from Astro with hashed inline scripts ([ADR 0004](adr/0004-astro-hashed-csp.md)),
+Stage 4. The CSP now comes from Astro with hashed inline scripts ([ADR 0004](adr/0004-astro-hashed-csp.md), #86),
 so islands load without `'unsafe-inline'`; CI audits every built page.
 
 ## Stage 2 sign-off
@@ -42,7 +42,7 @@ so islands load without `'unsafe-inline'`; CI audits every built page.
 
 ## Next steps
 
-1. Review the CSP PR, then Task 6 in three PRs (terminal island, one-screen layout, budgets), then Tasks 7
+1. Review the terminal island PR (6a, #87), then 6b and 6c (one-screen layout, budgets), then Tasks 7
    to 9 (`plans/stage-3.md`).
 2. Carried over: submit the sitemap in Google Search Console; check the share card in a link inspector
    (runbook: `docs/runbooks/share-image.md`); set up the uptime monitor (M10); decide on Renovate's

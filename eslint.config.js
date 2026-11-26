@@ -73,6 +73,10 @@ export default defineConfig(
   {
     files: TSX,
     extends: [eslintReact.configs['recommended-type-checked'], jsxA11y.configs.recommended],
+    rules: {
+      // Same as the Astro rule below: unstyled lists keep role="list" for Safari/VoiceOver.
+      'jsx-a11y-x/no-redundant-roles': ['error', { ul: ['list'], ol: ['list'] }],
+    },
   },
 
   // Astro components (with JSX a11y rules).

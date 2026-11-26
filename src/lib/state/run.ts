@@ -41,6 +41,25 @@ async function resultFor(input: string): Promise<CommandResult> {
   return execute(parsed.command, { ...context, snapshot: $snapshot.get().data, now: new Date() });
 }
 
+const append = (entry: Entry) => {
+  $terminal.setKey('entries', [...$terminal.get().entries, entry].slice(-MAX_ENTRIES));
+};
+
+/**
+ * Shows the server-rendered first result (today's `kubectl get experience`) as the first entry, so the
+ * hydrated island matches the HTML. Only before anything has run, so a cleared terminal stays clear.
+ */
+export function seedTerminal(input: string, result: CommandResult): void {
+  const { entries, history } = $terminal.get();
+  if (entries.length > 0 || history.length > 0) return;
+  append({ id: nextId++, input, source: 'input', result });
+}
+
+/** Ctrl+C: echoes the line with `^C` and runs nothing (no history, no announcement). */
+export function echoCancel(input: string): void {
+  append({ id: nextId++, input: `${input}^C`, source: 'input', result: { kind: 'lines', lines: [] } });
+}
+
 export async function runCommand(input: string, source: RunSource): Promise<void> {
   const trimmed = input.trim();
   pushHistory(trimmed);
@@ -53,6 +72,6 @@ export async function runCommand(input: string, source: RunSource): Promise<void
   if (result.kind === 'detail') $selection.set(result.target);
 
   const entry: Entry = { id: nextId++, input: trimmed, source, result };
-  $terminal.setKey('entries', [...$terminal.get().entries, entry].slice(-MAX_ENTRIES));
+  append(entry);
   $terminal.setKey('announcement', summarize(entry));
 }

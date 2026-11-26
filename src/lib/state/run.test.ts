@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { SNAPSHOT } from '@/lib/commands/fixtures';
+import type { CommandResult } from '@/lib/commands/types';
 
-import { clearTerminal, runCommand, setRunContext } from './run';
+import { clearTerminal, echoCancel, runCommand, seedTerminal, setRunContext } from './run';
 import { $selection } from './selection';
 import { $snapshot, loadSnapshot } from './snapshot-loader';
 import { $terminal, MAX_ENTRIES, summarize } from './terminal';
@@ -140,5 +141,34 @@ describe('summarize', () => {
       'Opening github',
     );
     expect(entry({ kind: 'action', action: 'clear' })).toBe('');
+  });
+});
+
+describe('seedTerminal', () => {
+  it('shows the server-rendered entry once, before anything has run', async () => {
+    const result: CommandResult = { kind: 'lines', lines: [{ text: 'seed' }] };
+    seedTerminal('kubectl get experience', result);
+    seedTerminal('kubectl get experience', result);
+    expect(entries()).toHaveLength(1);
+    expect(entries()[0]).toMatchObject({ input: 'kubectl get experience', source: 'input', result });
+    expect($terminal.get().history).toEqual([]);
+    expect($terminal.get().announcement).toBe('');
+    await runCommand('clear', 'input');
+    seedTerminal('kubectl get experience', result);
+    expect(entries()).toEqual([]);
+  });
+});
+
+describe('echoCancel', () => {
+  it('prints the line with ^C, skipping history and the announcement', async () => {
+    await runCommand('kubectl version', 'input');
+    const announcement = $terminal.get().announcement;
+    echoCancel('kubectl get no');
+    expect(entries().at(-1)).toMatchObject({
+      input: 'kubectl get no^C',
+      result: { kind: 'lines', lines: [] },
+    });
+    expect($terminal.get().history).toEqual(['kubectl version']);
+    expect($terminal.get().announcement).toBe(announcement);
   });
 });

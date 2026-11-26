@@ -1,4 +1,4 @@
-import { expectNoHorizontalOverflow, expectNoSeriousA11yViolations } from '../support/checks';
+import { expectNoHorizontalOverflow, expectNoSeriousA11yViolations, MIN_TARGET } from '../support/checks';
 import { expect, test } from '../support/fixtures';
 
 import type { Page } from '@playwright/test';
@@ -69,7 +69,7 @@ test.describe('cluster dashboard @dashboard', () => {
     expect(await chips.count()).toBeGreaterThanOrEqual(4);
     for (const chip of await chips.all()) {
       const box = await chip.boundingBox();
-      expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
+      expect(box?.height ?? 0).toBeGreaterThanOrEqual(MIN_TARGET);
     }
   });
 
@@ -185,5 +185,113 @@ test.describe('cluster dashboard without JavaScript @dashboard', () => {
     await page.goto('./');
     await page.getByRole('link', { name: 'Launch cluster' }).click();
     await expect(page.getByRole('region', { name: 'Cluster map' })).toBeVisible();
+  });
+});
+
+// The terminal island (stage-3 design §5.4): every run happens in place, through one run path.
+test.describe('terminal @dashboard', () => {
+  /** Opens the dashboard (cluster mode on phones) and waits for the input to hydrate. */
+  async function open(page: Page) {
+    await page.goto(isMobile(page) ? './#cluster' : './');
+    const input = page.getByRole('textbox', { name: 'Command' });
+    await expect(input).toBeVisible();
+    return { input, terminal: page.getByRole('region', { name: 'Terminal' }) };
+  }
+
+  async function run(page: Page, command: string) {
+    const { input } = await open(page);
+    await input.fill(command);
+    await input.press('Enter');
+  }
+
+  /** Records every navigation of the main frame after the first load. */
+  function navigations(page: Page): string[] {
+    const urls: string[] = [];
+    page.on('framenavigated', (frame) => {
+      if (frame === page.mainFrame()) urls.push(frame.url());
+    });
+    return urls;
+  }
+
+  test('runs typed commands and prints real kubectl output', async ({ page }) => {
+    const { input, terminal } = await open(page);
+    await input.fill('kubectl get nodes');
+    await input.press('Enter');
+    await expect(terminal.getByRole('table', { name: 'kubectl get nodes' })).toBeVisible();
+    await expect(input).toHaveValue('');
+
+    await input.fill('k get pods -n projects');
+    await input.press('Enter');
+    await expect(terminal.getByRole('table', { name: 'k get pods -n projects' })).toBeVisible();
+
+    await input.fill('kubectl top skills');
+    await input.press('Enter');
+    await expect(terminal.getByRole('table', { name: 'kubectl top skills' })).toBeVisible();
+
+    await input.fill('help');
+    await input.press('Enter');
+    await expect(terminal.getByText('$ help')).toBeVisible();
+    await expect(terminal.getByRole('link', { name: 'kubectl get nodes' }).first()).toBeVisible();
+  });
+
+  test('runs chips and table names in place without navigating', async ({ page }) => {
+    const { terminal } = await open(page);
+    const urls = navigations(page);
+    await terminal.getByRole('link', { name: 'top skills' }).click();
+    await expect(terminal.getByText('$ kubectl top skills')).toBeVisible();
+    for (const chip of await terminal.getByRole('navigation', { name: 'Commands' }).getByRole('link').all()) {
+      await chip.click();
+    }
+    await terminal.getByRole('table', { name: 'kubectl get experience' }).getByRole('link').first().click();
+    await expect(terminal.getByText(/^\$ kubectl describe node /)).toBeVisible();
+    expect(urls).toEqual([]);
+    expect(new URL(page.url()).pathname).toMatch(/\/$/);
+  });
+
+  test('suggests the closest command for a typo', async ({ page }) => {
+    await run(page, 'kubectl getx nodes');
+    const log = page.getByRole('log', { name: 'Terminal output' });
+    await expect(log.getByText('Did you mean this?')).toBeVisible();
+    await log.getByRole('link', { name: 'kubectl get nodes' }).click();
+    await expect(log.getByRole('table', { name: 'kubectl get nodes' })).toBeVisible();
+  });
+
+  test('clear empties the output', async ({ page }) => {
+    await run(page, 'clear');
+    const log = page.getByRole('log', { name: 'Terminal output' });
+    await expect(log.locator('p')).toHaveCount(0);
+  });
+
+  test('has no overflow or serious accessibility issues after running commands', async ({ page }) => {
+    await run(page, 'kubectl get pods -n projects -o wide');
+    const terminal = page.getByRole('region', { name: 'Terminal' });
+    await expect(terminal.getByRole('table', { name: 'kubectl get pods -n projects -o wide' })).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+    await expectNoSeriousA11yViolations(page);
+  });
+
+  test.describe('when the data fails to load', () => {
+    // The browser logs the blocked fetch (and the unused preload) itself.
+    test.use({ expectedConsoleError: /Failed to load resource|net::ERR_FAILED|NetworkError|preload/i });
+
+    test('shows the error, keeps offline commands working, and recovers with Retry', async ({ page }) => {
+      await page.route('**/cluster.*.json', (route) => route.abort());
+      const { input, terminal } = await open(page);
+      await expect(
+        terminal.getByText('Unable to connect to the server: failed to load cluster data'),
+      ).toBeVisible();
+      await input.fill('kubectl version');
+      await input.press('Enter');
+      await expect(
+        page.getByRole('log', { name: 'Terminal output' }).getByText(/^Client Version:/),
+      ).toBeVisible();
+
+      await page.unroute('**/cluster.*.json');
+      await terminal.getByRole('button', { name: 'Retry' }).click();
+      await expect(terminal.getByRole('button', { name: 'Retry' })).toBeHidden();
+      await input.fill('kubectl get nodes');
+      await input.press('Enter');
+      await expect(terminal.getByRole('table', { name: 'kubectl get nodes' })).toBeVisible();
+    });
   });
 });
