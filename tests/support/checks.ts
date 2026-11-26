@@ -36,11 +36,17 @@ export async function expectNoSeriousA11yViolations(page: Page): Promise<void> {
   expect(summary, details.join(' | ')).toEqual([]);
 }
 
+/**
+ * SPEC §4 touch targets are 44 CSS pixels. Browsers report boxes as floats, and Firefox can measure a
+ * 2.75rem box as 43.99994px, so the check allows 0.01px of rounding (never a real shortfall).
+ */
+export const MIN_TARGET = 44 - 0.01;
+
 /** SPEC §4 touch targets: a visible link at least 44 by 44 CSS pixels. */
 export async function expectTappable(scope: Page | Locator, name: string): Promise<void> {
   const link = scope.getByRole('link', { name, exact: true });
   await expect(link).toBeVisible();
   const box = await link.boundingBox();
-  expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
-  expect(box?.width ?? 0).toBeGreaterThanOrEqual(44);
+  expect(box?.height ?? 0).toBeGreaterThanOrEqual(MIN_TARGET);
+  expect(box?.width ?? 0).toBeGreaterThanOrEqual(MIN_TARGET);
 }

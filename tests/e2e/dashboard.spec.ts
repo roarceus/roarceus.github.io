@@ -1,4 +1,4 @@
-import { expectNoHorizontalOverflow, expectNoSeriousA11yViolations } from '../support/checks';
+import { expectNoHorizontalOverflow, expectNoSeriousA11yViolations, MIN_TARGET } from '../support/checks';
 import { expect, test } from '../support/fixtures';
 
 import type { Page } from '@playwright/test';
@@ -69,7 +69,7 @@ test.describe('cluster dashboard @dashboard', () => {
     expect(await chips.count()).toBeGreaterThanOrEqual(4);
     for (const chip of await chips.all()) {
       const box = await chip.boundingBox();
-      expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
+      expect(box?.height ?? 0).toBeGreaterThanOrEqual(MIN_TARGET);
     }
   });
 
