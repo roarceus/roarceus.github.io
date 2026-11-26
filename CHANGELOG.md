@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.3.0](https://github.com/roarceus/roarceus.github.io/compare/v0.2.0...v0.3.0) (2026-11-26)
+
+
+### Features
+
+* **cluster:** add cluster data helpers and feature flags ([#64](https://github.com/roarceus/roarceus.github.io/issues/64)) ([a76b5ec](https://github.com/roarceus/roarceus.github.io/commit/a76b5eca83bb313a112e594fa3d564167167aa0f))
+* **cluster:** add dashboard shell behind a feature flag ([#65](https://github.com/roarceus/roarceus.github.io/issues/65)) ([5f91de7](https://github.com/roarceus/roarceus.github.io/commit/5f91de7808987f39f9d2b774566b056d078053e3))
+* **design:** add design tokens with contrast and scope checks ([#58](https://github.com/roarceus/roarceus.github.io/issues/58)) ([7b901f2](https://github.com/roarceus/roarceus.github.io/commit/7b901f265cc231e8b699883042ee483fc516598e)), closes [#50](https://github.com/roarceus/roarceus.github.io/issues/50)
+* **plain:** add jump chips and expanders to the plain view ([#62](https://github.com/roarceus/roarceus.github.io/issues/62)) ([adf5f99](https://github.com/roarceus/roarceus.github.io/commit/adf5f99c33e9b29cb25e586057092dcd8b0659d3))
+* **ui:** add top bar, site mark, and lucide icons ([#61](https://github.com/roarceus/roarceus.github.io/issues/61)) ([8009e32](https://github.com/roarceus/roarceus.github.io/commit/8009e32b7a6365a83640df073f5b167b08c28049)), closes [#52](https://github.com/roarceus/roarceus.github.io/issues/52)
+* **ui:** add ui primitives ([#60](https://github.com/roarceus/roarceus.github.io/issues/60)) ([ff56e7f](https://github.com/roarceus/roarceus.github.io/commit/ff56e7f2bc245b293dbe70e1e5230d2e4bf25fdb))
+
+
+### Bug Fixes
+
+* **a11y:** give headings an explicit text color for webkit ([#63](https://github.com/roarceus/roarceus.github.io/issues/63)) ([69ddf09](https://github.com/roarceus/roarceus.github.io/commit/69ddf099577bf0cd63d706359a1b27fe8741c6e6))
+* **ui:** widen the cluster dashboard and line up the top bar ([#66](https://github.com/roarceus/roarceus.github.io/issues/66)) ([2558075](https://github.com/roarceus/roarceus.github.io/commit/2558075027e32d04e67c1318a8e0e0af22a36cef))
+
 ## [0.2.0](https://github.com/roarceus/roarceus.github.io/compare/v0.1.0...v0.2.0) (2026-11-25)
 
 
