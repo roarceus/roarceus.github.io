@@ -516,6 +516,8 @@ The project follows a full company-style lifecycle. Every phase below has an own
 - **CodeQL** (section 10) and `pnpm audit` in CI (fail on high/critical in production dependencies).
 - **Content Security Policy** via `<meta http-equiv="Content-Security-Policy">` (GitHub Pages can't set headers):
   self-hosted scripts, styles, and fonts only, plus the analytics and contact-form endpoints. No inline event handlers.
+  Astro writes the tag with a hash for each inline script and style it emits, never `'unsafe-inline'`
+  ([ADR 0004](adr/0004-astro-hashed-csp.md)); CI audits every built page.
 - External links use `rel="noopener noreferrer"`. No third-party scripts beyond analytics.
 - `SECURITY.md` explaining how to report a vulnerability.
 

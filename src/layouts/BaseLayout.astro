@@ -29,29 +29,12 @@ const {
   view = 'page',
   wide = false,
 } = Astro.props;
-
-// GitHub Pages can't set headers, so the CSP ships as a meta tag (SPEC §10b). Production only:
-// the dev server injects inline scripts and styles. The only off-site endpoint is the contact
-// form's (Web3Forms): fetch from the script, or a plain form post without JavaScript.
-const contactOrigin = new URL(site.contact.endpoint).origin;
-const csp = [
-  "default-src 'self'",
-  "script-src 'self'",
-  "style-src 'self'",
-  "img-src 'self' data:",
-  "font-src 'self'",
-  `connect-src 'self' ${contactOrigin}`,
-  "object-src 'none'",
-  "base-uri 'self'",
-  `form-action 'self' ${contactOrigin}`,
-].join('; ');
 ---
 
 <!doctype html>
 <html lang={site.locale}>
   <head>
     <meta charset="utf-8" />
-    {import.meta.env.PROD && <meta http-equiv="Content-Security-Policy" content={csp} />}
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="dark" />
     <meta name="theme-color" content={site.themeColor} />

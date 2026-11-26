@@ -173,6 +173,53 @@
     font-size: 0.9em;
     color: var(--text);
   }
+
+  /* Highlighted code blocks (Shiki). Token colors come from classes, not style attributes, so they
+     work under the CSP (ADR 0004); each maps to a token already checked for AA on --surface-2. */
+  .astro-code {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+    padding: 1rem;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  .code-comment {
+    color: var(--text-muted);
+  }
+
+  .code-string {
+    color: var(--status-running);
+  }
+
+  .code-constant {
+    color: var(--status-pending);
+  }
+
+  .code-keyword {
+    color: var(--accent-soft);
+  }
+
+  .code-function {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .code-italic {
+    font-style: italic;
+  }
+
+  .code-bold {
+    font-weight: 600;
+  }
+
+  .code-underline {
+    text-decoration: underline;
+  }
 }
 
 /* Printing the plain view gives a clean, light, one-column resume-like page (SPEC §4). */

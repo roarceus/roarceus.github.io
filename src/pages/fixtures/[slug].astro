@@ -1,0 +1,28 @@
+---
+// Test-only pages (ADR 0004): built with the `fixtures` flag in CI's dashboard build, never in previews
+// or releases. The code-block page proves highlighted Markdown renders under the CSP.
+import { getCollection, render } from 'astro:content';
+
+import { isEnabled } from '@/config/features';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+import type { GetStaticPaths } from 'astro';
+
+export const getStaticPaths = (async () => {
+  if (!isEnabled('fixtures')) return [];
+  const entries = await getCollection('fixtures');
+  return entries.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}) satisfies GetStaticPaths;
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<BaseLayout title={entry.data.title} noindex>
+  <main id="main" class="mx-auto flex max-w-3xl flex-col gap-5 px-4 py-10 sm:px-8">
+    <h1 class="text-[length:var(--text-h2-fluid)] font-semibold text-text">{entry.data.title}</h1>
+    <div class="prose">
+      <Content />
+    </div>
+  </main>
+</BaseLayout>

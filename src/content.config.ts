@@ -1,4 +1,5 @@
 import { file, glob } from 'astro/loaders';
+import { z } from 'astro/zod';
 import { defineCollection } from 'astro:content';
 
 import {
@@ -45,5 +46,10 @@ export const collections = {
   achievements: defineCollection({
     loader: file(dir('achievements.yaml')),
     schema: achievementSchema,
+  }),
+  /** Test pages built only with the `fixtures` flag (src/pages/fixtures/). Not portfolio content. */
+  fixtures: defineCollection({
+    loader: glob({ pattern: '*.md', base: './tests/fixtures/content' }),
+    schema: z.object({ title: z.string() }),
   }),
 };
