@@ -16,6 +16,8 @@ interface Props {
   noindex?: boolean;
   /** Which view this page is, for the top bar's view switch. */
   view?: 'cluster' | 'plain' | 'page';
+  /** Lets the top bar and footer grow with a full-width page (the cluster dashboard). */
+  wide?: boolean;
 }
 
 const {
@@ -25,6 +27,7 @@ const {
   person = false,
   noindex = false,
   view = 'page',
+  wide = false,
 } = Astro.props;
 
 // GitHub Pages can't set headers, so the CSP ships as a meta tag (SPEC §10b). Production only:
@@ -60,8 +63,8 @@ const csp = [
     <a href="#main" class="skip-link">
       Skip to content
     </a>
-    <TopBar view={view} />
+    <TopBar view={view} wide={wide} />
     <slot />
-    <SiteFooter />
+    <SiteFooter wide={wide} />
   </body>
 </html>

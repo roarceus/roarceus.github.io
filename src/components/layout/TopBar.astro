@@ -21,9 +21,11 @@ import SiteMark from './SiteMark.astro';
 interface Props {
   /** Which view the page is: the cluster home, the plain view, or any other page. */
   view?: 'cluster' | 'plain' | 'page';
+  /** Match a full-width page (the cluster dashboard) instead of the text width. */
+  wide?: boolean;
 }
 
-const { view = 'page' } = Astro.props;
+const { view = 'page', wide = false } = Astro.props;
 const { data: profile } = await getProfile();
 
 // On the plain view the switch goes back to `/`: "Cluster view" once the dashboard is on, "Home"
@@ -42,7 +44,12 @@ const icon = 'size-4 max-lg:hidden';
 ---
 
 <header class="border-b border-border print:hidden">
-  <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-3 gap-y-1 px-4 py-1.5 sm:px-8">
+  <div
+    class:list={[
+      'mx-auto flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-4 py-1.5 sm:px-8',
+      wide ? 'max-w-(--shell-wide)' : 'max-w-6xl',
+    ]}
+  >
     <div class="flex min-w-0 items-center gap-3">
       <a
         href={url()}
