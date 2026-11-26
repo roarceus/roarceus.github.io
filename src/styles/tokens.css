@@ -81,6 +81,8 @@
   --topbar-h: 3.5rem;
   --jumpbar-h: 3.25rem;
   --terminal-h: 14rem;
+  /* The cluster dashboard (and its top bar and footer) grows to this; text pages stay narrower. */
+  --shell-wide: 120rem;
 
   /*
    * Cluster scene (ADR 0002): flat, Mini Metro-like colors and the only place glow is allowed.

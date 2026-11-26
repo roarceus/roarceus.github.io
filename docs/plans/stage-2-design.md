@@ -203,6 +203,9 @@ location and open-to-work pill, tagline, actions (View portfolio, Resume, Contac
   rather than an aspect ratio, because node cards would overflow a fixed ratio; Lighthouse measured CLS
   at 0.022 or less. The terminal dock is not collapsible yet: with only a static table there is nothing
   worth collapsing, so collapse arrives with the real terminal in Stage 3.
+- **Width (after PR 7):** the dashboard, with its top bar and footer, grows to `--shell-wide` (120rem,
+  1920px) so the map gets the screen. The detail panel is a fixed column (20rem, 26rem from 1280px) to
+  keep its text readable. Text pages keep the 72rem width.
 - **Detail panel:** the pre-selected role (see 4.12; MasterControl today), as SPEC §9 asks, built from content. The header is
   `describe node/<node>`.
 - **Terminal dock:**

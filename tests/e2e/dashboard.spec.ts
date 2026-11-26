@@ -113,6 +113,46 @@ test.describe('cluster dashboard @dashboard', () => {
   });
 });
 
+// The dashboard is a playground, not a page of text: it uses wide screens up to 120rem (1920px),
+// keeps the detail panel a readable fixed column, and lines up with the top bar and footer.
+test.describe('cluster dashboard width @dashboard', () => {
+  const box = async (page: Page, selector: string) => {
+    const b = await page.locator(selector).first().boundingBox();
+    if (!b) throw new Error(`${selector} has no box`);
+    return b;
+  };
+
+  for (const viewport of [
+    { width: 1280, height: 800 },
+    { width: 1920, height: 1080 },
+    { width: 2560, height: 1440 },
+  ]) {
+    test(`fills the screen and lines up with the top bar at ${String(viewport.width)}px`, async ({
+      page,
+    }) => {
+      // Sets its own viewport, so one desktop project per engine is enough.
+      test.skip(!test.info().project.name.endsWith('-1280'), 'runs in the 1280px project');
+      await page.setViewportSize(viewport);
+      await page.goto('./');
+
+      const main = await box(page, 'main#main');
+      const inner = Math.min(viewport.width, 1920);
+      expect(main.width).toBeGreaterThanOrEqual(inner - 20);
+      expect(main.width).toBeLessThanOrEqual(1920);
+
+      for (const bar of ['header > div', 'footer > div']) {
+        const b = await box(page, bar);
+        expect(Math.abs(b.x - main.x), `${bar} left edge`).toBeLessThanOrEqual(1);
+        expect(Math.abs(b.width - main.width), `${bar} width`).toBeLessThanOrEqual(1);
+      }
+
+      const details = await page.getByRole('region', { name: 'Details' }).boundingBox();
+      expect(details?.width ?? 0).toBeLessThanOrEqual(viewport.width >= 1280 ? 26 * 16 + 1 : 20 * 16 + 1);
+      await expectNoHorizontalOverflow(page);
+    });
+  }
+});
+
 test.describe('cluster dashboard without JavaScript @dashboard', () => {
   test.use({ javaScriptEnabled: false });
 

@@ -2,7 +2,8 @@
 // `/` (SPEC §4, design doc §4.6). Production shows the pre-rendered hero until the cluster dashboard
 // is ready (flag `clusterDashboard`, off in production). With the flag on:
 // - 768px and up: hero line, cluster stage, detail panel, and docked terminal (side by side from
-//   1024px, stacked below).
+//   1024px, stacked below). The page grows to --shell-wide so the map gets the screen; the detail
+//   panel stays a fixed, readable column (20rem, 26rem from 1280px).
 // - Phones: the plain layout first, with a "Launch cluster" link to #cluster. CSS :target opens
 //   cluster mode (stage, bottom sheet, chip bar) without JavaScript; Back or the browser's back
 //   button leaves it.
@@ -26,13 +27,13 @@ const onMap = new Set(cluster?.nodes.map((node) => node.name));
 const roles = dashboard ? (await getExperience()).filter(({ data }) => onMap.has(data.node)) : [];
 ---
 
-<BaseLayout person view="cluster">
+<BaseLayout person view="cluster" wide={dashboard}>
   {cluster === undefined ? (
     <main id="main">
       <HomeHero />
     </main>
   ) : (
-    <main id="main" class="dashboard mx-auto max-w-7xl px-4 py-6 sm:px-8 sm:py-8">
+    <main id="main" class="dashboard mx-auto max-w-(--shell-wide) px-4 py-6 sm:px-8 sm:py-8">
       <div data-mobile-home class="flex flex-col gap-6 md:hidden">
         <div class="flex flex-col gap-3">
           <h1 class="text-[length:var(--text-display-fluid)] leading-tight font-semibold tracking-tight text-text">
@@ -70,7 +71,7 @@ const roles = dashboard ? (await getExperience()).filter(({ data }) => onMap.has
 
       <div
         id="cluster"
-        class="cluster-view flex flex-col gap-4 max-md:hidden max-md:target:flex lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(20rem,1fr)] lg:gap-6"
+        class="cluster-view flex flex-col gap-4 max-md:hidden max-md:target:flex lg:grid lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-6 xl:grid-cols-[minmax(0,1fr)_26rem]"
       >
         <div class="flex items-center justify-between gap-3 md:hidden">
           <p class="font-mono text-sm text-text-muted">sohan-cluster</p>
