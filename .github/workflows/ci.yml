@@ -77,8 +77,12 @@ jobs:
 
       - name: Build with the dashboard flag (design doc §4.8; never set for releases)
         env:
-          PUBLIC_ENABLED_FLAGS: clusterDashboard
+          # fixtures: test-only pages for the e2e CSP checks (ADR 0004).
+          PUBLIC_ENABLED_FLAGS: clusterDashboard,fixtures
         run: pnpm exec astro build --outDir dist-dashboard
+
+      - name: Check the CSP of every built page (ADR 0004)
+        run: node .github/scripts/check-csp.mjs dist dist-dashboard
 
       - name: Check the terminal data file size (stage-3 design §5.1, under 30 KB gzipped)
         run: |
@@ -88,13 +92,14 @@ jobs:
           if [ "$size" -gt 30720 ]; then echo "::error::$file is over the 30 KB gzipped budget"; exit 1; fi
           if ls dist/cluster.*.json >/dev/null 2>&1; then echo "::error::the production build must not ship cluster.*.json"; exit 1; fi
 
-      - name: Build under a preview base path and check every reference uses it
+      - name: Build under a preview base path and check every reference and the CSP
         env:
           BASE_PATH: /pr-preview/pr-0/
         run: |
           # Once as production ships, once with the dashboard flag as previews ship.
-          for flags in "" clusterDashboard; do
+          for flags in "" clusterDashboard,fixtures; do
             PUBLIC_ENABLED_FLAGS="$flags" pnpm exec astro build --outDir dist-base-check
+            node .github/scripts/check-csp.mjs dist-base-check
             bad=$(grep -rhoE '(href|src|action)="/[^"]*"|url\(/[^)]*\)' dist-base-check --include='*.html' --include='*.css' \
               | grep -v '/pr-preview/pr-0/' || true)
             if [ -n "$bad" ]; then

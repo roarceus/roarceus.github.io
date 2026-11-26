@@ -4,12 +4,13 @@ _Last updated: 2026-11-26_
 
 ## Current stage
 
-**Stage 3 — Terminal engine: in progress** (Tasks 1 to 5 of 9: plan #77, parser #78, snapshot #80, commands #84, store). v0.3.0 is live. Design:
+**Stage 3 — Terminal engine: in progress** (Tasks 1 to 5 of 9: plan #77, parser #78, snapshot #80, commands #84, store #85). v0.3.0 is live. Design:
 [`plans/stage-3-design.md`](plans/stage-3-design.md) (approved with changes 2026-11-25). Plan:
 [`plans/stage-3.md`](plans/stage-3.md) (approved) ·
 [milestone](https://github.com/roarceus/roarceus.github.io/milestone/4) (#68 to #76). Store:
 [ADR 0003](adr/0003-nanostores-for-island-state.md). The dashboard stays behind `clusterDashboard` until
-Stage 4.
+Stage 4. The CSP now comes from Astro with hashed inline scripts ([ADR 0004](adr/0004-astro-hashed-csp.md)),
+so islands load without `'unsafe-inline'`; CI audits every built page.
 
 ## Stage 2 sign-off
 
@@ -41,8 +42,8 @@ Stage 4.
 
 ## Next steps
 
-1. Review the store PR (Task 5); then PRs 6 to 9 in order (`plans/stage-3.md`). Commands and the store run
-   only in tests until the terminal island lands in Task 6, which also adds `@nanostores/react`.
+1. Review the CSP PR, then Task 6 in three PRs (terminal island, one-screen layout, budgets), then Tasks 7
+   to 9 (`plans/stage-3.md`).
 2. Carried over: submit the sitemap in Google Search Console; check the share card in a link inspector
    (runbook: `docs/runbooks/share-image.md`); set up the uptime monitor (M10); decide on Renovate's
    queued TypeScript 7 PR.

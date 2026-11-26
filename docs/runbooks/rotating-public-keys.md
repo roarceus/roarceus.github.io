@@ -25,5 +25,5 @@ Stage 6. Keys live in `src/config/`, never in components. Rotating one:
    (form submits, analytics event appears).
 3. Merge and release, then revoke the old key in the provider's dashboard.
 
-If a provider's endpoint or domain changes, update the CSP in `src/layouts/BaseLayout.astro` in the
-same PR.
+If a provider's endpoint or domain changes, update `cspDirectives()` in `src/lib/seo/csp.ts` in the
+same PR (ADR 0004); CI's CSP audit fails until it matches.

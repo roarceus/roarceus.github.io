@@ -138,7 +138,7 @@ export default defineConfig(
 
   // Node-side config files and tests.
   {
-    files: ['*.{js,mjs,cjs,ts}', 'tests/**'],
+    files: ['*.{js,mjs,cjs,ts}', 'tests/**', '.github/scripts/**'],
     languageOptions: { globals: globals.node },
   },
   {
