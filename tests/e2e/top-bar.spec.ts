@@ -72,6 +72,19 @@ for (const { path, view, viewHref } of PAGES) {
   });
 }
 
+test('thickens the link underline on hover and keyboard focus', async ({ page }) => {
+  await page.goto('plain/');
+  const link = page.locator('main a.link').first();
+  const thickness = () => link.evaluate((el) => getComputedStyle(el).textDecorationThickness);
+  await expect.poll(thickness).toBe('1px');
+  await link.hover();
+  await expect.poll(thickness).toBe('2px');
+  await page.mouse.move(0, 0);
+  await link.focus();
+  expect(await link.evaluate((el) => el.matches(':focus-visible'))).toBe(true);
+  await expect.poll(thickness).toBe('2px');
+});
+
 test('keeps the skip link first and the top bar accessible', async ({ page }) => {
   await page.goto('./');
   // WebKit skips links on Tab by default (a Safari setting), so check document order instead.

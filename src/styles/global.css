@@ -118,8 +118,11 @@
     text-underline-offset: 0.2em;
   }
 
-  .link:hover {
+  /* Hover and keyboard focus strengthen the underline, not just the color (WCAG 1.4.1). */
+  .link:hover,
+  .link:focus-visible {
     color: var(--text);
+    text-decoration-thickness: 2px;
   }
 
   .skip-link {
