@@ -27,11 +27,10 @@ const cluster = dashboard ? await getCluster() : undefined;
 const onMap = new Set(cluster?.nodes.map((node) => node.name));
 // The terminal's data file, content-hashed (stage-3 design §5.1); preloaded so the first command
 // doesn't wait on it.
-const snapshotHref = dashboard
-  ? url(
-      `cluster.${(await getSnapshot({ version: buildInfo.version, commit: buildInfo.shortCommit })).hash}.json`,
-    )
+const terminal = dashboard
+  ? await getSnapshot({ version: buildInfo.version, commit: buildInfo.shortCommit })
   : undefined;
+const snapshotHref = terminal && url(`cluster.${terminal.hash}.json`);
 const roles = dashboard ? (await getExperience()).filter(({ data }) => onMap.has(data.node)) : [];
 ---
 
@@ -117,9 +116,11 @@ const roles = dashboard ? (await getExperience()).filter(({ data }) => onMap.has
             <DetailPanel entry={cluster.selected} />
           </BottomSheet>
         )}
-        <div class="lg:col-span-2">
-          <TerminalDock rows={cluster.rows} />
-        </div>
+        {terminal && snapshotHref && (
+          <div class="lg:col-span-2">
+            <TerminalDock snapshot={terminal.snapshot} snapshotHref={snapshotHref} />
+          </div>
+        )}
       </div>
     </main>
   )}

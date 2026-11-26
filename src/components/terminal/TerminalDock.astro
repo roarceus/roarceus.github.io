@@ -1,55 +1,42 @@
 ---
-// The docked terminal (design doc §4.6). Stage 2 pre-renders `kubectl get experience` in real kubectl
-// form and links the command chips to the matching plain-view sections; Stage 3 adds the input and
-// turns chips into commands. No input yet: a disabled one would be a dead control. Below 768px only
-// the chips show.
-import Chip from '@/components/ui/Chip.astro';
-import Table from '@/components/ui/Table.astro';
-import type { ExperienceRow } from '@/lib/content/cluster';
+// The docked terminal (design doc stage-3 §5.4). The island renders on the server with today's
+// `kubectl get experience` and the chips as plain-view links, so no-JS and first paint match Stage 2;
+// it hydrates when the browser is idle and adds the input.
+import { execute } from '@/lib/commands/run';
+import type { ClusterSnapshot } from '@/lib/content/snapshot';
+import { parse } from '@/lib/parser/parse';
 import { url } from '@/lib/utils/url';
 
+import { Terminal } from './Terminal';
+
 interface Props {
-  rows: readonly ExperienceRow[];
+  snapshot: ClusterSnapshot;
+  /** `url('cluster.<hash>.json')`. */
+  snapshotHref: string;
 }
 
-const { rows } = Astro.props;
+const { snapshot, snapshotHref } = Astro.props;
 
-const columns = [
-  { key: 'name', label: 'Name' },
-  { key: 'role', label: 'Role' },
-  { key: 'node', label: 'Node' },
-  { key: 'status', label: 'Status' },
-  { key: 'age', label: 'Age' },
-];
-const cells = rows.map((row) => ({
-  ...row,
-  name: { text: row.name, href: url('plain/#experience') },
-}));
+const FIRST = 'kubectl get experience';
+const parsed = parse(FIRST);
+if (!parsed.ok) throw new Error(parsed.error);
+const base = url();
+const result = await execute(parsed.command, { snapshot, build: snapshot.build, base, now: new Date() });
 
 const chips = [
-  { label: 'get pods -n projects', href: url('plain/#projects') },
-  { label: 'top skills', href: url('plain/#skills') },
-  { label: 'get certificates', href: url('plain/#certifications') },
-  { label: 'logs updates', href: url('plain/#updates') },
-  { label: 'help', href: url('plain/') },
+  'kubectl get pods -n projects',
+  'kubectl top skills',
+  'kubectl get certificates',
+  'kubectl logs updates',
+  'help',
 ];
 ---
 
-<section aria-label="Terminal" class="flex flex-col gap-4 rounded-lg border border-border bg-surface-2 p-4">
-  <div class="flex flex-col gap-2 max-md:hidden">
-    <p class="font-mono text-sm text-text">$ kubectl get experience</p>
-    <Table caption="kubectl get experience" columns={columns} rows={cells} />
-  </div>
-  <nav aria-label="Commands">
-    <ul
-      role="list"
-      class="flex gap-2 overflow-x-auto [scrollbar-width:none] md:flex-wrap md:overflow-visible"
-    >
-      {chips.map((chip) => (
-        <li class="shrink-0">
-          <Chip href={chip.href}>{chip.label}</Chip>
-        </li>
-      ))}
-    </ul>
-  </nav>
-</section>
+<Terminal
+  client:idle
+  snapshotHref={snapshotHref}
+  build={snapshot.build}
+  base={base}
+  initial={{ input: FIRST, result }}
+  chips={chips}
+/>
