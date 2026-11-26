@@ -9,6 +9,11 @@ import { resolveFlags } from '@/lib/utils/flags';
 export const defaultFeatures = {
   /** The cluster dashboard on `/` (Stage 2 shell, live from Stage 4). */
   clusterDashboard: false,
+  /**
+   * Test-only pages under /fixtures/ (a code block for the CSP check, ADR 0004). On in CI's dashboard
+   * build only, never in previews or releases.
+   */
+  fixtures: false,
   bootSequence: false,
   chaosMode: false,
 } as const satisfies Record<string, boolean>;
