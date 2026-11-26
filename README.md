@@ -130,8 +130,10 @@ src/
   content/      portfolio content (YAML + Markdown); schemas registered in content.config.ts
   layouts/      page layouts (BaseLayout sets meta tags and the CSP)
   lib/content/  Zod schemas, query helpers, integrity check, cluster data (nodes, pods, kubectl rows)
+  lib/parser/   terminal command parser (pure: tokens, flags, kubectl-style errors)
   lib/seo/      share metadata and JSON-LD helpers
-  lib/utils/    framework-free helpers: url() for the base path, dates, contrast ratios, kubectl ages and names, flags
+  lib/utils/    framework-free helpers: url() for the base path, dates, contrast ratios, kubectl ages and names,
+                flags, did-you-mean suggestions
   pages/        routes (plus rss.xml, robots.txt, and the 404 page)
   styles/       tokens.css (design tokens, AA-checked by tokens.test.ts; --scene-* only for the cluster
                 scene, ADR 0002) and global.css
