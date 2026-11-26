@@ -19,7 +19,16 @@ const TSX = ['**/*.tsx'];
 
 export default defineConfig(
   {
-    ignores: ['dist/', '.astro/', 'coverage/', 'playwright-report/', 'test-results/', 'node_modules/'],
+    ignores: [
+      'dist/',
+      'dist-dashboard/',
+      'dist-base-check/',
+      '.astro/',
+      'coverage/',
+      'playwright-report/',
+      'test-results/',
+      'node_modules/',
+    ],
   },
 
   js.configs.recommended,

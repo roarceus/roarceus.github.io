@@ -43,6 +43,11 @@ test.describe('home', () => {
     expect(loaded).toEqual(expect.arrayContaining(['Inter Variable', 'JetBrains Mono Variable']));
   });
 
+  test('keeps the cluster dashboard off in production builds (flag off)', async ({ page }) => {
+    await expect(page.getByRole('region', { name: 'Cluster map' })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Launch cluster' })).toHaveCount(0);
+  });
+
   test('has no horizontal overflow', async ({ page }) => {
     await expectNoHorizontalOverflow(page);
   });

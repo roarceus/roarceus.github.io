@@ -17,7 +17,8 @@ export interface ClusterExperience {
   start: string;
   end: string;
   node: string;
-  cluster: boolean;
+  /** Missing means on the map; only `false` takes the node off (SPEC §7). */
+  cluster?: boolean | undefined;
 }
 
 export interface ClusterEducation {
@@ -25,7 +26,8 @@ export interface ClusterEducation {
   start: string;
   end: string;
   node?: string | undefined;
-  cluster: boolean;
+  /** Missing means on the map; only `false` takes the node off (SPEC §7). */
+  cluster?: boolean | undefined;
 }
 
 export interface ClusterProject {
@@ -91,7 +93,8 @@ export function clusterNodes(
       data.node === undefined ? [] : [{ id, data: { ...data, node: data.node, role: 'education' as const } }],
     ),
   ];
-  const offMap = new Set(declared.filter(({ data }) => !data.cluster).map(({ data }) => data.node));
+  // Only an explicit `cluster: false` takes a node off the map (a missing flag means on).
+  const offMap = new Set(declared.filter(({ data }) => data.cluster === false).map(({ data }) => data.node));
   const labels = nodeLabels(experience, education);
   const ordered = sortByOrder(projects);
 

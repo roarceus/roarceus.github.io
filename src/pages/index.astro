@@ -1,59 +1,120 @@
 ---
-// Pre-rendered hero and the no-JS entry point (SPEC §4). The cluster dashboard builds on top of
-// this in Stage 2; until then it sends visitors to the plain view.
+// `/` (SPEC §4, design doc §4.6). Production shows the pre-rendered hero until the cluster dashboard
+// is ready (flag `clusterDashboard`, off in production). With the flag on:
+// - 768px and up: hero line, cluster stage, detail panel, and docked terminal (side by side from
+//   1024px, stacked below).
+// - Phones: the plain layout first, with a "Launch cluster" link to #cluster. CSS :target opens
+//   cluster mode (stage, bottom sheet, chip bar) without JavaScript; Back or the browser's back
+//   button leaves it.
+import ClusterStage from '@/components/cluster/ClusterStage.astro';
+import DetailPanel from '@/components/cluster/DetailPanel.astro';
+import BottomSheet from '@/components/layout/BottomSheet.astro';
+import HomeHero from '@/components/plain/HomeHero.astro';
+import TerminalDock from '@/components/terminal/TerminalDock.astro';
+import Button from '@/components/ui/Button.astro';
+import { focusRing, target } from '@/components/ui/recipes';
 import StatusPill from '@/components/ui/StatusPill.astro';
-import { plainSections } from '@/config/sections';
+import { isEnabled } from '@/config/features';
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import { getProfile } from '@/lib/content/queries';
+import { getCluster, getExperience, getProfile } from '@/lib/content/queries';
 import { url } from '@/lib/utils/url';
 
+const dashboard = isEnabled('clusterDashboard');
 const { data: profile } = await getProfile();
-const button =
-  'inline-flex min-h-11 min-w-11 items-center justify-center rounded-md px-4 font-mono text-sm font-semibold';
+const cluster = dashboard ? await getCluster() : undefined;
+const onMap = new Set(cluster?.nodes.map((node) => node.name));
+const roles = dashboard ? (await getExperience()).filter(({ data }) => onMap.has(data.node)) : [];
 ---
 
 <BaseLayout person view="cluster">
-  <main
-    id="main"
-    class="mx-auto flex min-h-[70dvh] max-w-3xl flex-col justify-center gap-6 px-4 py-16 sm:px-8"
-  >
-    <p class="font-mono text-[length:var(--text-sm-fluid)] text-text-muted">sohan-cluster</p>
-    <h1 class="text-[length:var(--text-display-fluid)] leading-tight font-semibold tracking-tight text-text">
-      {profile.name}
-    </h1>
-    <p class="text-lg text-text">{profile.title}</p>
-    <p class="max-w-prose text-[length:var(--text-base-fluid)] text-text-muted">{profile.tagline}</p>
-    <p class="flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-sm text-text-muted">
-      <span>{profile.location}</span>
-      {profile.openToWork && <StatusPill status="running" label="Open to work" />}
-    </p>
-    <div role="group" aria-label="Main actions" class="flex flex-wrap gap-3">
-      <a href={url('plain/')} class:list={[button, 'bg-accent text-on-accent hover:underline']}>
-        View portfolio
-      </a>
-      <a
-        href={url(profile.resume)}
-        class:list={[button, 'border border-border text-text hover:border-accent-soft']}
+  {cluster === undefined ? (
+    <main id="main">
+      <HomeHero />
+    </main>
+  ) : (
+    <main id="main" class="dashboard mx-auto max-w-7xl px-4 py-6 sm:px-8 sm:py-8">
+      <div data-mobile-home class="flex flex-col gap-6 md:hidden">
+        <div class="flex flex-col gap-3">
+          <h1 class="text-[length:var(--text-display-fluid)] leading-tight font-semibold tracking-tight text-text">
+            {profile.name}
+          </h1>
+          <p class="text-lg text-text">{profile.title}</p>
+          <p class="flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-sm text-text-muted">
+            <span>{profile.location}</span>
+            {profile.openToWork && <StatusPill status="running" label="Open to work" />}
+          </p>
+        </div>
+        <Button variant="primary" href="#cluster">
+          Launch cluster
+        </Button>
+        <section aria-labelledby="mobile-experience" class="flex flex-col gap-3">
+          <h2 id="mobile-experience" class="font-mono text-sm text-text-muted">
+            experience
+          </h2>
+          <ul role="list" aria-label="Experience" class="flex flex-col gap-3">
+            {roles.map(({ data }) => (
+              <li class="rounded-lg border border-border bg-surface-1 p-4">
+                <p class="font-semibold text-text">{data.role}</p>
+                <p class="text-text-muted">{data.org}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+        <a
+          href={url('plain/')}
+          class:list={['link self-start font-mono text-sm', target, 'inline-flex items-center']}
+        >
+          Full portfolio
+        </a>
+      </div>
+
+      <div
+        id="cluster"
+        class="cluster-view flex flex-col gap-4 max-md:hidden max-md:target:flex lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(20rem,1fr)] lg:gap-6"
       >
-        Resume
-      </a>
-      <a
-        href={url('plain/#contact')}
-        class:list={[button, 'border border-border text-text hover:border-accent-soft']}
-      >
-        Contact
-      </a>
-    </div>
-    <nav aria-label="Portfolio sections">
-      <ul role="list" class="flex flex-wrap gap-x-1 font-mono text-sm">
-        {plainSections.map(({ id, label }) => (
-          <li>
-            <a href={url(`plain/#${id}`)} class="link inline-flex min-h-11 items-center px-2 first:-ml-2">
-              {label}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </nav>
-  </main>
+        <div class="flex items-center justify-between gap-3 md:hidden">
+          <p class="font-mono text-sm text-text-muted">sohan-cluster</p>
+          <a
+            href={url()}
+            class:list={[
+              'link inline-flex items-center rounded-md px-2 font-mono text-sm',
+              target,
+              focusRing,
+            ]}
+          >
+            Back
+          </a>
+        </div>
+        <div class="flex flex-col gap-1 lg:col-span-2">
+          <!-- Only one h1 is ever displayed: this one, or the phone layout's when cluster mode is closed. -->
+          <h1 class="text-[length:var(--text-h2-fluid)] leading-tight font-semibold text-text">
+            {profile.name}
+          </h1>
+          <p class="text-text-muted">
+            {profile.title}, {profile.location}
+          </p>
+        </div>
+        <ClusterStage
+          nodes={cluster.nodes}
+          unscheduled={cluster.unscheduled}
+          selected={cluster.selected?.data.node}
+        />
+        {cluster.selected && (
+          <BottomSheet>
+            <DetailPanel entry={cluster.selected} />
+          </BottomSheet>
+        )}
+        <div class="lg:col-span-2">
+          <TerminalDock rows={cluster.rows} />
+        </div>
+      </div>
+    </main>
+  )}
 </BaseLayout>
+
+<style>
+  /* In cluster mode the phone's plain layout steps aside. */
+  .dashboard:has(#cluster:target) [data-mobile-home] {
+    display: none;
+  }
+</style>

@@ -278,7 +278,7 @@ Stages 8 to 10), `docs/plans/stage-2-design.md`, this plan, `docs/STATUS.md`.
 - [x] Tests green; `pnpm check` and `pnpm lhci` green; check widths; commit
       `feat(plain): add jump chips and expanders to the plain view`.
 
-### Task 6: Cluster data and flags (PR 6)
+### Task 6: Cluster data and flags (PR 6) — done (#64)
 
 **Files:**
 
@@ -385,7 +385,7 @@ import.meta.env.PUBLIC_ENABLED_FLAGS)`. `isEnabled` stays the same.
 
 **Steps:**
 
-- [ ] **Failing e2e first.**
+- [x] **Failing e2e first.**
   - **Flag off (`home.spec.ts`, default build):** a heading `Sohan Patil`; `View portfolio`, `Resume`, and
     `Contact`; no region named `Cluster map`; axe; overflow.
   - **Flag on (`dashboard.spec.ts`, run against the flag build):**
@@ -402,16 +402,16 @@ import.meta.env.PUBLIC_ENABLED_FLAGS)`. `isEnabled` stays the same.
     - **Every size:** axe and no overflow.
     - **Layout stability:** the stage footprint doesn't change between `load` and `networkidle`
       (bounding boxes equal).
-- [ ] **Implement** per design doc §4.6. Each node card links to `plain/#experience` or `plain/#education`
+- [x] **Implement** per design doc §4.6. Each node card links to `plain/#experience` or `plain/#education`
       through `url()`; pods link to `projects/<slug>/`. The unscheduled row is labelled `unscheduled`.
-- [ ] **CI.** The build job also runs
+- [x] **CI.** The build job also runs
       `PUBLIC_ENABLED_FLAGS=clusterDashboard pnpm exec astro build --outDir dist-dashboard` and uploads it.
   - A `dashboard` e2e job runs `--grep @dashboard` on chromium, firefox, and webkit against it.
   - `lighthouse` runs `/` from `dist-dashboard` with the same budgets.
   - The default e2e run uses `--grep-invert @dashboard`.
   - `ci-ok` needs the new job.
   - Every action stays pinned to a SHA, with least-privilege permissions.
-- [ ] Tests green; `pnpm check` and `pnpm lhci` green for both builds; check the preview at 320, 375,
+- [x] Tests green; `pnpm check` and `pnpm lhci` green for both builds; check the preview at 320, 375,
       768, 1024, 1280, and 1920px; commit `feat(cluster): add dashboard shell behind a feature flag`.
 
 ### Task 8: Stage 2 wrap-up (PR 8)

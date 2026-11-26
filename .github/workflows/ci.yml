@@ -75,16 +75,24 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Build with the dashboard flag (design doc §4.8; never set for releases)
+        env:
+          PUBLIC_ENABLED_FLAGS: clusterDashboard
+        run: pnpm exec astro build --outDir dist-dashboard
+
       - name: Build under a preview base path and check every reference uses it
         env:
           BASE_PATH: /pr-preview/pr-0/
         run: |
-          pnpm exec astro build --outDir dist-base-check
-          bad=$(grep -rhoE '(href|src|action)="/[^"]*"|url\(/[^)]*\)' dist-base-check --include='*.html' --include='*.css' \
-            | grep -v '/pr-preview/pr-0/' || true)
-          if [ -n "$bad" ]; then
-            echo "::error::References outside the base path:"; echo "$bad"; exit 1
-          fi
+          # Once as production ships, once with the dashboard flag as previews ship.
+          for flags in "" clusterDashboard; do
+            PUBLIC_ENABLED_FLAGS="$flags" pnpm exec astro build --outDir dist-base-check
+            bad=$(grep -rhoE '(href|src|action)="/[^"]*"|url\(/[^)]*\)' dist-base-check --include='*.html' --include='*.css' \
+              | grep -v '/pr-preview/pr-0/' || true)
+            if [ -n "$bad" ]; then
+              echo "::error::References outside the base path (flags: '$flags'):"; echo "$bad"; exit 1
+            fi
+          done
 
       - name: Upload site
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -92,6 +100,13 @@ jobs:
           name: dist
           path: dist/
           include-hidden-files: true # keep .nojekyll
+          retention-days: 7
+      - name: Upload dashboard build
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dist-dashboard
+          path: dist-dashboard/
+          include-hidden-files: true
           retention-days: 7
 
   e2e:
@@ -118,13 +133,51 @@ jobs:
       - name: Install ${{ matrix.engine }}
         run: pnpm exec playwright install --with-deps ${{ matrix.engine }}
       - name: Playwright + axe
-        run: pnpm exec playwright test tests/e2e --project="${{ matrix.engine }}-*"
+        # The production build; the dashboard specs run in e2e-dashboard.
+        run: pnpm exec playwright test tests/e2e --project="${{ matrix.engine }}-*" --grep-invert @dashboard
 
       - name: Upload report
         if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: playwright-report-${{ matrix.engine }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+
+  # The cluster dashboard shell, built with its flag on (design doc §4.8).
+  e2e-dashboard:
+    name: e2e dashboard (${{ matrix.engine }})
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [chromium, firefox, webkit]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: dist-dashboard
+          path: dist/
+
+      - name: Install ${{ matrix.engine }}
+        run: pnpm exec playwright install --with-deps ${{ matrix.engine }}
+      - name: Playwright + axe (dashboard)
+        run: pnpm exec playwright test tests/e2e --project="${{ matrix.engine }}-*" --grep @dashboard
+
+      - name: Upload report
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: playwright-report-dashboard-${{ matrix.engine }}
           path: |
             playwright-report/
             test-results/
@@ -149,6 +202,12 @@ jobs:
 
       - name: Lighthouse CI (mobile budgets)
         run: pnpm lhci
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: dist-dashboard
+          path: dist-dashboard/
+      - name: Lighthouse CI on the dashboard build (/)
+        run: pnpm exec lhci autorun --collect.staticDistDir=./dist-dashboard --collect.url=http://localhost/index.html
       - name: Upload Lighthouse reports
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -206,7 +265,7 @@ jobs:
   ci-ok:
     name: ci-ok
     if: always()
-    needs: [quality, build, e2e, lighthouse, links, dependency-review]
+    needs: [quality, build, e2e, e2e-dashboard, lighthouse, links, dependency-review]
     runs-on: ubuntu-latest
     timeout-minutes: 2
     permissions: {}

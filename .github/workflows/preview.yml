@@ -41,6 +41,8 @@ jobs:
         env:
           BASE_PATH: /pr-preview/pr-${{ github.event.pull_request.number }}/
           PUBLIC_COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
+          # Previews show unfinished work behind its flag; releases never set this (design doc §4.8).
+          PUBLIC_ENABLED_FLAGS: clusterDashboard
         run: pnpm build
 
       - name: Deploy or remove preview
@@ -71,6 +73,7 @@ jobs:
         env:
           SMOKE_BASE_URL: ${{ needs.deploy.outputs.url }}
           SMOKE_EXPECT_COMMIT: ${{ github.event.pull_request.head.sha }}
+          SMOKE_EXPECT_DASHBOARD: 'true'
         run: |
           # Normalize to a trailing slash; the action's URL may omit it.
           export SMOKE_BASE_URL="${SMOKE_BASE_URL%/}/"

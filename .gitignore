@@ -1,5 +1,7 @@
 # build output
 dist/
+dist-dashboard/
+dist-base-check/
 
 # generated types
 .astro/
