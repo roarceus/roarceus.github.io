@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { kubectlAge, toKubeName } from './kubectl';
+import { kubeRole, kubectlAge, kubectlAgeClamped, toKubeName } from './kubectl';
 
 const NOW = new Date('2026-11-25T00:00:00Z');
 
@@ -35,6 +35,21 @@ describe('kubectlAge', () => {
   });
 });
 
+describe('kubectlAge with a day', () => {
+  it('counts from that day when given YYYY-MM-DD', () => {
+    expect(kubectlAge('2025-11-20', NOW)).toBe('370d');
+    expect(() => kubectlAge('2026-11-32', NOW)).toThrow();
+  });
+});
+
+describe('kubectlAgeClamped', () => {
+  it('shows 0d for a start after now (a visitor clock behind the content) and ages the rest', () => {
+    expect(kubectlAgeClamped('2026-12', NOW)).toBe('0d');
+    expect(kubectlAgeClamped('2026-11-26', NOW)).toBe('0d');
+    expect(kubectlAgeClamped('2025-11-20', NOW)).toBe('370d');
+  });
+});
+
 describe('toKubeName', () => {
   it.each([
     ['DevOps Engineer (Co-op)', 'devops-engineer-co-op'],
@@ -46,5 +61,16 @@ describe('toKubeName', () => {
     ['Web Development Intern', 'web-development-intern'],
   ])('turns %j into %j', (input, expected) => {
     expect(toKubeName(input)).toBe(expected);
+  });
+});
+
+describe('kubeRole', () => {
+  it.each([
+    ['Teaching Assistant, Network Structures & Cloud Computing (CSYE 6225)', 'teaching-assistant'],
+    ['DevOps Engineer (Co-op)', 'devops-engineer'],
+    ['Software Engineer', 'software-engineer'],
+    ['(Odd) title', 'odd-title'],
+  ])('shortens %j to %j', (input, expected) => {
+    expect(kubeRole(input)).toBe(expected);
   });
 });

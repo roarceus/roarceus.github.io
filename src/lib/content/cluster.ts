@@ -1,4 +1,4 @@
-import { kubectlAge, toKubeName } from '@/lib/utils/kubectl';
+import { kubeRole, kubectlAgeClamped } from '@/lib/utils/kubectl';
 
 import { nodeLabels } from './nodes';
 import { sortByOrder, sortByRecency, type Entry } from './sort';
@@ -79,7 +79,8 @@ const toPod = ({ id, data }: Entry<ClusterProject>): Pod => ({
 
 /**
  * Nodes on the map, newest first. A node is on the map only if every entry that declares it keeps
- * `cluster: true`; its role and order come from its newest entry. Pods are the node's projects by
+ * `cluster: true`; its order comes from its newest entry. Its role is `education` when a degree
+ * declares it (a TA role there still sits on it), otherwise the newest entry's type. Pods are the node's projects by
  * `order`; projects of off-map nodes are left out.
  */
 export function clusterNodes(
@@ -95,6 +96,9 @@ export function clusterNodes(
   ];
   // Only an explicit `cluster: false` takes a node off the map (a missing flag means on).
   const offMap = new Set(declared.filter(({ data }) => data.cluster === false).map(({ data }) => data.node));
+  const schools = new Set(
+    declared.filter(({ data }) => data.role === 'education').map(({ data }) => data.node),
+  );
   const labels = nodeLabels(experience, education);
   const ordered = sortByOrder(projects);
 
@@ -106,7 +110,7 @@ export function clusterNodes(
     nodes.push({
       name: data.node,
       label: labels.get(data.node) ?? data.node,
-      role: data.role,
+      role: schools.has(data.node) ? 'education' : data.role,
       pods: ordered.filter((project) => project.data.node === data.node).map(toPod),
     });
   }
@@ -140,9 +144,9 @@ export function experienceRows(
     .filter(({ data }) => onMap.has(data.node))
     .map(({ id, data }) => ({
       name: id,
-      role: toKubeName(data.role),
+      role: kubeRole(data.role),
       node: data.node,
       status: data.end === 'present' ? 'Active' : 'Completed',
-      age: kubectlAge(data.start, now),
+      age: kubectlAgeClamped(data.start, now),
     }));
 }

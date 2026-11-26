@@ -1,10 +1,10 @@
 # Status
 
-_Last updated: 2026-11-25_
+_Last updated: 2026-11-26_
 
 ## Current stage
 
-**Stage 3 — Terminal engine: in progress** (Tasks 1 to 3 of 9: plan #77, parser #78, snapshot). v0.3.0 is live. Design:
+**Stage 3 — Terminal engine: in progress** (Tasks 1 to 4 of 9: plan #77, parser #78, snapshot #80, commands). v0.3.0 is live. Design:
 [`plans/stage-3-design.md`](plans/stage-3-design.md) (approved with changes 2026-11-25). Plan:
 [`plans/stage-3.md`](plans/stage-3.md) (approved) ·
 [milestone](https://github.com/roarceus/roarceus.github.io/milestone/4) (#68 to #76). Store:
@@ -41,7 +41,8 @@ Stage 4.
 
 ## Next steps
 
-1. Sohan: approve the Stage 3 plan; then PRs 2 to 9 in order (`plans/stage-3.md`).
+1. Review the commands PR (Task 4); then PRs 5 to 9 in order (`plans/stage-3.md`). The commands run only
+   in tests until the terminal island lands in Task 6.
 2. Carried over: submit the sitemap in Google Search Console; check the share card in a link inspector
    (runbook: `docs/runbooks/share-image.md`); set up the uptime monitor (M10); decide on Renovate's
    queued TypeScript 7 PR.

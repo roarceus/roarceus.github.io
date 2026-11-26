@@ -131,6 +131,8 @@ src/
   layouts/      page layouts (BaseLayout sets meta tags and the CSP)
   lib/content/  Zod schemas, query helpers, integrity check, cluster data (nodes, pods, kubectl rows), and the
                 terminal's content snapshot (served as cluster.<hash>.json when the dashboard flag is on)
+  lib/commands/  terminal commands (registry, get/describe/top/logs and friends, Tab completion, a small
+                YAML writer); each returns plain data the terminal renders, never HTML
   lib/parser/   terminal command parser (pure: tokens, flags, kubectl-style errors)
   lib/seo/      share metadata and JSON-LD helpers
   lib/utils/    framework-free helpers: url() for the base path, dates, contrast ratios, kubectl ages and names,

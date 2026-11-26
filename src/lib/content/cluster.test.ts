@@ -106,9 +106,20 @@ describe('clusterNodes', () => {
     expect(nodes[0]).toMatchObject({
       name: 'northeastern',
       label: 'Northeastern University',
-      role: 'teaching',
+      role: 'education',
     });
     expect(nodes[1]).toMatchObject({ label: 'MasterControl', role: 'work' });
+  });
+
+  it('marks a node a degree declares as education, with the TA role still on it', () => {
+    const northeastern = nodes.find((node) => node.name === 'northeastern');
+    expect(northeastern?.role).toBe('education');
+    const rows = experienceRows(EXPERIENCE, nodes, new Date('2026-11-26T00:00:00Z'));
+    expect(rows.find((row) => row.name === 'northeastern-ta')?.node).toBe('northeastern');
+  });
+
+  it('takes the role of the newest entry when no degree declares the node', () => {
+    expect(nodes.find((node) => node.name === 'capgemini')?.role).toBe('work');
   });
 
   it('schedules projects on their node by order, with their phase', () => {
@@ -221,7 +232,7 @@ describe('experienceRows', () => {
       },
       {
         name: 'mastercontrol',
-        role: 'devops-engineer-co-op',
+        role: 'devops-engineer',
         node: 'mastercontrol',
         status: 'Completed',
         age: '542d',

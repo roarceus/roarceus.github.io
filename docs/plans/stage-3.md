@@ -269,7 +269,7 @@ export function execute(cmd: ParsedCommand, ctx: CommandContext): Promise<Comman
 export function completions(input: string, ctx: CommandContext): string[]; // for Tab
 ```
 
-- [ ] **Tests first, per command,** against one fixture snapshot (`src/lib/commands/fixtures.ts`):
+- [x] **Tests first, per command,** against one fixture snapshot (`src/lib/commands/fixtures.ts`):
   - `get nodes`: columns `NAME STATUS ROLES AGE VERSION`, one row per node, `STATUS` `Ready`.
   - `get experience`: same columns and rows as `experienceRows()` (reuse it); names `run: 'kubectl
 describe node <node>'`.
@@ -289,16 +289,17 @@ namespace.`
 127.0.0.1 -> <host>` line; anything else → NotFound with suggestion.
   - `help` and `kubectl --help` and bare `kubectl` → lines listing every command, each with `run`.
   - Unknown verb → `error: unknown command "x" for "kubectl"` + `suggestion`; `clear` → `action: 'clear'`.
-- [ ] **Review follow-ups (approved 2026-11-26), tests first:**
+- [x] **Review follow-ups (approved 2026-11-26), tests first:**
   - ROLE in `get experience` uses `kubeRole(role)`: `toKubeName` of the title before the first `,` or `(`
     (`teaching-assistant`, `devops-engineer`, `software-engineer`); the full title stays in `describe`.
     The SSR table in `TerminalDock` uses the same helper.
   - A table test with 120-character names and roles: rows render, no cell is longer than the input, and
-    `ResultTable` (Task 6) keeps the overflow inside its box.
+    `ResultTable` (Task 6) keeps the overflow inside its box. (The lib half shipped in PR 4; the
+    `ResultTable` half moves to Task 6.)
   - Node role: when a degree declares a node, the node is `role=education` (Northeastern), and the TA
     row still sits on it (`clusterNodes` in `cluster.ts`, with a test).
-- [ ] Implement; `pnpm test src/lib/commands` → PASS; `src/lib` coverage ≥ 90%.
-- [ ] Commit `feat(commands): add command registry and v1 commands`.
+- [x] Implement; `pnpm test src/lib/commands` → PASS; `src/lib` coverage ≥ 90%.
+- [x] Commit `feat(commands): add command registry and v1 commands`.
 
 ### Task 5: Shared store, run path, and deep links (PR 5)
 
