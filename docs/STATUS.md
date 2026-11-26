@@ -4,9 +4,9 @@ _Last updated: 2026-11-25_
 
 ## Current stage
 
-**Stage 3 — Terminal engine: planning.** v0.3.0 is live. Design:
+**Stage 3 — Terminal engine: in progress** (Tasks 1 to 3 of 9: plan #77, parser #78, snapshot). v0.3.0 is live. Design:
 [`plans/stage-3-design.md`](plans/stage-3-design.md) (approved with changes 2026-11-25). Plan:
-[`plans/stage-3.md`](plans/stage-3.md) (waiting for approval) ·
+[`plans/stage-3.md`](plans/stage-3.md) (approved) ·
 [milestone](https://github.com/roarceus/roarceus.github.io/milestone/4) (#68 to #76). Store:
 [ADR 0003](adr/0003-nanostores-for-island-state.md). The dashboard stays behind `clusterDashboard` until
 Stage 4.

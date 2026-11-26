@@ -15,19 +15,28 @@ import TerminalDock from '@/components/terminal/TerminalDock.astro';
 import Button from '@/components/ui/Button.astro';
 import { focusRing, target } from '@/components/ui/recipes';
 import StatusPill from '@/components/ui/StatusPill.astro';
+import { buildInfo } from '@/config/build-info';
 import { isEnabled } from '@/config/features';
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import { getCluster, getExperience, getProfile } from '@/lib/content/queries';
+import { getCluster, getExperience, getProfile, getSnapshot } from '@/lib/content/queries';
 import { url } from '@/lib/utils/url';
 
 const dashboard = isEnabled('clusterDashboard');
 const { data: profile } = await getProfile();
 const cluster = dashboard ? await getCluster() : undefined;
 const onMap = new Set(cluster?.nodes.map((node) => node.name));
+// The terminal's data file, content-hashed (stage-3 design §5.1); preloaded so the first command
+// doesn't wait on it.
+const snapshotHref = dashboard
+  ? url(
+      `cluster.${(await getSnapshot({ version: buildInfo.version, commit: buildInfo.shortCommit })).hash}.json`,
+    )
+  : undefined;
 const roles = dashboard ? (await getExperience()).filter(({ data }) => onMap.has(data.node)) : [];
 ---
 
 <BaseLayout person view="cluster" wide={dashboard}>
+  {snapshotHref && <link slot="head" rel="preload" as="fetch" crossorigin="anonymous" href={snapshotHref} />}
   {cluster === undefined ? (
     <main id="main">
       <HomeHero />

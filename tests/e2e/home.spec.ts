@@ -48,6 +48,10 @@ test.describe('home', () => {
     await expect(page.getByRole('link', { name: 'Launch cluster' })).toHaveCount(0);
   });
 
+  test('ships no terminal data file in production builds (flag off)', async ({ page }) => {
+    await expect(page.locator('link[rel="preload"][as="fetch"]')).toHaveCount(0);
+  });
+
   test('has no horizontal overflow', async ({ page }) => {
     await expectNoHorizontalOverflow(page);
   });

@@ -26,7 +26,7 @@ links, all in place on `/`. Released as **v0.4.0** with `clusterDashboard` still
 - `docs/SPEC.md` §3 (structure), §4 ("One playground"), §7 (commands and terminal behavior), §10 (tests),
   §11 Stage 3. ADR 0003 (nanostores, written in Task 1). Rules: `CLAUDE.md`.
 
-**Status:** waiting for Sohan's approval. Milestone `Stage 3 — Terminal engine` (#68 to #76, one issue per task).
+**Status:** approved 2026-11-25 (native execution). Milestone `Stage 3 — Terminal engine` (#68 to #76, one issue per task).
 
 ## Global Constraints
 
@@ -81,20 +81,20 @@ Each PR updates the README and STATUS for what it changes, ticks this file, and 
 
 ---
 
-### Task 1: Plan and decisions (PR 1)
+### Task 1: Plan and decisions (PR 1) — done (#77)
 
 **Files:** `docs/plans/stage-3-design.md`, this plan, `docs/adr/0003-nanostores-for-island-state.md`,
 `docs/SPEC.md` (§4 `?run=` instead of `#pod/<slug>`; §10 happy-dom), `docs/STATUS.md`.
 
-- [ ] ADR 0003: context (cross-island state, `lib/state` without React), decision (nanostores +
+- [x] ADR 0003: context (cross-island state, `lib/state` without React), decision (nanostores +
       `@nanostores/react`), alternatives (Zustand vanilla, one big island), consequences.
-- [ ] SPEC §4 "One playground": the URL follows along with `?run=<command>` (read-only allowlist, 200
+- [x] SPEC §4 "One playground": the URL follows along with `?run=<command>` (read-only allowlist, 200
       characters), not a hash, because phones use `#cluster`. §10: happy-dom.
-- [ ] Milestone `Stage 3 — Terminal engine`; one issue per task with acceptance criteria and test approach;
+- [x] Milestone `Stage 3 — Terminal engine`; one issue per task with acceptance criteria and test approach;
       fill the Issues column.
-- [ ] STATUS: Stage 3 in progress. `pnpm check` green; draft PR.
+- [x] STATUS: Stage 3 in progress. `pnpm check` green; draft PR.
 
-### Task 2: Parser and suggestions (PR 2)
+### Task 2: Parser and suggestions (PR 2) — done (#78)
 
 **Files:** Create `src/lib/parser/parse.ts`, `src/lib/parser/parse.test.ts`,
 `src/lib/utils/suggest.ts`, `src/lib/utils/suggest.test.ts`.
@@ -116,7 +116,7 @@ export function suggest(word: string, candidates: readonly string[]): string | u
 export function levenshtein(a: string, b: string): number;
 ```
 
-- [ ] **Tests first** (`parse.test.ts`):
+- [x] **Tests first** (`parse.test.ts`):
   - `parse('k get pods -n projects')` → program `kubectl`, verb `get`, args `['pods']`, flags `{ n: 'projects' }`.
   - `--namespace=projects`, `--namespace projects`, `-o wide`, `--output=yaml`, `--help` normalize to `n`,
     `o`, `help: true`.
@@ -129,10 +129,10 @@ export function levenshtein(a: string, b: string): number;
   - `kubectl` alone → program `kubectl`, verb `undefined` (the command layer prints help).
   - `clear`, `help`, `HELP ` → their programs; anything else first → `{ ok: false, error: 'command not
 found: <word>' }` with the word escaped as text.
-- [ ] **Tests first** (`suggest.test.ts`): `levenshtein('kitten','sitting')` is 3; `suggest('gt', ['get',
+- [x] **Tests first** (`suggest.test.ts`): `levenshtein('kitten','sitting')` is 3; `suggest('gt', ['get',
 'describe'])` → `'get'`; `suggest('xyz', ['get'])` → `undefined`; ties pick the first candidate.
-- [ ] Implement; run `pnpm test src/lib/parser src/lib/utils/suggest` → PASS; coverage for both files 100%.
-- [ ] Commit `feat(terminal): add command parser and suggestions`.
+- [x] Implement; run `pnpm test src/lib/parser src/lib/utils/suggest` → PASS; coverage for both files 100%.
+- [x] Commit `feat(terminal): add command parser and suggestions`.
 
 ### Task 3: Cluster snapshot and hashed JSON (PR 3)
 
@@ -200,20 +200,25 @@ export async function getSnapshot(): Promise<{ snapshot: ClusterSnapshot; hash: 
 names follow the Zod output types; if a schema calls a field differently (e.g. `issuer`), use the schema's
 name and update this block in the same PR.
 
-- [ ] **Tests first:** `buildSnapshot` on fixtures: no Markdown bodies anywhere (`JSON.stringify` contains no
+- As built: `buildSnapshot(input)` takes no `now` (nothing in the snapshot depends on the clock, so the
+  hash is stable; ages are computed in the browser). `profile` carries `tagline` (no `summary` field in the
+  schema), projects map `tagline` to `summary`, achievements map `description` to `summary`, and
+  `getSnapshot(build)` takes the build info from the caller (`lib` doesn't import `config`). The JSON is
+  3.5 KB gzipped.
+- [x] **Tests first:** `buildSnapshot` on fixtures: no Markdown bodies anywhere (`JSON.stringify` contains no
       `\n#`), `cluster: false` nodes absent from `nodes` but their projects absent from `projects` too, updates
       capped at 10 newest, drafts excluded; `snapshotHash` is stable for equal input and changes when one
       project name changes; length 10, `/^[0-9a-f]+$/`.
-- [ ] Endpoint: `getStaticPaths` returns the one `{ params: { hash } }`; `GET` returns the JSON with
+- [x] Endpoint: `getStaticPaths` returns the one `{ params: { hash } }`; `GET` returns the JSON with
       `content-type: application/json`. Built only when the flag is on (empty paths otherwise), so production
       ships no JSON.
-- [ ] `index.astro` (flag on): `<link slot="head" rel="preload" as="fetch" crossorigin="anonymous"
+- [x] `index.astro` (flag on): `<link slot="head" rel="preload" as="fetch" crossorigin="anonymous"
 href={url(`cluster.${hash}.json`)}>`. The CI base-path grep already fails on a root-relative href.
-- [ ] CI build job, after the flag build: fail if `gzip -9 -c dist-dashboard/cluster.*.json | wc -c` >
+- [x] CI build job, after the flag build: fail if `gzip -9 -c dist-dashboard/cluster.*.json | wc -c` >
       30720, and print the size to the step summary.
-- [ ] e2e `@dashboard`: the preload `href` matches `/cluster\.[0-9a-f]{10}\.json$/` and responds 200 with
+- [x] e2e `@dashboard`: the preload `href` matches `/cluster\.[0-9a-f]{10}\.json$/` and responds 200 with
       `version: 1`; production e2e: no `cluster.*.json` link on `/`.
-- [ ] `pnpm check`; commit `feat(content): add hashed cluster snapshot for the terminal`.
+- [x] `pnpm check`; commit `feat(content): add hashed cluster snapshot for the terminal`.
 
 ### Task 4: Command registry and v1 commands (PR 4)
 
