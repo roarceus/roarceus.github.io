@@ -80,6 +80,14 @@ jobs:
           PUBLIC_ENABLED_FLAGS: clusterDashboard
         run: pnpm exec astro build --outDir dist-dashboard
 
+      - name: Check the terminal data file size (stage-3 design §5.1, under 30 KB gzipped)
+        run: |
+          file=$(ls dist-dashboard/cluster.*.json)
+          size=$(gzip -9 -c "$file" | wc -c)
+          echo "Terminal data file: $(basename "$file"), ${size} bytes gzipped (limit 30720)" | tee -a "$GITHUB_STEP_SUMMARY"
+          if [ "$size" -gt 30720 ]; then echo "::error::$file is over the 30 KB gzipped budget"; exit 1; fi
+          if ls dist/cluster.*.json >/dev/null 2>&1; then echo "::error::the production build must not ship cluster.*.json"; exit 1; fi
+
       - name: Build under a preview base path and check every reference uses it
         env:
           BASE_PATH: /pr-preview/pr-0/

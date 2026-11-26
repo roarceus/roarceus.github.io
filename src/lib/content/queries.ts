@@ -3,6 +3,7 @@ import { getCollection, render, type CollectionEntry } from 'astro:content';
 import { clusterNodes, experienceRows, preselectedRole, unscheduledPods } from './cluster';
 import { assertIntegrity } from './integrity';
 import { nodeLabels } from './nodes';
+import { buildSnapshot, snapshotHash, type ClusterSnapshot } from './snapshot';
 import { sortByDateDesc, sortByOrder, sortByRecency } from './sort';
 
 // The only module that touches astro:content (SPEC §3: components read content only through
@@ -90,6 +91,22 @@ export async function getCluster(now: Date = new Date()) {
     selected: preselectedRole(experience, nodes),
     rows: experienceRows(experience, nodes, now),
   };
+}
+
+/**
+ * The terminal's content snapshot and its hash (design doc stage-3 §5.1). `/` and the
+ * `cluster.<hash>.json` endpoint both call this, so the preloaded URL always matches the file.
+ */
+export async function getSnapshot(build: {
+  version: string;
+  commit: string;
+}): Promise<{ snapshot: ClusterSnapshot; hash: string }> {
+  const content = await load();
+  const [profile] = content.profile;
+  // Unreachable: assertIntegrity requires exactly one profile. Narrows the type.
+  if (!profile) throw new Error('No profile entry');
+  const snapshot = buildSnapshot({ ...content, profile: profile.data, build });
+  return { snapshot, hash: snapshotHash(snapshot) };
 }
 
 export async function getSkills(): Promise<CollectionEntry<'skills'>[]> {

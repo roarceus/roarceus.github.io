@@ -115,6 +115,22 @@ test.describe('cluster dashboard @dashboard', () => {
 
 // The dashboard is a playground, not a page of text: it uses wide screens up to 120rem (1920px),
 // keeps the detail panel a readable fixed column, and lines up with the top bar and footer.
+// The terminal's content snapshot (stage-3 design §5.1): content-hashed, preloaded, under the base path.
+test('preloads the hashed cluster snapshot @dashboard', async ({ page, request }) => {
+  await page.goto('./');
+  const link = page.locator('link[rel="preload"][as="fetch"]');
+  await expect(link).toHaveCount(1);
+  await expect(link).toHaveAttribute('crossorigin', 'anonymous');
+  const href = await link.evaluate((el) => (el as HTMLLinkElement).href);
+  expect(new URL(href).pathname).toMatch(/\/cluster\.[0-9a-f]{10}\.json$/);
+  const response = await request.get(href);
+  expect(response.status()).toBe(200);
+  expect(response.headers()['content-type']).toContain('application/json');
+  const snapshot = (await response.json()) as { version: number; nodes: unknown[] };
+  expect(snapshot.version).toBe(1);
+  expect(snapshot.nodes.length).toBeGreaterThan(0);
+});
+
 test.describe('cluster dashboard width @dashboard', () => {
   const box = async (page: Page, selector: string) => {
     const b = await page.locator(selector).first().boundingBox();
