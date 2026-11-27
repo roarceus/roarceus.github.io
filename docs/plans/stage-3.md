@@ -364,7 +364,7 @@ export function runHref(input: string, location: { pathname: string }): string; 
   `tests/static/no-raw-html.test.ts`, `.github/scripts/check-budgets.mjs`, `.github/budgets.json`.
 - Modify: `src/components/terminal/TerminalDock.astro` (renders `<Terminal client:idle>` with the
   snapshot href and the server-rendered table as initial output), `astro.config.mjs` (`manualChunks`:
-  `react`, `react-dom`, `scheduler` → `react-runtime`), `vitest.config.ts`, `package.json`, `ci.yml`,
+  `react`, `react-dom`, `scheduler` → `react-runtime`; Rolldown's `codeSplitting.groups` in practice, see 6c's PR), `vitest.config.ts`, `package.json`, `ci.yml`,
   `tests/e2e/dashboard.spec.ts`.
 
 **Interfaces:** Consumes Tasks 4 and 5. Produces `<ResultView result={CommandResult} />` for Task 7.
@@ -394,7 +394,7 @@ export function runHref(input: string, location: { pathname: string }): string; 
     fall back to the normal page with the footer. The panel's scroll reset on a new `describe` moves to
     Task 7, where the panel starts changing.
 - [x] Static test: no `innerHTML`, `dangerouslySetInnerHTML`, `eval(`, `new Function` in `src/`.
-- [ ] Budgets script (node, no deps): from `dist-dashboard/index.html`, collect island component and
+- [x] Budgets script (node, no deps): from `dist-dashboard/index.html`, collect island component and
       renderer URLs and their static `import` graph (skip `import(`), gzip each; report island code (excluding
       `react-runtime-*`) and the startup total; fail over `.github/budgets.json` limits (island 61440 bytes;
       startup set from this PR's measurement + 5%). Also total scripts of `dist/index.html` and
