@@ -467,9 +467,9 @@ does not exist`; the manifest form validates with `validateContact` (errors next
 
 ### Task 9: Stage 3 wrap-up (PR 9)
 
-- [ ] README: features (commands), architecture diagram (parser, registry, store, islands, snapshot),
+- [x] README: features (commands), architecture diagram (parser, registry, store, islands, snapshot),
       budgets, status; refresh `docs/assets/screenshot-dashboard.png` with terminal output.
-- [ ] STATUS: sign-off with measurements and links, retrospective; tighten the island budget to the
+- [x] STATUS: sign-off with measurements and links, retrospective; tighten the island budget to the
       measured size + 10%.
-- [ ] This plan ticked; then Sohan merges the release PR for v0.4.0 and production smoke confirms the
-      dashboard is still off.
+- [x] This plan ticked. Left for Sohan: merge the release PR for v0.4.0 (#79) and confirm production smoke
+      shows the dashboard still off.
