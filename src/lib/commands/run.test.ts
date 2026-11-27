@@ -53,9 +53,9 @@ describe('execute', () => {
       message: 'error: unknown command "gte" for "kubectl"',
       suggestion: 'kubectl get nodes',
     });
-    expect(await exec('kubectl apply -f contact.yaml')).toEqual({
+    expect(await exec('kubectl delete pod asktrace')).toEqual({
       kind: 'error',
-      message: 'error: unknown command "apply" for "kubectl"',
+      message: 'error: unknown command "delete" for "kubectl"',
     });
     expect(await exec('kubectl clear')).toMatchObject({
       message: 'error: unknown command "clear" for "kubectl"',
@@ -82,11 +82,11 @@ describe('registry', () => {
     expect(readOnly.sort()).toEqual(['cluster-info', 'describe', 'get', 'help', 'logs', 'top', 'version']);
   });
 
-  it('needs no data for help, clear, version, and config (plain view works offline)', () => {
+  it('needs no data for help, clear, version, config, and apply (contact works offline)', () => {
     const offline = [...registry.values()]
       .filter((command) => !command.needsData)
       .map((command) => command.verb);
-    expect(offline.sort()).toEqual(['clear', 'config', 'help', 'version']);
+    expect(offline.sort()).toEqual(['apply', 'clear', 'config', 'help', 'version']);
   });
 });
 

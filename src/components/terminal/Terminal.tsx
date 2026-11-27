@@ -2,6 +2,7 @@ import { useStore } from '@nanostores/react';
 import { useEffect, useId, useRef, useState } from 'react';
 
 import { startDeepLinks } from '@/components/cluster/deep-link';
+import { startPageRunLinks } from '@/components/cluster/page-run-links';
 import { button, chip } from '@/components/ui/recipes';
 import { useDesk, useHydrated } from '@/components/ui/useDesk';
 import { usePager } from '@/components/ui/usePager';
@@ -87,6 +88,8 @@ export function Terminal({ snapshotHref, build, base, initial, chips }: Props) {
 
   // ?run= deep links (design doc stage-3 §5.6). Here, after setRunContext, so runs use the page's base.
   useEffect(() => startDeepLinks(), []);
+  // The top bar's Contact button runs `apply -f contact.yaml` in place (ADR 0005).
+  useEffect(() => startPageRunLinks(), []);
 
   const toBottom = () => {
     const box = outputRef.current;

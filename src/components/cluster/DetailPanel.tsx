@@ -1,5 +1,5 @@
 import { useStore } from '@nanostores/react';
-import { useRef } from 'react';
+import { lazy, Suspense, useRef } from 'react';
 
 import { ResultView } from '@/components/terminal/ResultView';
 import { RunLink } from '@/components/terminal/RunLink';
@@ -15,11 +15,17 @@ import { $terminal } from '@/lib/state/terminal';
 
 import { CopyLink } from './CopyLink';
 
+// Its own chunk: only `kubectl apply -f contact.yaml` loads it (ADR 0005, design doc §5.5).
+const ContactManifest = lazy(() =>
+  import('./ContactManifest').then((module) => ({ default: module.ContactManifest })),
+);
+
 /**
  * The detail panel island (design doc stage-3 §5.5). The server renders `initial` (the pre-selected
  * role), so no-JS and first paint are unchanged; after hydration it follows `$selection`: a `describe`,
  * a clicked name, and later the map. On phones it is the bottom sheet's content, so it shows the latest
  * terminal result once a command runs. On the one-screen layout it never scrolls: long details page.
+ * `apply -f contact.yaml` swaps the details for the contact manifest form.
  */
 
 interface Props {
@@ -175,6 +181,7 @@ export function DetailPanel({ initial, base }: Props) {
 
   // Until hydrated, exactly the server view: a deep link may already have run in the terminal island.
   const hydrated = useHydrated();
+  const contact = hydrated && selection?.kind === 'contact';
   const live = hydrated && selection && data ? panelView(data, selection) : undefined;
   const selected = live ?? initial;
   // Phones: the sheet is where output goes, so once a command runs (not the entry shown with the
@@ -182,7 +189,7 @@ export function DetailPanel({ initial, base }: Props) {
   const last = entries.at(-1);
   const result =
     hydrated && phone && last && last.source !== 'page' && last.result.kind !== 'detail' ? last : undefined;
-  const key = result ? `run-${String(result.id)}` : selected.run;
+  const key = result ? `run-${String(result.id)}` : contact ? 'contact' : selected.run;
   const pager = usePager(boxRef, contentRef, desk, key);
 
   return (
@@ -194,10 +201,11 @@ export function DetailPanel({ initial, base }: Props) {
       // eslint-disable-next-line jsx-a11y-x/no-noninteractive-tabindex
       tabIndex={0}
       onKeyDown={pager.onKeyDown}
+      onFocus={pager.onFocus}
       className={`relative flex flex-col gap-3 rounded-lg border border-border bg-surface-1 p-4 sm:p-5 desk:min-h-0 desk:flex-1 ${focusRing}`}
     >
       <div ref={boxRef} data-testid="panel-pages" className="desk:min-h-0 desk:flex-1 desk:overflow-hidden">
-        <div ref={contentRef} className="flex flex-col gap-3">
+        <div ref={contentRef} className={`flex flex-col gap-3 ${contact ? 'desk:h-full' : ''}`}>
           {result ? (
             <>
               <p className="font-mono text-sm break-all text-text">{`$ ${result.input}`}</p>
@@ -213,6 +221,10 @@ export function DetailPanel({ initial, base }: Props) {
                 <ResultView result={result.result} base={base} />
               </div>
             </>
+          ) : contact ? (
+            <Suspense fallback={<p className="font-mono text-sm text-text-muted">Loading contact.yaml...</p>}>
+              <ContactManifest email={data?.profile.links.email} />
+            </Suspense>
           ) : (
             viewBlocks(selected, base)
           )}
@@ -220,9 +232,9 @@ export function DetailPanel({ initial, base }: Props) {
       </div>
       {/* The footer never pages away: Copy link for the view on screen, and the pager. It never wraps,
           so the pager showing up can't change the paged box's height (which would re-page it). */}
-      {(!result || (desk && pager.pages > 1)) && (
+      {((!result && !contact) || (desk && pager.pages > 1)) && (
         <div className="flex flex-nowrap items-start justify-between gap-2 border-t border-border pt-3">
-          {!result && <CopyLink run={selected.run} />}
+          {!result && !contact && <CopyLink run={selected.run} />}
           {desk && pager.pages > 1 && (
             <div className="ml-auto flex shrink-0 items-center font-mono text-sm text-text-muted">
               <button

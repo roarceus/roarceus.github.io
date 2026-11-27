@@ -64,4 +64,8 @@ describe('panelView', () => {
     expect(panelView(SNAPSHOT, { kind: 'node', name: 'nope' })).toBeUndefined();
     expect(panelView(SNAPSHOT, { kind: 'pod', name: 'nope' })).toBeUndefined();
   });
+
+  it('leaves the contact manifest to its own component', () => {
+    expect(panelView(SNAPSHOT, { kind: 'contact', name: 'sohan' })).toBeUndefined();
+  });
 });

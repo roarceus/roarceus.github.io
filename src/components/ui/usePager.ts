@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type RefObject } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type FocusEvent,
+  type KeyboardEvent,
+  type RefObject,
+} from 'react';
 
 /**
  * Where each page starts, in pixels from the top of the content. A page ends before the first block
@@ -24,6 +32,10 @@ function pageStarts(box: HTMLElement, content: HTMLElement | null, line: number)
   }
   return starts;
 }
+
+const isEditable = (target: EventTarget): boolean =>
+  target instanceof HTMLElement &&
+  (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName));
 
 /**
  * Pages a box that must never scroll (ADR 0005: nothing scrolls on the one-screen layout). The box
@@ -100,9 +112,12 @@ export function usePager(
     show(target);
   };
 
-  /** Space and Page Down for the next page, Page Up for the previous one, while the box has focus. */
+  /**
+   * Space and Page Down for the next page, Page Up for the previous one, while the box has focus. Keys
+   * typed into a field (the contact form) stay with the field.
+   */
   const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
-    if (!active || pages < 2) return;
+    if (!active || pages < 2 || isEditable(event.target)) return;
     if (event.key === ' ' || event.key === 'PageDown') {
       event.preventDefault();
       go(page + 1);
@@ -110,6 +125,17 @@ export function usePager(
       event.preventDefault();
       go(page - 1);
     }
+  };
+
+  /** Focus that lands on a field on another page (Tab, an error focusing a field) turns to that page. */
+  const onFocus = (event: FocusEvent<HTMLElement>) => {
+    const el = content.current;
+    // Only what pages: the pager buttons and the panel itself sit outside the content.
+    if (!active || pages < 2 || !el || !(event.target instanceof HTMLElement) || !el.contains(event.target))
+      return;
+    const top = event.target.getBoundingClientRect().top - el.getBoundingClientRect().top;
+    const index = starts.current.findLastIndex((start) => start <= top);
+    if (index >= 0 && index !== current.current) go(index);
   };
 
   return {
@@ -122,5 +148,6 @@ export function usePager(
       go(page - 1);
     },
     onKeyDown,
+    onFocus,
   };
 }

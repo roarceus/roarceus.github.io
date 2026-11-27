@@ -7,6 +7,7 @@ describe('plainHref', () => {
     ['kubectl describe pod asktrace', '/pr-preview/pr-9/projects/asktrace/'],
     ['kubectl describe pod/asktrace', '/pr-preview/pr-9/projects/asktrace/'],
     ['kubectl describe node mastercontrol', '/pr-preview/pr-9/plain/#experience'],
+    ['kubectl apply -f contact.yaml', '/pr-preview/pr-9/plain/#contact'],
     ['kubectl get experience', '/pr-preview/pr-9/plain/#experience'],
     ['kubectl get nodes', '/pr-preview/pr-9/plain/#experience'],
     ['kubectl get pods -n projects', '/pr-preview/pr-9/plain/#projects'],

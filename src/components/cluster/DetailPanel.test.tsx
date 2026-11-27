@@ -114,6 +114,15 @@ describe('DetailPanel', () => {
     expect(screen.getByText('describe pod/deployment-gating-bot')).toBeTruthy();
   });
 
+  it('loads the contact manifest on demand, with no copy link', async () => {
+    setup();
+    await actAsync(() => {
+      void runCommand('kubectl apply -f contact.yaml', 'chip');
+    });
+    expect(await screen.findByRole('form', { name: 'Contact manifest' })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: /copy link/i })).toBeNull();
+  });
+
   it('copies a link that reopens this view and says so', async () => {
     const writeText = vi.fn(() => Promise.resolve());
     vi.stubGlobal('navigator', { clipboard: { writeText } });
@@ -153,12 +162,34 @@ describe('DetailPanel', () => {
       size(box, 250);
       select('pod', 'asktrace');
       expect(screen.getByText('1 / 3')).toBeTruthy();
+      // Focus on the pager itself (outside the paged content) never turns the page.
+      const next = screen.getByRole('button', { name: 'Next page' });
+      next.getBoundingClientRect = () => ({ top: 300, bottom: 344 }) as DOMRect;
+      fireEvent.focus(next);
+      expect(screen.getByText('1 / 3')).toBeTruthy();
       fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
       expect(screen.getByText('2 / 3')).toBeTruthy();
       expect(box.scrollTop).toBeGreaterThan(0);
       select('node', 'northeastern');
       expect(screen.getByText('1 / 3')).toBeTruthy();
       expect(box.scrollTop).toBe(0);
+    });
+
+    it('lets Space type in a paged form, and turns to the page of a focused field', async () => {
+      setup();
+      const box = screen.getByTestId('panel-pages');
+      size(box, 250);
+      await actAsync(() => {
+        void runCommand('kubectl apply -f contact.yaml', 'chip');
+      });
+      const message = await screen.findByLabelText('message:');
+      expect(screen.getByText('1 / 3')).toBeTruthy();
+      expect(fireEvent.keyDown(message, { key: ' ' })).toBe(true);
+      expect(screen.getByText('1 / 3')).toBeTruthy();
+
+      message.getBoundingClientRect = () => ({ top: 150, bottom: 222 }) as DOMRect;
+      fireEvent.focus(message);
+      expect(screen.getByText('2 / 3')).toBeTruthy();
     });
 
     it('shows no pager when the details fit', () => {
@@ -191,6 +222,15 @@ describe('DetailPanel', () => {
         void runCommand('kubectl describe pod asktrace', 'chip');
       });
       expect(screen.getByRole('heading', { name: 'askTRACE' })).toBeTruthy();
+    });
+
+    it('shows the contact manifest in the sheet, not the terminal echo', async () => {
+      setup();
+      await actAsync(() => {
+        void runCommand('kubectl apply -f contact.yaml', 'chip');
+      });
+      expect(await screen.findByRole('form', { name: 'Contact manifest' })).toBeTruthy();
+      expect(screen.queryByText(/is open in the details panel/)).toBeNull();
     });
   });
 });

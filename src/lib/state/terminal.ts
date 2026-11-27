@@ -39,7 +39,9 @@ export function summarize({ result }: Entry): string {
     case 'table':
       return `${result.caption}: ${plural(result.rows.length, 'row')}`;
     case 'detail':
-      return `Showing ${result.target.kind} ${result.target.name}`;
+      return result.target.kind === 'contact'
+        ? 'Showing the contact form'
+        : `Showing ${result.target.kind} ${result.target.name}`;
     case 'yaml':
       return `YAML output, ${plural(result.text.trimEnd().split('\n').length, 'line')}`;
     case 'lines':

@@ -1,5 +1,6 @@
 import type { ParsedCommand } from '@/lib/parser/parse';
 
+import { CONTACT_FILE } from './apply';
 import { error, errorWithMatch } from './format';
 import { PROGRAM_ONLY, registry } from './registry';
 
@@ -51,7 +52,9 @@ function candidates(parts: string[], ctx: CommandContext): string[] {
   const command = registry.get(verb.toLowerCase());
   if (!command || PROGRAM_ONLY.has(command.verb)) return [];
 
-  const flagValues = FLAG_VALUES[parts[parts.length - 2] ?? ''];
+  const previous = parts[parts.length - 2] ?? '';
+  if (command.verb === 'apply' && (previous === '-f' || previous === '--filename')) return [CONTACT_FILE];
+  const flagValues = FLAG_VALUES[previous];
   if (flagValues) return flagValues;
   const word = rest[rest.length - 1] ?? '';
   if (word.startsWith('-')) return [];

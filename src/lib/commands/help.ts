@@ -29,6 +29,7 @@ function entries({ snapshot }: CommandContext): [string, string, string?][] {
     ['kubectl logs updates -f', 'Latest updates'],
     ['kubectl get events', 'Timeline'],
     ['kubectl get all', 'Everything at once'],
+    ['kubectl apply -f contact.yaml', 'Send me a message'],
     ['kubectl port-forward github', 'Open GitHub'],
     ['kubectl port-forward linkedin', 'Open LinkedIn'],
     ['kubectl config use-context plain', 'Plain view'],

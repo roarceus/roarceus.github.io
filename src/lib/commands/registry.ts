@@ -1,3 +1,4 @@
+import { apply } from './apply';
 import { describe } from './describe';
 import { get } from './get';
 import { help } from './help';
@@ -7,9 +8,9 @@ import { top } from './top';
 
 import type { Command } from './types';
 
-/** Every command by verb (SPEC §7). `apply` joins in Task 8. */
+/** Every command by verb (SPEC §7). */
 export const registry: ReadonlyMap<string, Command> = new Map(
-  [get, describe, top, logs, version, clusterInfo, config, portForward, help, clear].map((command) => [
+  [get, describe, top, logs, apply, version, clusterInfo, config, portForward, help, clear].map((command) => [
     command.verb,
     command,
   ]),
