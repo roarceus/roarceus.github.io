@@ -1,0 +1,1 @@
+var e=window.location.pathname;try{e=decodeURI(e)}catch{}document.querySelectorAll(`[data-missing-path]`).forEach(t=>{t.textContent=e});
