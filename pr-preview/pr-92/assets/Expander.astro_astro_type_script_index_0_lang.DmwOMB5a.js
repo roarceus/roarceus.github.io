@@ -1,0 +1,1 @@
+var e=new Set;window.addEventListener(`beforeprint`,()=>{for(let t of document.querySelectorAll(`details.expander`))t.open||(t.open=!0,e.add(t))}),window.addEventListener(`afterprint`,()=>{for(let t of e)t.open=!1;e.clear()});
