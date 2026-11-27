@@ -89,6 +89,21 @@ export default defineConfig({
       // Never inline assets as data: URIs (Vite inlines files under 4 KB by default). A small
       // font subset got inlined and the CSP's font-src 'self' blocked it.
       assetsInlineLimit: 0,
+      rolldownOptions: {
+        output: {
+          // React, react-dom and scheduler go in one shared chunk, so every island reuses it and the
+          // budget check can tell island code from the runtime (stage-3 plan, Task 6c). Rolldown
+          // replaces Rollup's manualChunks with codeSplitting groups.
+          codeSplitting: {
+            groups: [
+              {
+                name: 'react-runtime',
+                test: /[\\/]node_modules[\\/](?:\.pnpm[\\/][^\\/]+[\\/]node_modules[\\/])?(?:react|react-dom|scheduler)[\\/]/,
+              },
+            ],
+          },
+        },
+      },
     },
   },
 });

@@ -84,6 +84,9 @@ jobs:
       - name: Check the CSP of every built page (ADR 0004)
         run: node .github/scripts/check-csp.mjs dist dist-dashboard
 
+      - name: Check the JavaScript budgets (stage-3 plan, Task 6c; limits in .github/budgets.json)
+        run: node .github/scripts/check-budgets.mjs dist dist-dashboard
+
       - name: Check the terminal data file size (stage-3 design §5.1, under 30 KB gzipped)
         run: |
           file=$(ls dist-dashboard/cluster.*.json)

@@ -1,0 +1,9 @@
+{
+  "$comment": "Gzipped JavaScript budgets, checked by .github/scripts/check-budgets.mjs (stage-3 plan, Task 6c). islandBytes: the dashboard's island code without the shared react-runtime chunk. startupBytes: everything the dashboard runs at startup, set to the 6c measurement (82835) plus 5%. pages: production startup scripts, never above their v0.3.0 values.",
+  "islandBytes": 61440,
+  "startupBytes": 86977,
+  "pages": {
+    "index.html": 0,
+    "plain/index.html": 1988
+  }
+}
