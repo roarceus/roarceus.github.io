@@ -1,1 +1,0 @@
-function e(){window.location.hash===`#cluster`&&document.getElementById(`cluster-heading`)?.focus()}window.addEventListener(`hashchange`,e),e();
