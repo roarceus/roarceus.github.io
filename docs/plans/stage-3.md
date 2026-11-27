@@ -405,7 +405,7 @@ export function runHref(input: string, location: { pathname: string }): string; 
       console errors at every project size; a routed failure of `cluster.*.json` shows the error and Retry
       recovers.
 - [ ] `pnpm check`; Lighthouse passes; commit `feat(terminal): add interactive terminal island`.
-- [ ] **6d, paged boxes (ADR 0005):** on the one-screen layout (`desk`), the terminal output shows only the
+- [x] **6d, paged boxes (ADR 0005):** on the one-screen layout (`desk`), the terminal output shows only the
       latest result and pages a long one (`-- more (1/2) --`, Space or a Next button; Up/Down still walk
       history). The detail panel pages in Task 7 (it needs the island), and the map stays a focusable scroll
       box only until Stage 4 draws the scene to fit; without JavaScript both keep their scroll boxes. Below

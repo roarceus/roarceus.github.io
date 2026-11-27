@@ -69,6 +69,20 @@ describe('ResultView', () => {
     expect(screen.getByRole('cell').textContent).toBe(long);
   });
 
+  it('lets comma lists break after each comma and nowhere else', () => {
+    show({
+      kind: 'table',
+      caption: 'c',
+      columns: [{ key: 'tech', label: 'TECH' }],
+      rows: [{ tech: 'Go,Python,GKE' }],
+    });
+    const cell = screen.getByRole('cell');
+    expect(cell.textContent).toBe('Go,Python,GKE');
+    expect(cell.querySelectorAll('wbr')).toHaveLength(2);
+    const parts = [...cell.childNodes].map((node) => (node.nodeName === 'WBR' ? '|' : node.textContent));
+    expect(parts.join('')).toBe('Go,|Python,|GKE');
+  });
+
   it('renders links, toned lines, and YAML as text', () => {
     show({
       kind: 'lines',

@@ -23,7 +23,12 @@ beforeEach(() => {
   $terminal.set({ entries: [], history: [], announcement: '' });
   $selection.set(undefined);
   $snapshot.set({ status: 'ready', data: SNAPSHOT });
-  vi.stubGlobal('matchMedia', (query: string) => ({ matches: false, media: query }) as MediaQueryList);
+  vi.stubGlobal('matchMedia', (query: string) => ({
+    matches: false,
+    media: query,
+    addEventListener: () => undefined,
+    removeEventListener: () => undefined,
+  }));
 });
 
 afterEach(() => {
@@ -47,6 +52,12 @@ function setup() {
 const entries = () => $terminal.get().entries;
 const inputs = () => entries().map((entry) => entry.input);
 
+/** happy-dom does no layout: give the log a fixed size and a content height. */
+function size(log: HTMLElement, scrollHeight: number) {
+  Object.defineProperty(log, 'clientHeight', { configurable: true, value: 100 });
+  Object.defineProperty(log, 'scrollHeight', { configurable: true, value: scrollHeight });
+}
+
 async function type(input: HTMLInputElement, value: string, key = 'Enter', init: KeyboardEventInit = {}) {
   fireEvent.change(input, { target: { value } });
   await actAsync(() => {
@@ -59,7 +70,7 @@ describe('Terminal', () => {
     setup();
     const log = screen.getByRole('log', { name: 'Terminal output' });
     expect(log.getAttribute('aria-live')).toBe('off');
-    expect(screen.getByText('$ kubectl get experience')).toBeTruthy();
+    expect(screen.getAllByText('$ kubectl get experience').length).toBeGreaterThan(0);
     expect(screen.getByRole('table', { name: 'kubectl get experience' })).toBeTruthy();
   });
 
@@ -198,12 +209,6 @@ describe('Terminal', () => {
   });
 
   describe('following the output', () => {
-    /** happy-dom does no layout: give the log a fixed size and a content height. */
-    function size(log: HTMLElement, scrollHeight: number) {
-      Object.defineProperty(log, 'clientHeight', { configurable: true, value: 100 });
-      Object.defineProperty(log, 'scrollHeight', { configurable: true, value: scrollHeight });
-    }
-
     it('scrolls to the newest result when already at the bottom', async () => {
       const input = setup();
       const log = screen.getByRole('log');
@@ -247,5 +252,66 @@ describe('Terminal', () => {
     const input = setup();
     await type(input, 'kubectl port-forward github');
     expect(open).toHaveBeenCalledWith('https://github.com/roarceus', '_blank', 'noopener,noreferrer');
+  });
+
+  describe('on the one-screen desktop layout', () => {
+    beforeEach(() => {
+      // The `desk` media query (src/components/terminal/useDesk.ts) matches.
+      vi.stubGlobal('matchMedia', (query: string) => ({
+        matches: query.includes('43.75rem'),
+        media: query,
+        addEventListener: () => undefined,
+        removeEventListener: () => undefined,
+      }));
+    });
+
+    // The `desk:` classes do the hiding, so the server render and the hydrated page match; the e2e
+    // tests check what is visible.
+    it('marks every result but the latest as hidden on the one-screen layout', async () => {
+      const input = setup();
+      await type(input, 'kubectl get nodes');
+      const earlier = screen.getByRole('table', { name: 'kubectl get experience' }).closest('.flex');
+      const latest = screen.getByRole('table', { name: 'kubectl get nodes' }).closest('.flex');
+      expect(earlier?.className).toContain('desk:hidden');
+      expect(latest?.className).not.toContain('desk:hidden');
+    });
+
+    it('pages a long result instead of scrolling, and a new result starts on page 1', async () => {
+      const input = setup();
+      const log = screen.getByRole('log');
+      size(log, 250);
+      await type(input, 'help');
+      expect(screen.getByText('-- more (1/3) --')).toBeTruthy();
+      fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
+      expect(log.scrollTop).toBe(100);
+      expect(screen.getByText('-- more (2/3) --')).toBeTruthy();
+      fireEvent.keyDown(log, { key: ' ' });
+      expect(log.scrollTop).toBe(200);
+      fireEvent.keyDown(log, { key: 'PageDown' });
+      expect(screen.getByText('-- more (3/3) --')).toBeTruthy();
+      fireEvent.keyDown(log, { key: 'PageUp' });
+      fireEvent.click(screen.getByRole('button', { name: 'Previous page' }));
+      expect(log.scrollTop).toBe(0);
+      fireEvent.keyDown(log, { key: ' ' });
+      await type(input, 'kubectl version');
+      expect(log.scrollTop).toBe(0);
+      expect(screen.getByText('-- more (1/3) --')).toBeTruthy();
+    });
+
+    it('shows no pager when the result fits', async () => {
+      const input = setup();
+      size(screen.getByRole('log'), 100);
+      await type(input, 'kubectl version');
+      expect(screen.queryByText(/-- more/)).toBeNull();
+      expect(screen.queryByRole('button', { name: 'Next page' })).toBeNull();
+    });
+
+    it('lets Space type in the input, never page', async () => {
+      const input = setup();
+      size(screen.getByRole('log'), 250);
+      await type(input, 'help');
+      expect(fireEvent.keyDown(input, { key: ' ' })).toBe(true);
+      expect(screen.getByText('-- more (1/3) --')).toBeTruthy();
+    });
   });
 });

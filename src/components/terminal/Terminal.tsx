@@ -11,6 +11,8 @@ import { LiveRegion } from './LiveRegion';
 import { ResultView } from './ResultView';
 import { RunLink } from './RunLink';
 import { TerminalInput } from './TerminalInput';
+import { useDesk } from './useDesk';
+import { usePager } from './usePager';
 
 /**
  * The docked terminal island (design doc stage-3 §5.4). The server renders today's
@@ -79,6 +81,13 @@ export function Terminal({ snapshotHref, build, base, initial, chips }: Props) {
   const outputId = useId();
   const outputRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  // On the one-screen layout nothing scrolls (ADR 0005): the output shows only the latest result and
+  // pages it like `less`. Earlier commands come back with Up/Down in the input.
+  const desk = useDesk();
+  const deskRef = useRef(desk);
+  deskRef.current = desk;
+  const last = entries.at(-1);
+  const pager = usePager(outputRef, contentRef, desk, lastId);
 
   useEffect(() => {
     if ($snapshot.get().status === 'idle') void loadSnapshot(snapshotHref);
@@ -90,15 +99,15 @@ export function Terminal({ snapshotHref, build, base, initial, chips }: Props) {
   };
 
   useEffect(() => {
-    if (atBottomRef.current) toBottom();
-  }, [lastId, collapsed]);
+    if (!desk && atBottomRef.current) toBottom();
+  }, [lastId, collapsed, desk]);
 
   // Streamed lines grow the output after the entry lands: keep following while at the bottom.
   useEffect(() => {
     const content = contentRef.current;
     if (!content || typeof ResizeObserver === 'undefined') return;
     const observer = new ResizeObserver(() => {
-      if (atBottomRef.current) toBottom();
+      if (!deskRef.current && atBottomRef.current) toBottom();
     });
     observer.observe(content);
     return () => {
@@ -115,7 +124,7 @@ export function Terminal({ snapshotHref, build, base, initial, chips }: Props) {
     if (bottom) setSeenId(lastId);
   };
 
-  const showJump = !collapsed && !atBottom && lastId !== seenId;
+  const showJump = !desk && !collapsed && !atBottom && lastId !== seenId;
 
   return (
     <section
@@ -123,23 +132,51 @@ export function Terminal({ snapshotHref, build, base, initial, chips }: Props) {
       className="flex flex-col gap-3 rounded-lg border border-border bg-surface-2 p-4"
     >
       <div className="relative" hidden={collapsed}>
+        {/* On the one-screen layout the command stays in a header row with the pager, so paging never
+            shifts the layout and you always see which result you're reading. CSS (`desk:`) switches
+            the layout, so the server-rendered page and the hydrated one match. */}
+        {last && (
+          <div className="hidden min-h-11 flex-wrap items-center justify-between gap-x-3 desk:flex">
+            <p className="min-w-0 font-mono text-sm break-all text-text">{`$ ${last.input}`}</p>
+            {desk && pager.pages > 1 && (
+              <div className="flex shrink-0 items-center gap-2 font-mono text-sm text-text-muted">
+                <p>{`-- more (${String(pager.page + 1)}/${String(pager.pages)}) --`}</p>
+                <button
+                  type="button"
+                  aria-label="Previous page"
+                  onClick={pager.previous}
+                  className={button('ghost')}
+                >
+                  Previous
+                </button>
+                <button type="button" aria-label="Next page" onClick={pager.next} className={button('ghost')}>
+                  Next
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+        {/* Paging keys on the focusable log, the way the arrow keys scroll a scroll box. */}
+        {/* eslint-disable-next-line jsx-a11y-x/no-noninteractive-element-interactions */}
         <div
           id={outputId}
           ref={outputRef}
           role="log"
           aria-live="off"
           aria-label="Terminal output"
-          // A scrolling region takes keyboard focus so arrow keys can scroll it (WCAG 2.1.1).
+          // Takes keyboard focus so the arrow keys scroll it, or, on the one-screen layout, Space and
+          // Page Up/Down page it (WCAG 2.1.1).
           // eslint-disable-next-line jsx-a11y-x/no-noninteractive-tabindex
           tabIndex={0}
           hidden={collapsed}
           onScroll={onScroll}
-          className="relative flex max-h-[max(var(--terminal-h),40vh)] flex-col overflow-auto rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft desk:max-h-[clamp(6rem,25dvh,var(--terminal-h))]"
+          onKeyDown={pager.onKeyDown}
+          className="relative flex max-h-[max(var(--terminal-h),40vh)] flex-col overflow-auto rounded-md leading-5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft desk:max-h-[round(down,clamp(5rem,calc(25dvh-2.5rem),var(--terminal-h)),1.25rem)] desk:overflow-hidden"
         >
           <div ref={contentRef} className="flex flex-col gap-3">
             {entries.map((entry) => (
-              <div key={entry.id} className="flex flex-col gap-1">
-                <p className="font-mono text-sm whitespace-pre text-text">{`$ ${entry.input}`}</p>
+              <div key={entry.id} className={`flex flex-col gap-1 ${entry === last ? '' : 'desk:hidden'}`}>
+                <p className="font-mono text-sm whitespace-pre text-text desk:hidden">{`$ ${entry.input}`}</p>
                 <ResultView result={entry.result} base={base} />
               </div>
             ))}
