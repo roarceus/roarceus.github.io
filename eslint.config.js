@@ -88,6 +88,12 @@ export default defineConfig(
       // Safari/VoiceOver drops list semantics from lists styled with list-style: none, so unstyled
       // lists keep an explicit role="list".
       'astro/jsx-a11y/no-redundant-roles': ['error', { ul: ['list'], ol: ['list'] }],
+      // Labeled sections that scroll inside themselves (the map and the detail panel) take keyboard
+      // focus so the arrow keys can scroll them (WCAG 2.1.1). Astro tags can't hold a disable comment.
+      'astro/jsx-a11y/no-noninteractive-tabindex': [
+        'error',
+        { tags: ['section'], roles: ['tabpanel'], allowExpressionValues: true },
+      ],
     },
   },
 

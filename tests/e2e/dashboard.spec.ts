@@ -1,7 +1,7 @@
 import { expectNoHorizontalOverflow, expectNoSeriousA11yViolations, MIN_TARGET } from '../support/checks';
 import { expect, test } from '../support/fixtures';
 
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 
 // The cluster dashboard shell on `/` (design doc §4.6). Runs only against a build with
 // PUBLIC_ENABLED_FLAGS=clusterDashboard (CI's dashboard job); the default e2e run skips @dashboard.
@@ -122,7 +122,7 @@ test.describe('cluster dashboard @dashboard', () => {
 });
 
 // The dashboard is a playground, not a page of text: it uses wide screens up to 120rem (1920px),
-// keeps the detail panel a readable fixed column, and lines up with the top bar and footer.
+// keeps the detail panel a readable fixed column, and lines up with the top bar and status line.
 // The terminal's content snapshot (stage-3 design §5.1): content-hashed, preloaded, under the base path.
 test('preloads the hashed cluster snapshot @dashboard', async ({ page, request }) => {
   await page.goto('./');
@@ -164,11 +164,14 @@ test.describe('cluster dashboard width @dashboard', () => {
       expect(main.width).toBeGreaterThanOrEqual(inner - 20);
       expect(main.width).toBeLessThanOrEqual(1920);
 
-      for (const bar of ['header > div', 'footer > div']) {
-        const b = await box(page, bar);
-        expect(Math.abs(b.x - main.x), `${bar} left edge`).toBeLessThanOrEqual(1);
-        expect(Math.abs(b.width - main.width), `${bar} width`).toBeLessThanOrEqual(1);
-      }
+      const header = await box(page, 'header > div');
+      expect(Math.abs(header.x - main.x), 'top bar left edge').toBeLessThanOrEqual(1);
+      expect(Math.abs(header.width - main.width), 'top bar width').toBeLessThanOrEqual(1);
+      // The footer's content is the dashboard's status line on a one-screen desktop, lined up with
+      // the map.
+      const status = await box(page, '[data-status-line]');
+      const map = await box(page, '[aria-label="Cluster map"]');
+      expect(Math.abs(status.x - map.x), 'status line left edge').toBeLessThanOrEqual(1);
 
       const details = await page.getByRole('region', { name: 'Details' }).boundingBox();
       expect(details?.width ?? 0).toBeLessThanOrEqual(viewport.width >= 1280 ? 26 * 16 + 1 : 20 * 16 + 1);
@@ -293,5 +296,170 @@ test.describe('terminal @dashboard', () => {
       await input.press('Enter');
       await expect(terminal.getByRole('table', { name: 'kubectl get nodes' })).toBeVisible();
     });
+  });
+});
+
+// The one-screen desktop layout (stage-3 plan, Task 6b): from 1024x700 the dashboard fills the window
+// and each part scrolls in its own box; smaller, zoomed, or printed, the page flows as usual.
+test.describe('one-screen desktop @dashboard', () => {
+  // Sets its own viewports, so one desktop project per engine is enough.
+  test.beforeEach(() => {
+    test.skip(!test.info().project.name.endsWith('-1280'), 'runs in the 1280px project');
+  });
+
+  async function open(page: Page, viewport: { width: number; height: number }) {
+    await page.setViewportSize(viewport);
+    await page.goto('./');
+    const input = page.getByRole('textbox', { name: 'Command' });
+    await expect(input).toBeVisible();
+    return input;
+  }
+
+  const pageScrolls = (page: Page) =>
+    page.evaluate(() => document.documentElement.scrollHeight > window.innerHeight);
+
+  /** Tabs from the top of the page and collects the accessible names of the focused elements. */
+  async function tabStops(page: Page): Promise<string[]> {
+    const names: string[] = [];
+    await page.locator('body').focus();
+    for (let i = 0; i < 60; i++) {
+      await page.keyboard.press('Tab');
+      names.push(await page.evaluate(() => document.activeElement?.getAttribute('aria-label') ?? ''));
+    }
+    return names;
+  }
+
+  async function fillOutput(page: Page, input: Locator) {
+    for (const command of ['kubectl top skills', 'kubectl get pods -n projects -o wide', 'help']) {
+      await input.fill(command);
+      await input.press('Enter');
+    }
+    const log = page.getByRole('log', { name: 'Terminal output' });
+    await expect.poll(() => log.evaluate((el) => el.scrollHeight > el.clientHeight)).toBe(true);
+    return log;
+  }
+
+  for (const viewport of [
+    { width: 1024, height: 700 },
+    { width: 1280, height: 800 },
+    { width: 1920, height: 1080 },
+    { width: 2560, height: 1440 },
+  ]) {
+    test(`fits one screen at ${String(viewport.width)}x${String(viewport.height)}`, async ({ page }) => {
+      const input = await open(page, viewport);
+      expect(await pageScrolls(page)).toBe(false);
+      await expect(page.getByRole('region', { name: 'Cluster map' })).toBeInViewport({ ratio: 1 });
+      await expect(input).toBeInViewport({ ratio: 1 });
+      await expect(page.locator('[data-status-line]')).toBeInViewport({ ratio: 1 });
+      await expect(page.locator('body > footer')).toBeHidden();
+      await expectNoHorizontalOverflow(page);
+      await expectNoSeriousA11yViolations(page);
+    });
+  }
+
+  test('reaches every scroll box with Tab and scrolls it with the arrow keys', async ({ page }) => {
+    const input = await open(page, { width: 1024, height: 700 });
+    await fillOutput(page, input);
+    const stops = await tabStops(page);
+    for (const name of ['Cluster map', 'Details', 'Terminal output']) {
+      expect(stops, `${name} takes focus`).toContain(name);
+      const box = page.getByRole(name === 'Terminal output' ? 'log' : 'region', { name });
+      await box.evaluate((el) => {
+        el.scrollTop = 0;
+      });
+      await box.focus();
+      await page.keyboard.press('ArrowDown');
+      await expect.poll(() => box.evaluate((el) => el.scrollTop), `${name} scrolls`).toBeGreaterThan(0);
+    }
+    expect(await pageScrolls(page)).toBe(false);
+  });
+
+  test('keeps Up and Down in the input for history, never scrolling', async ({ page }) => {
+    const input = await open(page, { width: 1280, height: 800 });
+    const log = await fillOutput(page, input);
+    await log.evaluate((el) => {
+      el.scrollTop = 0;
+    });
+    await input.press('ArrowUp');
+    await expect(input).toHaveValue('help');
+    await input.press('ArrowDown');
+    expect(await log.evaluate((el) => el.scrollTop)).toBe(0);
+    expect(await page.evaluate(() => window.scrollY)).toBe(0);
+  });
+
+  test('follows new output at the bottom and offers a jump when scrolled up', async ({ page }) => {
+    const input = await open(page, { width: 1280, height: 800 });
+    const log = await fillOutput(page, input);
+    const atBottom = () => log.evaluate((el) => el.scrollHeight - el.scrollTop - el.clientHeight <= 8);
+    await expect.poll(atBottom).toBe(true);
+
+    await log.evaluate((el) => {
+      el.scrollTop = 0;
+    });
+    await input.fill('kubectl get nodes');
+    await input.press('Enter');
+    const jump = page.getByRole('button', { name: 'Jump to latest' });
+    await expect(jump).toBeVisible();
+    expect(await log.evaluate((el) => el.scrollTop)).toBe(0);
+    await jump.click();
+    await expect.poll(atBottom).toBe(true);
+    await expect(jump).toBeHidden();
+  });
+
+  test('collapses the terminal to give the map room, and expands for new output', async ({ page }) => {
+    await open(page, { width: 1280, height: 800 });
+    const map = page.getByRole('region', { name: 'Cluster map' });
+    const before = (await map.boundingBox())?.height ?? 0;
+    const terminal = page.getByRole('region', { name: 'Terminal' });
+    await terminal.getByRole('button', { name: 'Collapse' }).click();
+    await expect(page.getByRole('log', { name: 'Terminal output' })).toBeHidden();
+    expect((await map.boundingBox())?.height ?? 0).toBeGreaterThan(before);
+
+    await terminal.getByRole('link', { name: 'top skills' }).click();
+    await expect(page.getByRole('log', { name: 'Terminal output' })).toBeVisible();
+    await expect(terminal.getByRole('button', { name: 'Collapse' })).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  test('sizes terminal tables to their content, not the full width', async ({ page }) => {
+    await open(page, { width: 1920, height: 1080 });
+    const table = page.getByRole('table', { name: 'kubectl get experience' });
+    const log = page.getByRole('log', { name: 'Terminal output' });
+    const t = (await table.boundingBox())?.width ?? 0;
+    const l = (await log.boundingBox())?.width ?? 0;
+    expect(t).toBeLessThan(l * 0.75);
+  });
+
+  for (const [label, viewport] of [
+    ['below 700px tall', { width: 1280, height: 650 }],
+    // 1280x800 at 200% browser zoom has a 640x400 CSS viewport.
+    ['at 200% zoom', { width: 640, height: 400 }],
+  ] as const) {
+    test(`scrolls the page normally ${label}`, async ({ page }) => {
+      await page.setViewportSize(viewport);
+      await page.goto(viewport.width < 768 ? './#cluster' : './');
+      expect(await pageScrolls(page)).toBe(true);
+      await expect(page.locator('body > footer')).toBeVisible();
+      for (const name of ['Cluster map', 'Details']) {
+        const clipped = await page
+          .getByRole('region', { name })
+          .evaluate((el) => el.scrollHeight > el.clientHeight + 1);
+        expect(clipped, `${name} is not clipped`).toBe(false);
+      }
+      await expectNoHorizontalOverflow(page);
+    });
+  }
+
+  test('prints in normal flow with the footer', async ({ page }) => {
+    await open(page, { width: 1280, height: 800 });
+    await page.emulateMedia({ media: 'print' });
+    expect(await pageScrolls(page)).toBe(true);
+    await expect(page.locator('body > footer')).toBeVisible();
+    await expect(page.locator('[data-status-line]')).toBeHidden();
+    for (const name of ['Cluster map', 'Details']) {
+      const overflow = await page
+        .getByRole('region', { name })
+        .evaluate((el) => getComputedStyle(el).overflowY);
+      expect(overflow, `${name} prints in full`).toBe('visible');
+    }
   });
 });

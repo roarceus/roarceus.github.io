@@ -66,56 +66,97 @@ export function Terminal({ snapshotHref, build, base, initial, chips }: Props) {
   const entries = useActions();
   const { status } = useStore($snapshot, { keys: ['status'] });
   const hydrated = useHydrated();
-  const [collapsed, setCollapsed] = useState(false);
+  // Collapse remembers the newest entry it hid; any new output expands the terminal again, so a chip,
+  // name or command never prints out of sight.
+  const lastId = entries.at(-1)?.id;
+  const [collapsedAt, setCollapsedAt] = useState<number | undefined | null>(null);
+  const collapsed = collapsedAt !== null && collapsedAt === lastId;
+  // Follow the output only while the reader is at the bottom; scrolled up, new output waits behind
+  // "Jump to latest". `seenId` is the newest entry they were at the bottom for.
+  const [atBottom, setAtBottom] = useState(true);
+  const [seenId, setSeenId] = useState(lastId);
+  const atBottomRef = useRef(true);
   const outputId = useId();
   const outputRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if ($snapshot.get().status === 'idle') void loadSnapshot(snapshotHref);
   }, [snapshotHref]);
 
-  const lastId = entries.at(-1)?.id;
-  useEffect(() => {
+  const toBottom = () => {
     const box = outputRef.current;
     if (box) box.scrollTop = box.scrollHeight;
-  }, [lastId]);
+  };
+
+  useEffect(() => {
+    if (atBottomRef.current) toBottom();
+  }, [lastId, collapsed]);
+
+  // Streamed lines grow the output after the entry lands: keep following while at the bottom.
+  useEffect(() => {
+    const content = contentRef.current;
+    if (!content || typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(() => {
+      if (atBottomRef.current) toBottom();
+    });
+    observer.observe(content);
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  const onScroll = () => {
+    const box = outputRef.current;
+    if (!box) return;
+    const bottom = box.scrollHeight - box.scrollTop - box.clientHeight <= 8;
+    atBottomRef.current = bottom;
+    setAtBottom(bottom);
+    if (bottom) setSeenId(lastId);
+  };
+
+  const showJump = !collapsed && !atBottom && lastId !== seenId;
 
   return (
     <section
       aria-label="Terminal"
       className="flex flex-col gap-3 rounded-lg border border-border bg-surface-2 p-4"
     >
-      <div className="hidden justify-end md:flex lg:hidden">
-        <button
-          type="button"
-          aria-expanded={!collapsed}
-          aria-controls={outputId}
-          onClick={() => {
-            setCollapsed(!collapsed);
-          }}
-          className={button('ghost')}
+      <div className="relative" hidden={collapsed}>
+        <div
+          id={outputId}
+          ref={outputRef}
+          role="log"
+          aria-live="off"
+          aria-label="Terminal output"
+          // A scrolling region takes keyboard focus so arrow keys can scroll it (WCAG 2.1.1).
+          // eslint-disable-next-line jsx-a11y-x/no-noninteractive-tabindex
+          tabIndex={0}
+          hidden={collapsed}
+          onScroll={onScroll}
+          className="relative flex max-h-[max(var(--terminal-h),40vh)] flex-col overflow-auto rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft desk:max-h-[clamp(6rem,25dvh,var(--terminal-h))]"
         >
-          {collapsed ? 'Expand' : 'Collapse'}
-        </button>
-      </div>
-      <div
-        id={outputId}
-        ref={outputRef}
-        role="log"
-        aria-live="off"
-        aria-label="Terminal output"
-        // A scrolling region takes keyboard focus so arrow keys can scroll it (WCAG 2.1.1).
-        // eslint-disable-next-line jsx-a11y-x/no-noninteractive-tabindex
-        tabIndex={0}
-        hidden={collapsed}
-        className="flex max-h-[max(var(--terminal-h),40vh)] flex-col gap-3 overflow-auto rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
-      >
-        {entries.map((entry) => (
-          <div key={entry.id} className="flex flex-col gap-1">
-            <p className="font-mono text-sm whitespace-pre text-text">{`$ ${entry.input}`}</p>
-            <ResultView result={entry.result} base={base} />
+          <div ref={contentRef} className="flex flex-col gap-3">
+            {entries.map((entry) => (
+              <div key={entry.id} className="flex flex-col gap-1">
+                <p className="font-mono text-sm whitespace-pre text-text">{`$ ${entry.input}`}</p>
+                <ResultView result={entry.result} base={base} />
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
+        {showJump && (
+          <button
+            type="button"
+            onClick={() => {
+              toBottom();
+              outputRef.current?.focus();
+            }}
+            className={`${button('secondary')} absolute right-2 bottom-2`}
+          >
+            Jump to latest
+          </button>
+        )}
       </div>
       {status === 'error' && (
         <div className="flex flex-wrap items-center gap-3 font-mono text-sm">
@@ -132,20 +173,33 @@ export function Terminal({ snapshotHref, build, base, initial, chips }: Props) {
         </div>
       )}
       <div className="min-h-11">{hydrated && <TerminalInput build={build} base={base} />}</div>
-      <nav aria-label="Commands">
-        <ul
-          role="list"
-          className="flex [scrollbar-width:none] gap-2 overflow-x-auto md:flex-wrap md:overflow-visible"
+      <div className="flex items-start gap-3">
+        <nav aria-label="Commands" className="min-w-0 flex-1">
+          <ul
+            role="list"
+            className="flex [scrollbar-width:none] gap-2 overflow-x-auto md:flex-wrap md:overflow-visible"
+          >
+            {chips.map((run) => (
+              <li key={run} className="shrink-0">
+                <RunLink run={run} base={base} source="chip" className={chip()}>
+                  {run.replace(/^kubectl /, '')}
+                </RunLink>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <button
+          type="button"
+          aria-expanded={!collapsed}
+          aria-controls={outputId}
+          onClick={() => {
+            setCollapsedAt(collapsed ? null : lastId);
+          }}
+          className={`${button('ghost')} shrink-0 max-md:hidden`}
         >
-          {chips.map((run) => (
-            <li key={run} className="shrink-0">
-              <RunLink run={run} base={base} source="chip" className={chip()}>
-                {run.replace(/^kubectl /, '')}
-              </RunLink>
-            </li>
-          ))}
-        </ul>
-      </nav>
+          {collapsed ? 'Expand' : 'Collapse'}
+        </button>
+      </div>
       <LiveRegion />
     </section>
   );

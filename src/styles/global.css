@@ -67,7 +67,40 @@
   z-index: var(--z-skip);
 }
 
+/*
+ * The one-screen desktop dashboard (stage-3 plan, Task 6b): a screen at least 1024px wide and 700px
+ * tall. Zoom shrinks the CSS viewport, so 200% zoom on 1280x800 falls back to the scrolling page.
+ * Screen only: printing keeps the normal flow and the footer.
+ */
+@custom-variant desk (@media screen and (min-width: 64rem) and (min-height: 43.75rem));
+
 @layer base {
+  /* A page that fills the window (BaseLayout `fill`): the top bar, then main takes the rest, and the
+     parts inside scroll in their own boxes. dvh follows mobile browser bars; vh is the fallback. */
+  @variant desk {
+    body[data-shell='fill'] {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    @supports (height: 100dvh) {
+      body[data-shell='fill'] {
+        height: 100dvh;
+      }
+    }
+
+    body[data-shell='fill'] > main {
+      flex: 1 1 0;
+      min-height: 0;
+    }
+
+    /* Its content moves into the dashboard's status line. */
+    body[data-shell='fill'] > footer {
+      display: none;
+    }
+  }
+
   html {
     background-color: var(--bg);
     color: var(--text);

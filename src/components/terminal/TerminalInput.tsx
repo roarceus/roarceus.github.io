@@ -115,7 +115,8 @@ export function TerminalInput({ build, base }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-1">
+    // The hint takes no space while empty, so hydrating the input fits the box the server reserved.
+    <div className="flex flex-col">
       <div className="flex items-center gap-2 font-mono text-sm">
         <label htmlFor={id} className="sr-only">
           Command
@@ -142,7 +143,7 @@ export function TerminalInput({ build, base }: Props) {
           placeholder="kubectl get pods -n projects"
         />
       </div>
-      <p id={`${id}-hint`} className="font-mono text-xs text-text-muted" aria-live="polite">
+      <p id={`${id}-hint`} className="mt-1 font-mono text-xs text-text-muted empty:mt-0" aria-live="polite">
         {options.length > 0 ? options.join(' ') : ''}
       </p>
     </div>

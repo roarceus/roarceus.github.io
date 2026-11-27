@@ -4,6 +4,8 @@
 // - 768px and up: hero line, cluster stage, detail panel, and docked terminal (side by side from
 //   1024px, stacked below). The page grows to --shell-wide so the map gets the screen; the detail
 //   panel stays a fixed, readable column (20rem, 26rem from 1280px).
+// - From 1024x700 (the `desk` variant): one screen, no page scroll. Map and panel on top, the terminal
+//   docked below, each scrolling in its own box; the footer becomes a status line at the bottom.
 // - Phones: the plain layout first, with a "Launch cluster" link to #cluster. CSS :target opens
 //   cluster mode (stage, bottom sheet, chip bar) without JavaScript; Back or the browser's back
 //   button leaves it.
@@ -13,10 +15,12 @@ import BottomSheet from '@/components/layout/BottomSheet.astro';
 import HomeHero from '@/components/plain/HomeHero.astro';
 import TerminalDock from '@/components/terminal/TerminalDock.astro';
 import Button from '@/components/ui/Button.astro';
+import ExternalLink from '@/components/ui/ExternalLink.astro';
 import { focusRing, target } from '@/components/ui/recipes';
 import StatusPill from '@/components/ui/StatusPill.astro';
 import { buildInfo } from '@/config/build-info';
 import { isEnabled } from '@/config/features';
+import { site } from '@/config/site';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getCluster, getExperience, getProfile, getSnapshot } from '@/lib/content/queries';
 import { url } from '@/lib/utils/url';
@@ -34,14 +38,17 @@ const snapshotHref = terminal && url(`cluster.${terminal.hash}.json`);
 const roles = dashboard ? (await getExperience()).filter(({ data }) => onMap.has(data.node)) : [];
 ---
 
-<BaseLayout person view="cluster" wide={dashboard}>
+<BaseLayout person view="cluster" wide={dashboard} fill={dashboard}>
   {snapshotHref && <link slot="head" rel="preload" as="fetch" crossorigin="anonymous" href={snapshotHref} />}
   {cluster === undefined ? (
     <main id="main">
       <HomeHero />
     </main>
   ) : (
-    <main id="main" class="dashboard mx-auto max-w-(--shell-wide) px-4 py-6 sm:px-8 sm:py-8">
+    <main
+      id="main"
+      class="dashboard mx-auto w-full max-w-(--shell-wide) px-4 py-6 sm:px-8 sm:py-8 desk:flex desk:flex-col desk:py-4"
+    >
       <div data-mobile-home class="flex flex-col gap-6 md:hidden">
         <div class="flex flex-col gap-3">
           <h1 class="text-[length:var(--text-display-fluid)] leading-tight font-semibold tracking-tight text-text">
@@ -79,7 +86,7 @@ const roles = dashboard ? (await getExperience()).filter(({ data }) => onMap.has
 
       <div
         id="cluster"
-        class="cluster-view flex flex-col gap-4 max-md:hidden max-md:target:flex lg:grid lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-6 xl:grid-cols-[minmax(0,1fr)_26rem]"
+        class="cluster-view flex flex-col gap-4 max-md:hidden max-md:target:flex lg:grid lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-6 xl:grid-cols-[minmax(0,1fr)_26rem] desk:min-h-0 desk:flex-1 desk:grid-rows-[auto_minmax(0,1fr)_auto_auto] desk:gap-4"
       >
         <div class="flex items-center justify-between gap-3 md:hidden">
           <p class="font-mono text-sm text-text-muted">sohan-cluster</p>
@@ -94,7 +101,7 @@ const roles = dashboard ? (await getExperience()).filter(({ data }) => onMap.has
             Back
           </a>
         </div>
-        <div class="flex flex-col gap-1 lg:col-span-2">
+        <div class="flex flex-col gap-1 lg:col-span-2 desk:flex-row desk:flex-wrap desk:items-baseline desk:gap-x-4">
           <!-- Only one h1 is ever displayed: this one, or the phone layout's when cluster mode is closed. -->
           <h1 class="text-[length:var(--text-h2-fluid)] leading-tight font-semibold text-text">
             {profile.name}
@@ -112,7 +119,7 @@ const roles = dashboard ? (await getExperience()).filter(({ data }) => onMap.has
           selected={cluster.selected?.data.node}
         />
         {cluster.selected && (
-          <BottomSheet>
+          <BottomSheet class="desk:flex desk:min-h-0 desk:flex-col">
             <DetailPanel entry={cluster.selected} />
           </BottomSheet>
         )}
@@ -121,6 +128,15 @@ const roles = dashboard ? (await getExperience()).filter(({ data }) => onMap.has
             <TerminalDock snapshot={terminal.snapshot} snapshotHref={snapshotHref} />
           </div>
         )}
+        <p
+          data-status-line
+          class="hidden flex-wrap items-center gap-x-4 font-mono text-sm text-text-muted lg:col-span-2 desk:flex"
+        >
+          <span>
+            v{buildInfo.version} ({buildInfo.shortCommit})
+          </span>
+          <ExternalLink href={site.repo}>Source on GitHub</ExternalLink>
+        </p>
       </div>
     </main>
   )}

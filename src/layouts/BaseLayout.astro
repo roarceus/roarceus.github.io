@@ -18,6 +18,8 @@ interface Props {
   view?: 'cluster' | 'plain' | 'page';
   /** Lets the top bar and footer grow with a full-width page (the cluster dashboard). */
   wide?: boolean;
+  /** On large screens the page fills the window instead of scrolling (the `desk` variant). */
+  fill?: boolean;
 }
 
 const {
@@ -28,6 +30,7 @@ const {
   noindex = false,
   view = 'page',
   wide = false,
+  fill = false,
 } = Astro.props;
 ---
 
@@ -43,7 +46,7 @@ const {
     <slot name="head" />
     <link rel="alternate" type="application/rss+xml" title={`${site.name}: updates`} href={url('rss.xml')} />
   </head>
-  <body>
+  <body data-shell={fill ? 'fill' : undefined}>
     <a href="#main" class="skip-link">
       Skip to content
     </a>
