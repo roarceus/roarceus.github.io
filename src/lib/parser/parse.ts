@@ -86,7 +86,9 @@ export function parse(input: string): ParseResult {
   }
 
   const positional: string[] = [];
-  const flags: Record<string, string | true> = {};
+  // Flag names come from the input (and from ?run= links): a null prototype keeps any name, even
+  // `__proto__` or `constructor`, a plain key.
+  const flags = Object.create(null) as Record<string, string | true>;
   for (let i = 0; i < rest.length; i++) {
     const token = rest[i] ?? '';
     if (!isFlag(token)) {
@@ -96,7 +98,7 @@ export function parse(input: string): ParseResult {
     const body = token.replace(/^--?/, '');
     const eq = body.indexOf('=');
     const rawName = eq === -1 ? body : body.slice(0, eq);
-    const name = ALIASES[rawName] ?? rawName;
+    const name = Object.hasOwn(ALIASES, rawName) ? (ALIASES[rawName] ?? rawName) : rawName;
     if (eq !== -1) {
       flags[name] = body.slice(eq + 1);
       continue;
