@@ -8,7 +8,7 @@ export const site = {
   repo: 'https://github.com/roarceus/roarceus.github.io',
   /**
    * Contact form (Web3Forms). The access key is public by design: it only lets a page send
-   * messages to Sohan's inbox. Rotating it: docs/runbooks/rotating-public-keys.md.
+   * messages to my inbox. Rotating it: docs/runbooks/rotating-public-keys.md.
    */
   contact: {
     endpoint: 'https://api.web3forms.com/submit',

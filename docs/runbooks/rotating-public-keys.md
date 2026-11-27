@@ -17,7 +17,7 @@ The App ID doesn't change. If the App itself is replaced, update `vars.RELEASE_A
 ## Public site keys
 
 The Web3Forms access key (contact form, `site.contact.accessKey` in `src/config/site.ts`) is **public**
-by design: it only lets a page send messages to Sohan's inbox. GoatCounter (analytics) joins it in
+by design: it only lets a page send messages to my inbox. GoatCounter (analytics) joins it in
 Stage 6. Keys live in `src/config/`, never in components. Rotating one:
 
 1. Create the new key in the provider's dashboard.

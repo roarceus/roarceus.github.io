@@ -7,20 +7,20 @@
 ## Context
 
 SPEC §5 asked for a clean "real tool" look (Lens, Grafana, k9s): dark, one accent, no glow, no heavy
-gradients. After Stage 1, Sohan asked for more flair: something that feels game-like and explorable, up to a
+gradients. After Stage 1, I asked for more flair: something that feels game-like and explorable, up to a
 3D cluster, so the site stands out from the usual terminal portfolio.
 
-Both goals are real. The site exists to get Sohan hired, so a recruiter must understand who Sohan is in about
+Both goals are real. The site exists to get me hired, so a recruiter must understand who I am in about
 10 seconds without touching anything, and an infrastructure engineer must find the kubectl details accurate.
 An engineer who wants to keep exploring should also enjoy it. The feeling to aim for after 30 seconds:
 "this person genuinely knows Kubernetes and builds polished, production-grade things, and exploring it was
 fun." Credibility first, delight second.
 
-References Sohan gave: Lens and k9s (credibility, real tool UI), Mini Metro (clean, flat, readable game
+References I gave: Lens and k9s (credibility, real tool UI), Mini Metro (clean, flat, readable game
 visuals), Bruno Simon's portfolio (the "I can explore this" moment), Linear's website (polish, typography,
 restraint).
 
-Sohan is job hunting, so v1.0 has to ship soon. A 3D scene is a lot of work and a real risk to the mobile
+I'm job hunting, so v1.0 has to ship soon. A 3D scene is a lot of work and a real risk to the mobile
 performance budget (Lighthouse mobile ≥ 90, SPEC §10).
 
 ## Decision
@@ -75,11 +75,11 @@ performance budget (Lighthouse mobile ≥ 90, SPEC §10).
 ## Alternatives considered
 
 - **Keep SPEC §5 everywhere (all tool, no flair).** Safe and credible, but it looks like many other
-  terminal portfolios and drops what Sohan asked for.
+  terminal portfolios and drops what I asked for.
 - **Flair everywhere (themed chrome, glow, animated backgrounds).** It would be memorable, but it hurts
   credibility and readability for recruiters, makes AA contrast harder, and costs performance on every page.
 - **Build the 3D scene for v1.0 instead of the 2D map.** It would be the biggest "wow", but it delays v1.0
-  while Sohan is job hunting. It also risks the mobile budget and still needs a 2D fallback, so the 2D map
+  while I'm job hunting. It also risks the mobile budget and still needs a 2D fallback, so the 2D map
   gets built either way.
 
 ## Consequences

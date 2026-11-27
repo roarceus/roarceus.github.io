@@ -194,7 +194,7 @@ describe('unscheduledPods', () => {
 describe('preselectedRole', () => {
   const nodes = clusterNodes(EXPERIENCE, EDUCATION, PROJECTS);
 
-  it('picks the newest work role on the map (Sohan picked this over the newest role by date)', () => {
+  it('picks the newest work role on the map (I picked this over the newest role by date)', () => {
     expect(preselectedRole(EXPERIENCE, nodes)?.id).toBe('mastercontrol');
   });
 

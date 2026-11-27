@@ -420,4 +420,4 @@ import.meta.env.PUBLIC_ENABLED_FLAGS)`. `isEnabled` stays the same.
       (`PUBLIC_ENABLED_FLAGS`), the status line.
 - [x] STATUS: sign-off with screenshots and links, plus a retrospective. Close the remaining stage
       questions.
-- [x] This plan ticked; then Sohan merges the release PR for v0.3.0.
+- [x] This plan ticked; then I merge the release PR for v0.3.0.

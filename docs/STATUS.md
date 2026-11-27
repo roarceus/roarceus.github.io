@@ -4,7 +4,8 @@ _Last updated: 2026-11-27_
 
 ## Current stage
 
-**Stage 3 (terminal engine): done**, pending the v0.4.0 release PR (#79). v0.3.0 is live. Next: Stage 4, the
+**Stage 3 (terminal engine): done. v0.4.0 is live** (release #79, 2026-11-27; production shows the hero with
+the dashboard off, as intended). Next: Stage 4, the
 3D cluster on one fixed screen where nothing scrolls ([ADR 0005](adr/0005-3d-cluster-one-screen.md); concept:
 [`concepts/cluster-3d-concept.html`](concepts/cluster-3d-concept.html)). The dashboard stays behind
 `clusterDashboard` until then. Stage 3 design: [`plans/stage-3-design.md`](plans/stage-3-design.md); plan:
@@ -39,16 +40,16 @@ _Last updated: 2026-11-27_
 
 ## Next steps
 
-1. Sohan: merge the release PR for v0.4.0 (#79), then confirm production smoke shows the dashboard still off.
-2. Stage 4 planning: the 3D scene with a 2D fallback (ADR 0005); start with `docs/plans/stage-4.md`.
-3. Carried over: submit the sitemap in Google Search Console; check the share card in a link inspector
+1. Stage 4 planning, once I give the go: the 3D scene with a 2D fallback (ADR 0005); start with
+   `docs/plans/stage-4.md`.
+2. Carried over: submit the sitemap in Google Search Console; check the share card in a link inspector
    (runbook: `docs/runbooks/share-image.md`); set up the uptime monitor (M10); decide on Renovate's
    queued TypeScript 7 PR.
 
 ## Open questions
 
 - Older project dates and eras are still open in `docs/content-review.md`.
-- Global `~/.npmrc` uses `registry=http://`; switching it to `https://` is Sohan's call (repo is pinned).
+- Global `~/.npmrc` uses `registry=http://`; switching it to `https://` is my call (the repo is pinned).
 
 ## Known issues
 

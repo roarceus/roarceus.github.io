@@ -13,7 +13,7 @@ import { validateContact, type ContactField, type ContactMessage } from '@/lib/c
  */
 
 interface Props {
-  /** Shown when sending fails, so the visitor can still reach Sohan. Missing until data loads. */
+  /** Shown when sending fails, so the visitor can still reach me. Missing until data loads. */
   email: string | undefined;
 }
 

@@ -471,5 +471,5 @@ does not exist`; the manifest form validates with `validateContact` (errors next
       budgets, status; refresh `docs/assets/screenshot-dashboard.png` with terminal output.
 - [x] STATUS: sign-off with measurements and links, retrospective; tighten the island budget to the
       measured size + 10%.
-- [x] This plan ticked. Left for Sohan: merge the release PR for v0.4.0 (#79) and confirm production smoke
+- [x] This plan ticked. Left for me: merge the release PR for v0.4.0 (#79) and confirm production smoke
       shows the dashboard still off.

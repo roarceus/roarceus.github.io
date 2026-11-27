@@ -1,7 +1,7 @@
 # Contributing
 
 This is a personal portfolio, so outside contributions are rare, but the same process applies to every
-change, including Sohan's and Claude Code's. The working rules live in [`CLAUDE.md`](CLAUDE.md) and the
+change, including ours (mine and Claude Code's). The working rules live in [`CLAUDE.md`](CLAUDE.md) and the
 spec in [`docs/SPEC.md`](docs/SPEC.md).
 
 ## Before you start

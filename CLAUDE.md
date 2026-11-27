@@ -1,15 +1,15 @@
 # CLAUDE.md — working rules for this repo
 
-Project: Sohan Patil's Kubernetes-themed portfolio at https://roarceus.github.io/
+Project: my (Sohan Patil's) Kubernetes-themed portfolio, which we build together, at https://roarceus.github.io/
 Full spec: `docs/SPEC.md` (source of truth). Read it before starting any stage.
 
 ## How we work
 - Work one stage at a time (SPEC section 11). Stop at the end of each stage, summarize what changed,
-  list anything Sohan must do manually, and wait for approval before starting the next stage.
+  list anything I must do manually, and wait for approval before starting the next stage.
 - Before writing code for a stage, post a short plan (files, components, tests) and wait for a "go".
 - One PR per stage (or several smaller PRs within a stage if it gets large).
 - Run `pnpm check` (lint, typecheck, unit tests, build) before every push. Don't push red.
-- Ask instead of guessing when a requirement is unclear. Never invent facts about Sohan: use `TODO(sohan)`.
+- Ask instead of guessing when a requirement is unclear. Never invent facts about me: use `TODO(sohan)`.
 
 ## Git workflow (strict)
 `main` is protected and head branches are auto-deleted after merge.
@@ -57,7 +57,7 @@ Format:
 - Keep PRs focused and reviewable (aim for under ~500 changed lines excluding lockfiles and generated files).
   Split large stages into several PRs.
 - Open PRs as **draft** while work is in progress; mark ready only when CI is green and the preview works.
-- After opening, post the preview URL and a short summary in chat, then wait for Sohan to review and merge.
+- After opening, post the preview URL and a short summary in chat, then wait for me to review and merge.
   Never merge PRs yourself unless explicitly asked.
 
 ## Context management (avoid context rot)

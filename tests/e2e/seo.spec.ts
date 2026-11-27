@@ -60,7 +60,7 @@ test.describe('page metadata', () => {
   });
 
   for (const path of ['', 'plain/']) {
-    test(`describes Sohan as a Person in JSON-LD on /${path}`, async ({ page }) => {
+    test(`describes me as a Person in JSON-LD on /${path}`, async ({ page }) => {
       await page.goto(`./${path}`);
       const raw = await page.locator('script[type="application/ld+json"]').textContent();
       const data = JSON.parse(raw ?? '{}') as Record<string, unknown>;

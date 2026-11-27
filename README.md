@@ -3,7 +3,7 @@
 [![CI](https://github.com/roarceus/roarceus.github.io/actions/workflows/ci.yml/badge.svg)](https://github.com/roarceus/roarceus.github.io/actions/workflows/ci.yml)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/roarceus/roarceus.github.io/badge)](https://scorecard.dev/viewer/?uri=github.com/roarceus/roarceus.github.io)
 
-Personal portfolio of **Sohan Patil**, software engineer (DevOps, cloud, full stack), built as an
+My portfolio (I'm **Sohan Patil**, a software engineer in DevOps, cloud, and full stack), built as an
 interactive Kubernetes cluster: explore with `kubectl`-style commands or a clickable cluster map, or
 switch to a plain, recruiter-friendly view.
 
@@ -17,7 +17,7 @@ Coming next, already in PR previews behind a flag: the cluster dashboard on `/`.
 
 ## Status
 
-**Stage 3 (terminal engine) is done; v0.4.0 ships with its release PR. v0.3.0 is live.** Stage 3 made the
+**v0.4.0 is live: Stage 3 (terminal engine) is done.** Stage 3 made the
 dashboard's terminal real: `kubectl`-style commands with real-looking output, Tab completion, history, and
 clickable names and chips that run in place. On desktops at least 1024 by 700 pixels the dashboard fits one
 screen and nothing scrolls: long output and long details page like `less`
