@@ -1,6 +1,6 @@
 # roarceus.github.io — Project Spec
 
-Personal portfolio for **Sohan Patil**, software engineer (DevOps / cloud / full stack).
+My portfolio (I'm **Sohan Patil**, software engineer: DevOps / cloud / full stack).
 Theme: an interactive Kubernetes cluster. Visitors explore my career with `kubectl`-style
 commands or by clicking a live 3D cluster ([ADR 0005](adr/0005-3d-cluster-one-screen.md)). A plain, recruiter-friendly view is always one click away.
 
@@ -138,7 +138,7 @@ Production-grade layout. New top-level folders or changes to this structure need
 | `/plain/` | Full plain portfolio: one scrollable, print-friendly page with all sections |
 | `/projects/<slug>/` | Static project detail page (shareable, SEO) |
 | `/updates/` | Updates list; `/updates/<slug>/` per entry; `/rss.xml` feed |
-| `/resume.pdf` | Resume download (file supplied by Sohan in `public/`) |
+| `/resume.pdf` | Resume download (a file I supply in `public/`) |
 | `/404` | Themed: `Error from server (NotFound): page "<path>" not found` + links home |
 
 **Always-visible simple controls** (top bar on every page): name, `Plain view` / `Cluster view` toggle,
@@ -238,7 +238,7 @@ With `prefers-reduced-motion`, skip the boot animation and use fades or no anima
 
 **Trademarks:** the Kubernetes name and logo belong to the Linux Foundation / CNCF. Use "Kubernetes" and
 `kubectl` descriptively, but never use the official Kubernetes logo (the helm wheel) or a close copy as the
-site's logo, favicon, or branding. Design an original mark (e.g. a hexagon/node motif with Sohan's initials).
+site's logo, favicon, or branding. Design an original mark (e.g. a hexagon/node motif with my initials).
 Same for cloud provider logos: only in a skills/tech context, never as branding.
 
 **Accuracy matters:** terminal output must look like real `kubectl` output (column alignment,
@@ -260,14 +260,14 @@ Collections (adjust fields as needed, but keep this shape):
 - **skills**: category, items with optional proficiency level (used by `kubectl top skills`).
 - **certifications**: name, issuer, status (`issued` | `in-progress`), date, credential URL.
 - **achievements**: title, date, description, link.
-- **updates** (Markdown files): title, date, tags, summary, body. Sohan will keep posting these.
+- **updates** (Markdown files): title, date, tags, summary, body. I will keep posting these.
 
 ### Content sourcing (Stage 1)
 1. Read the old portfolio repo `roarceus/portfolio` on GitHub and extract its content.
 2. Map it into the collections above.
 3. Apply the **current facts** below, which override anything outdated in the old site.
 4. Write `docs/content-review.md` listing every item that is outdated, missing, vague, or needs a number,
-   so Sohan can fill gaps. Use clearly marked `TODO(sohan)` placeholders, never invented facts.
+   so I can fill gaps. Use clearly marked `TODO(sohan)` placeholders, never invented facts.
 
 ### Current facts (source of truth)
 - ~3 years of software engineering experience across the stack. Main languages TypeScript and Python, some Java; React.
@@ -276,7 +276,7 @@ Collections (adjust fields as needed, but keep this shape):
 - **MasterControl**: DevOps Engineer co-op. Projects there include an AI agent framework for Gradle rollouts (LangGraph + Claude Code) and a GitOps deployment bot (GitHub App / Probot).
 - **Teaching assistant** for a cloud computing course at Northeastern for one semester (after the co-op).
 - Currently: based in the San Francisco Bay Area (moved August 2026; shown as "San Francisco Bay Area", not a city), job searching, and studying for the **CKA** and **CKAD** (both in progress).
-- Notable projects to include (details from the old repo, project READMEs, and Sohan): **askTRACE** (Kafka / GKE / RAG, GCP Terraform, Jenkins CI), **AWS infrastructure automation with Terraform** (webapp + serverless, CI/CD), a **GitOps deployment-gating bot** and an **AI agent framework for large-scale code migrations** (both internal to MasterControl: never use their internal names publicly), **SafeHaven** (MERN refugee portal).
+- Notable projects to include (details from the old repo, project READMEs, and me): **askTRACE** (Kafka / GKE / RAG, GCP Terraform, Jenkins CI), **AWS infrastructure automation with Terraform** (webapp + serverless, CI/CD), a **GitOps deployment-gating bot** and an **AI agent framework for large-scale code migrations** (both internal to MasterControl: never use their internal names publicly), **SafeHaven** (MERN refugee portal).
 - Exact dates, metrics, links, and contact details not listed here: `TODO(sohan)`.
 
 ---
@@ -496,7 +496,7 @@ Pin every third-party action to a full commit SHA (with the version in a comment
 - **Renovate** (`renovate.json`): grouped minor/patch updates, weekly schedule, automerge for dev-dependency patches only if CI passes, pin action digests.
 - Dependabot security alerts on. No secrets in the repo. Public keys (Web3Forms, GoatCounter site code) live in a config file.
 
-### Manual setup Sohan does in GitHub (list these in the README; Claude Code cannot do them all)
+### Manual setup I do in GitHub (list these in the README; Claude Code cannot do them all)
 - Create the public repo `roarceus.github.io`.
 - Settings → Pages → Source: **Deploy from a branch**, branch `gh-pages`, folder `/`.
 - Settings → Actions → General → Workflow permissions: read and write; allow GitHub Actions to create and approve pull requests (needed by release-please).
@@ -565,7 +565,7 @@ The project follows a full company-style lifecycle. Every phase below has an own
 - **Scheduled workflow** (`scheduled.yml`, weekly): production smoke tests, link check on the live site
   (external links rot), and Lighthouse against production. On failure, it opens (or updates) a single issue
   labeled `ops` instead of failing silently.
-- **Uptime:** a free external monitor (e.g. UptimeRobot) pinging the homepage, alerting Sohan by email.
+- **Uptime:** a free external monitor (e.g. UptimeRobot) pinging the homepage, alerting me by email.
 - **Analytics review:** GoatCounter tracks page views and command usage; use it to see which sections and
   commands people actually use, and feed that back into the backlog.
 
@@ -600,8 +600,8 @@ The project follows a full company-style lifecycle. Every phase below has an own
 
 ## 11. Stages
 
-Each stage: its own branch and PR, CI green, preview reviewed by Sohan, merged, then a release.
-**Stop after each stage** and wait for Sohan's go-ahead before starting the next.
+Each stage: its own branch and PR, CI green, preview reviewed by me, merged, then a release.
+**Stop after each stage** and wait for my go-ahead before starting the next.
 
 ### Stage 0 — Foundation → v0.1.0
 Scaffold Astro + React + TS + Tailwind; all tooling (section 10), including commitlint, the PR title check,
@@ -651,7 +651,7 @@ Running), chaos mode, a visible `kubectl scale`, badges, easter eggs (section 8)
 
 ### Stage 7 — Hardening → v1.0.0
 Full accessibility audit, performance pass, cross-browser check (Chrome, Firefox, Safari, mobile Safari),
-content final review with Sohan, docs pass, release `1.0.0`.
+final content review together, docs pass, release `1.0.0`.
 
 ### Post-1.0 stages ([ADR 0002](adr/0002-design-direction-tool-and-game.md))
 Each ships behind a feature flag, off in production until approved.

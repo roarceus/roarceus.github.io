@@ -17,7 +17,7 @@ test.describe('plain view', () => {
     await page.goto('./plain/');
   });
 
-  test('introduces Sohan with title, location, and links', async ({ page }) => {
+  test('introduces me with title, location, and links', async ({ page }) => {
     await expect(page).toHaveTitle(/Sohan Patil/);
     const main = page.getByRole('main');
     await expect(main.getByRole('heading', { level: 1, name: 'Sohan Patil' })).toBeVisible();

@@ -1,6 +1,6 @@
 # Stage 3 design: the terminal engine
 
-_Status: approved by Sohan with changes (2026-11-25). Builds on SPEC §4 ("One playground"), §7, §11 Stage 3,
+_Status: approved with changes (2026-11-25). Builds on SPEC §4 ("One playground"), §7, §11 Stage 3,
 and [ADR 0002](../adr/0002-design-direction-tool-and-game.md)._
 
 ## 1. Intent
@@ -24,7 +24,7 @@ a `?run=` link opens the right view, and the plain view and production `/` are e
   input, URLs, or content reaching the DOM unescaped; output that doesn't look like kubectl; a blank or
   broken terminal when something fails.
 
-## 3. Constraints (decided with Sohan)
+## 3. Constraints (decided together)
 
 - **Flag:** stays `clusterDashboard`. On in PR previews, off in production until Stage 4 flips it. With
   the flag off, `/` renders exactly as today and `?run=` is ignored; production smoke tests check both.

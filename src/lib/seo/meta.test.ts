@@ -15,7 +15,7 @@ describe('isPreviewBase', () => {
 });
 
 describe('personJsonLd', () => {
-  it('describes Sohan as a schema.org Person with profile links', () => {
+  it('describes me as a schema.org Person with profile links', () => {
     expect(
       personJsonLd({
         name: 'Sohan Patil',

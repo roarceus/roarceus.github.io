@@ -12,7 +12,7 @@ describe('version', () => {
 });
 
 describe('cluster-info', () => {
-  it('introduces Sohan with real links', async () => {
+  it('introduces me with real links', async () => {
     const { lines } = as(await exec('kubectl cluster-info', { base: '/pr-preview/pr-9/' }), 'lines');
     expect(lines).toEqual([
       { text: 'Sohan Patil (Software Engineer) is running at Boston, MA', tone: 'ok' },

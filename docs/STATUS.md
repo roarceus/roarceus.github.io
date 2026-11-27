@@ -40,7 +40,7 @@ the dashboard off, as intended). Next: Stage 4, the
 
 ## Next steps
 
-1. Stage 4 planning, once Sohan gives the go: the 3D scene with a 2D fallback (ADR 0005); start with
+1. Stage 4 planning, once I give the go: the 3D scene with a 2D fallback (ADR 0005); start with
    `docs/plans/stage-4.md`.
 2. Carried over: submit the sitemap in Google Search Console; check the share card in a link inspector
    (runbook: `docs/runbooks/share-image.md`); set up the uptime monitor (M10); decide on Renovate's
@@ -49,7 +49,7 @@ the dashboard off, as intended). Next: Stage 4, the
 ## Open questions
 
 - Older project dates and eras are still open in `docs/content-review.md`.
-- Global `~/.npmrc` uses `registry=http://`; switching it to `https://` is Sohan's call (repo is pinned).
+- Global `~/.npmrc` uses `registry=http://`; switching it to `https://` is my call (the repo is pinned).
 
 ## Known issues
 

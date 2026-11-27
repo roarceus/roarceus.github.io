@@ -2,7 +2,7 @@
 
 Everything in `src/content/` that was a guess, outdated, conflicting, vague, or missing a number. Content
 came from the old site (`roarceus/portfolio`, `public/data/sections/*.json`), SPEC §6 "Current facts", and
-Sohan's answers (2026-11-25). Nothing is invented: unknowns stay `TODO(sohan)` or are listed here.
+my answers (2026-11-25). Nothing is invented: unknowns stay `TODO(sohan)` or are listed here.
 
 **How to answer:** reply in chat or edit this file. Answers land in a `fix(content)` PR and get ticked here.
 
@@ -63,7 +63,7 @@ Sohan's answers (2026-11-25). Nothing is invented: unknowns stay `TODO(sohan)` o
 - [x] AWS project: CSYE 6225, solo, three repos; the org link resolves (`tf-aws-infra`, `webapp`,
       `serverless`).
 - [x] Grade Calculator Jan to Apr 2025; HuskyHub Jan to Apr 2024.
-- [x] Skill levels (1 to 5) set for the 21 skills Sohan rated; the rest show no bar.
+- [x] Skill levels (1 to 5) set for the 21 skills I rated; the rest show no bar.
 - [x] Title kept, written without the middle dot. Tagline shortened to cover backend too: "I build backend
       services, CI/CD pipelines, and Kubernetes tooling." Location shown as "San Francisco Bay Area".
 

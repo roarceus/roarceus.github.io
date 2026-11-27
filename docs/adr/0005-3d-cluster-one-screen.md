@@ -12,7 +12,7 @@ game" and put the 3D cluster after v1.0 (Stage 8), with a 2D SVG map first (Stag
 Task 6b of Stage 3 then made the desktop dashboard fit one screen (from 1024 by 700 pixels), with the map,
 the detail panel, and the terminal output each scrolling inside its own box.
 
-On 2026-11-26 Sohan reviewed a clickable 3D concept
+On 2026-11-26 we reviewed a clickable 3D concept
 ([`docs/concepts/cluster-3d-concept.html`](../concepts/cluster-3d-concept.html)) and asked for:
 
 - the 3D cluster as the main desktop experience, not a post-1.0 extra ("we want to woo everyone");
@@ -123,7 +123,7 @@ back out. Inside, the pod's objects are clickable, and each shows real content:
 ## Alternatives considered
 
 - **Keep 2D for v1.0 and 3D in v1.1 (ADR 0002's plan).** v1.0 ships sooner, but the first impression is the
-  2D map, and Sohan wants the 3D experience to be the first impression.
+  2D map, and I want the 3D experience to be the first impression.
 - **Keep the scroll boxes from Task 6b.** Simpler, but a fixed screen whose parts scroll doesn't feel like one
   playground, and paging keeps every view a complete, readable unit.
 - **No fallback below 1024 by 700.** Would keep the fixed screen everywhere, but fails WCAG Reflow and cuts

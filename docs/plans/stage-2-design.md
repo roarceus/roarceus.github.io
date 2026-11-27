@@ -1,11 +1,11 @@
 # Stage 2 design: design system and layout shell
 
-- **Status:** approved by Sohan, 2026-11-25
+- **Status:** approved, 2026-11-25
 - **Date:** 2026-11-25
 - **Direction:** [ADR 0002](../adr/0002-design-direction-tool-and-game.md), "the UI is the tool, the cluster
   is the game"
 - **Spec:** SPEC §4 (IA, responsive), §5 (design system), §11 Stage 2
-- **References:** Sohan's four mockups (desktop dashboard, mobile views, contact and chaos, 3D concept). We
+- **References:** my four mockups (desktop dashboard, mobile views, contact and chaos, 3D concept). We
   use them for layout and interaction, not as pixel targets.
 
 ## 1. Intent
@@ -16,7 +16,7 @@ in Stage 6, and 3D in Stage 8.
 
 What this stage must achieve:
 
-- A recruiter gets who Sohan is in 10 seconds, without interacting.
+- A recruiter gets who I am in 10 seconds, without interacting.
 - Every page feels like one polished tool (Linear-level typography and restraint).
 - The plain view gets noticeably shorter without losing content, crawlability, or print.
 - The layout already has a slot that can host the 2D map now and a 3D canvas later.
@@ -46,7 +46,7 @@ What this stage must achieve:
 
 **Anti-goals (a failure even if it "works")**
 
-- Production `/` showing placeholder or unfinished UI while Sohan is job hunting.
+- Production `/` showing placeholder or unfinished UI while I'm job hunting.
 - Glow, gradients, or decorative motion in the chrome.
 - Content hidden in a way that search engines, screen readers, or printing lose.
 - Any regression in Lighthouse mobile (≥ 90 performance, ≥ 95 elsewhere), CLS, or sideways scroll from
@@ -54,7 +54,7 @@ What this stage must achieve:
 
 ## 3. Approaches
 
-**Shortening the plain view.** Sohan chose option 1.
+**Shortening the plain view.** We chose option 1.
 
 1. **Jump chips and expanders (chosen).**
    - A sticky row of section chips on phones and tablets; the sidebar stays on desktop.
@@ -66,7 +66,7 @@ What this stage must achieve:
    means more clicks, and printing the page no longer gives a full résumé.
 3. **Tabs per section.** Dropped: tabs hide whole sections and scan and print badly.
 
-**Keeping placeholders off production** (my call; Sohan can overrule): the dashboard sits behind
+**Keeping placeholders off production** (our call; easy to change): the dashboard sits behind
 `clusterDashboard`, which is on in dev, CI, and PR previews and off in production. Production `/` keeps the
 current hero, restyled with the new system. The alternative was shipping the shell with placeholders in
 v0.3.0, which looks unfinished to recruiters.
@@ -213,7 +213,7 @@ location and open-to-work pill, tagline, actions (View portfolio, Resume, Contac
     formatting.
   - The chips link to the matching plain-view sections until Stage 3 turns them into commands.
   - There is no input yet: a disabled input would be a dead control.
-- **Hero line:** the name and title stay above the stage, so a recruiter sees who Sohan is without
+- **Hero line:** the name and title stay above the stage, so a recruiter sees who I am without
   interacting.
 
 **Mobile, below 768px (flag on):**
@@ -301,7 +301,7 @@ defined now and used from Stage 4.
 
 ### 4.12 Cluster data rules (from the builder check)
 
-- **Nodes:** the map shows `capgemini`, `northeastern`, and `mastercontrol`, newest first (Sohan,
+- **Nodes:** the map shows `capgemini`, `northeastern`, and `mastercontrol`, newest first (my pick,
   2026-11-25).
   - `mumbai` (Bachelor's) and `sparks-foundation` (2020 internship) are older eras. Their content entries
     get an optional `cluster: false` field (schema default `true`) and stay off the map and out of
@@ -323,7 +323,7 @@ defined now and used from Stage 4.
   The helper lives in `lib/` with unit tests, and Stage 3 reuses it.
 
 - **Pre-selected role:** the most recent role with `type: work` on a cluster node (MasterControl today),
-  chosen by Sohan over the newest role by date.
+  chosen by me over the newest role by date.
 - **Mobile experience cards:** the roles on cluster nodes, newest first (three today), with no fixed count.
   The full list lives on the plain view.
 - **The flag-off production `/` on phones** keeps the restyled hero. The card layout and Launch cluster
@@ -369,4 +369,4 @@ defined now and used from Stage 4.
 - Exact tint values for the soft and scene tokens, as long as the contrast test passes.
 - Spacing details inside components, on the 4px grid.
 - How the chips scroll horizontally on small screens (snap or not).
-- The mark's exact geometry. Sohan reviews it on the preview.
+- The mark's exact geometry. I review it on the preview.

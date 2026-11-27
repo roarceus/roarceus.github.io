@@ -42,4 +42,4 @@ body:
     id: source
     attributes:
       label: Source
-      description: Where the facts come from (resume, LinkedIn, project README, Sohan).
+      description: Where the facts come from (resume, LinkedIn, project README, me).

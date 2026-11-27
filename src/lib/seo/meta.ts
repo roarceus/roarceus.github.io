@@ -13,7 +13,7 @@ interface PersonInput {
   sameAs: string[];
 }
 
-/** schema.org Person for the pages that introduce Sohan (home and the plain view). */
+/** schema.org Person for the pages that introduce me (home and the plain view). */
 export function personJsonLd(person: PersonInput): Record<string, unknown> {
   return {
     '@context': 'https://schema.org',

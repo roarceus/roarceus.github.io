@@ -3,7 +3,7 @@
 [![CI](https://github.com/roarceus/roarceus.github.io/actions/workflows/ci.yml/badge.svg)](https://github.com/roarceus/roarceus.github.io/actions/workflows/ci.yml)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/roarceus/roarceus.github.io/badge)](https://scorecard.dev/viewer/?uri=github.com/roarceus/roarceus.github.io)
 
-Personal portfolio of **Sohan Patil**, software engineer (DevOps, cloud, full stack), built as an
+My portfolio (I'm **Sohan Patil**, a software engineer in DevOps, cloud, and full stack), built as an
 interactive Kubernetes cluster: explore with `kubectl`-style commands or a clickable cluster map, or
 switch to a plain, recruiter-friendly view.
 

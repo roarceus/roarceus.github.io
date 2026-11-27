@@ -17,7 +17,7 @@ Web3Forms (contact), Vitest, Playwright + axe, Lighthouse CI.
 
 **Spec:** `docs/SPEC.md` §2, §3 (structure), §4, §6, §10 Tests, §10b Secure, §11 Stage 1. Rules: `CLAUDE.md`.
 
-**Status:** Approved 2026-11-24 with Sohan's answers (see "Answers"). Issues #32–#40 on milestone Stage 1.
+**Status:** Approved 2026-11-24 with my answers (see "Answers"). Issues #32–#40 on milestone Stage 1.
 
 ## Global Constraints
 
@@ -26,7 +26,7 @@ Web3Forms (contact), Vitest, Playwright + axe, Lighthouse CI.
 - Components never hardcode portfolio content; they read it only via `@/lib/content/*`.
 - `lib/` stays free of React and the DOM. `lib/content` may import `astro:content` (the only allowed
   Astro import in `lib/`), so pure logic (sorting, date formatting, validation) lives in separate pure modules.
-- Facts come only from the old site, SPEC §6 "Current facts", or Sohan. Anything else is `TODO(sohan)`.
+- Facts come only from the old site, SPEC §6 "Current facts", or me. Anything else is `TODO(sohan)`.
   The current-facts list wins over the old site.
 - Dark only, tokens only. Stage 1 styling is deliberately plain (tokens, system font stacks, simple layout);
   Stage 2 owns fonts, components, and the visual direction (see "Design note").
@@ -73,7 +73,7 @@ Web3Forms (contact), Vitest, Playwright + axe, Lighthouse CI.
 ## Design note
 
 Stage 1 is content and structure, not the look. The plain view gets a clean, readable single column with
-the §5 tokens and system font stacks, so Stage 2 can apply the chosen visual direction (Sohan wants real
+the §5 tokens and system font stacks, so Stage 2 can apply the chosen visual direction (I want real
 flair: 3D, gamey, fun) without rewriting markup. Section components take content props and expose semantic
 HTML only, which keeps a later reskin cheap. The plain view stays recruiter-first in every direction.
 
@@ -136,10 +136,10 @@ SPEC §6 (CKAD) and §7 (nodes).
 
 - [x] Mapped the old site's `public/data/sections/*.json` with current facts winning; scope per A1, A2, A4,
       A5; the portfolio itself is a featured, unscheduled project.
-- [x] The two MasterControl tools: details from Sohan; public names only ("Deployment gating bot",
+- [x] The two MasterControl tools: details from me; public names only ("Deployment gating bot",
       "AI migration agent framework"), never the internal names.
 - [x] Found on the old site and kept: a 2020 **Web Development Intern** role at The Sparks Foundation, which
-      becomes a fifth node (`sparks-foundation`) running Credit Management System. Flagged for Sohan.
+      becomes a fifth node (`sparks-foundation`) running Credit Management System. Flagged for me.
 - [x] `docs/content-review.md`: must-answer items (dates, degree names, locations, Sparks, bots,
       SafeHaven), numbers wanted, and the conflicts current facts resolved.
 - [x] Content guide writing rules and the adding-content runbook filled in. Closes #30 (A8).
@@ -228,7 +228,7 @@ Modify `astro.config.mjs` (sitemap), `public/robots.txt` → `src/pages/robots.t
 
 ---
 
-## Manual steps for Sohan (each done before the PR that needs it)
+## Manual steps I do (each done before the PR that needs it)
 
 | #   | When        | Step                                                                                                                                          | Status                                           |
 | --- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
