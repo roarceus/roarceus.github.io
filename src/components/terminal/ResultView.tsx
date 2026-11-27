@@ -32,7 +32,11 @@ function LineView({ line, base }: { line: Line; base: string }) {
     ) : (
       line.text
     );
-  return <p className={`whitespace-pre ${line.tone ? TONE[line.tone] : 'text-text'}`}>{content}</p>;
+  return (
+    <p className={`whitespace-pre desk:whitespace-pre-wrap ${line.tone ? TONE[line.tone] : 'text-text'}`}>
+      {content}
+    </p>
+  );
 }
 
 const prefersReducedMotion = () =>
@@ -71,7 +75,7 @@ export function ResultView({ result, base }: { result: CommandResult; base: stri
     case 'table':
       return <ResultTable result={result} base={base} />;
     case 'yaml':
-      return <pre className="font-mono text-sm text-text">{result.text}</pre>;
+      return <pre className="font-mono text-sm text-text desk:whitespace-pre-wrap">{result.text}</pre>;
     case 'lines':
       return <Lines lines={result.lines} stream={result.stream} base={base} />;
     case 'detail':

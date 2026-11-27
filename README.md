@@ -24,8 +24,8 @@ dashboard stays behind the `clusterDashboard` flag, on in PR previews and off in
 terminal (Stage 3) and the 3D cluster (Stage 4, [ADR 0005](docs/adr/0005-3d-cluster-one-screen.md)) make it real. Direction: [ADR 0002](docs/adr/0002-design-direction-tool-and-game.md),
 the UI is the tool, the cluster is the game. In progress: Stage 3, the terminal engine. On previews the
 terminal already runs commands in place: type them, or click chips and names. On desktops at least
-1024 by 700 pixels the dashboard fits one screen, with the map, the details, and the terminal each
-scrolling in its own box
+1024 by 700 pixels the dashboard fits one screen: the terminal shows the latest result and pages a long
+one like `less` instead of scrolling ([ADR 0005](docs/adr/0005-3d-cluster-one-screen.md))
 ([design](docs/plans/stage-3-design.md), [plan](docs/plans/stage-3.md)). Progress:
 [`docs/STATUS.md`](docs/STATUS.md) · [project board](https://github.com/users/roarceus/projects/1) ·
 [changelog](CHANGELOG.md) (from v0.1.0).

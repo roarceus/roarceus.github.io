@@ -62,7 +62,7 @@ test.describe('cluster dashboard @dashboard', () => {
   test('prints kubectl get experience in the terminal with clickable chips', async ({ page }) => {
     test.skip(isMobile(page), 'phones show only the chips');
     const terminal = page.getByRole('region', { name: 'Terminal' });
-    await expect(terminal.getByText('$ kubectl get experience')).toBeVisible();
+    await expect(terminal.getByText('$ kubectl get experience').filter({ visible: true })).toBeVisible();
     const headers = await terminal.getByRole('columnheader').allTextContents();
     expect(headers.map((h) => h.trim().toUpperCase())).toEqual(['NAME', 'ROLE', 'NODE', 'STATUS', 'AGE']);
     const chips = terminal.getByRole('link', { name: /^(get|top|logs|help)/ });
@@ -233,20 +233,21 @@ test.describe('terminal @dashboard', () => {
 
     await input.fill('help');
     await input.press('Enter');
-    await expect(terminal.getByText('$ help')).toBeVisible();
+    await expect(terminal.getByText('$ help').filter({ visible: true })).toBeVisible();
     await expect(terminal.getByRole('link', { name: 'kubectl get nodes' }).first()).toBeVisible();
   });
 
   test('runs chips and table names in place without navigating', async ({ page }) => {
     const { terminal } = await open(page);
     const urls = navigations(page);
+    // A table name first: on the one-screen layout only the latest result stays on screen.
+    await terminal.getByRole('table', { name: 'kubectl get experience' }).getByRole('link').first().click();
+    await expect(terminal.getByText(/^\$ kubectl describe node /).filter({ visible: true })).toBeVisible();
     await terminal.getByRole('link', { name: 'top skills' }).click();
-    await expect(terminal.getByText('$ kubectl top skills')).toBeVisible();
+    await expect(terminal.getByText('$ kubectl top skills').filter({ visible: true })).toBeVisible();
     for (const chip of await terminal.getByRole('navigation', { name: 'Commands' }).getByRole('link').all()) {
       await chip.click();
     }
-    await terminal.getByRole('table', { name: 'kubectl get experience' }).getByRole('link').first().click();
-    await expect(terminal.getByText(/^\$ kubectl describe node /)).toBeVisible();
     expect(urls).toEqual([]);
     expect(new URL(page.url()).pathname).toMatch(/\/$/);
   });
@@ -364,9 +365,11 @@ test.describe('one-screen desktop @dashboard', () => {
     const input = await open(page, { width: 1024, height: 700 });
     await fillOutput(page, input);
     const stops = await tabStops(page);
-    for (const name of ['Cluster map', 'Details', 'Terminal output']) {
+    // The terminal output pages instead (next test); the map and panel scroll until Stage 4 and Task 7.
+    expect(stops, 'Terminal output takes focus').toContain('Terminal output');
+    for (const name of ['Cluster map', 'Details']) {
       expect(stops, `${name} takes focus`).toContain(name);
-      const box = page.getByRole(name === 'Terminal output' ? 'log' : 'region', { name });
+      const box = page.getByRole('region', { name });
       await box.evaluate((el) => {
         el.scrollTop = 0;
       });
@@ -390,8 +393,55 @@ test.describe('one-screen desktop @dashboard', () => {
     expect(await page.evaluate(() => window.scrollY)).toBe(0);
   });
 
+  for (const viewport of [
+    { width: 1024, height: 700 },
+    { width: 1280, height: 800 },
+  ]) {
+    test(`pages long output instead of scrolling at ${String(viewport.width)}x${String(viewport.height)}`, async ({
+      page,
+    }) => {
+      const input = await open(page, viewport);
+      await input.fill('kubectl get experience -o yaml');
+      await input.press('Enter');
+      const log = page.getByRole('log', { name: 'Terminal output' });
+      // Only the latest result, in a box that clips instead of scrolling (ADR 0005).
+      const terminal = page.getByRole('region', { name: 'Terminal' });
+      await expect(terminal.getByText(/^\$ /).filter({ visible: true })).toHaveCount(1);
+      expect(await log.evaluate((el) => getComputedStyle(el).overflowY)).toBe('hidden');
+      const more = page.getByText(/^-- more \(1\/\d+\) --$/);
+      await expect(more).toBeVisible();
+      const pages = Number((/\/(\d+)\)/.exec(await more.innerText()) ?? [])[1]);
+      expect(pages).toBeGreaterThan(1);
+
+      await log.hover();
+      await page.mouse.wheel(0, 400);
+      expect(await log.evaluate((el) => el.scrollTop), 'the wheel never scrolls it').toBe(0);
+
+      await log.focus();
+      for (let i = 1; i < pages; i++) await page.keyboard.press('Space');
+      await expect(page.getByText(`-- more (${String(pages)}/${String(pages)}) --`)).toBeVisible();
+      await page.getByRole('button', { name: 'Previous page' }).click();
+      await expect(page.getByText(`-- more (${String(pages - 1)}/${String(pages)}) --`)).toBeVisible();
+      expect(await pageScrolls(page)).toBe(false);
+    });
+  }
+
+  test('never cuts a line off: long lines and wide tables wrap', async ({ page }) => {
+    const input = await open(page, { width: 1024, height: 700 });
+    const log = page.getByRole('log', { name: 'Terminal output' });
+    for (const command of ['kubectl get experience -o yaml', 'kubectl get pods -n projects -o wide']) {
+      await input.fill(command);
+      await input.press('Enter');
+      await expect(
+        page.getByRole('region', { name: 'Terminal' }).getByText(`$ ${command}`).filter({ visible: true }),
+      ).toBeVisible();
+      expect(await log.evaluate((el) => el.scrollWidth - el.clientWidth), command).toBeLessThanOrEqual(0);
+    }
+  });
+
+  // Below the one-screen layout the output is a scroll box that follows new results.
   test('follows new output at the bottom and offers a jump when scrolled up', async ({ page }) => {
-    const input = await open(page, { width: 1280, height: 800 });
+    const input = await open(page, { width: 1280, height: 650 });
     const log = await fillOutput(page, input);
     const atBottom = () => log.evaluate((el) => el.scrollHeight - el.scrollTop - el.clientHeight <= 8);
     await expect.poll(atBottom).toBe(true);
