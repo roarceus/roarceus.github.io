@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.4.0](https://github.com/roarceus/roarceus.github.io/compare/v0.3.0...v0.4.0) (2026-11-27)
+
+
+### Features
+
+* **cluster:** add the detail panel island ([#92](https://github.com/roarceus/roarceus.github.io/issues/92)) ([8b59c4b](https://github.com/roarceus/roarceus.github.io/commit/8b59c4bc4fd840ed4f126cdd9fd95c05b24b2ea7)), closes [#74](https://github.com/roarceus/roarceus.github.io/issues/74)
+* **cluster:** open views from ?run= links ([#93](https://github.com/roarceus/roarceus.github.io/issues/93)) ([62c6f83](https://github.com/roarceus/roarceus.github.io/commit/62c6f83e69c9b9a4d43db7c614ddb6237726f1ab))
+* **commands:** add command registry and v1 commands ([#84](https://github.com/roarceus/roarceus.github.io/issues/84)) ([8055f2d](https://github.com/roarceus/roarceus.github.io/commit/8055f2d2110ae1faebd5bf06d4b4c523e799df85)), closes [#71](https://github.com/roarceus/roarceus.github.io/issues/71)
+* **commands:** add contact manifest command ([#94](https://github.com/roarceus/roarceus.github.io/issues/94)) ([92d3673](https://github.com/roarceus/roarceus.github.io/commit/92d3673f86162123297080b14c3dde1c07066432))
+* **content:** add capgemini projects and list project names ([#83](https://github.com/roarceus/roarceus.github.io/issues/83)) ([21b4027](https://github.com/roarceus/roarceus.github.io/commit/21b4027179ac55af745c55f3bddae25f76f2d8d8))
+* **content:** add hashed cluster snapshot for the terminal ([#80](https://github.com/roarceus/roarceus.github.io/issues/80)) ([1025a86](https://github.com/roarceus/roarceus.github.io/commit/1025a86df04abd5cb49aa0ffd62cf4a638a51b2e)), closes [#70](https://github.com/roarceus/roarceus.github.io/issues/70)
+* **terminal:** add command parser and suggestions ([#78](https://github.com/roarceus/roarceus.github.io/issues/78)) ([88e3531](https://github.com/roarceus/roarceus.github.io/commit/88e3531768bf9158cac35bf2d2509f5d07914d9e)), closes [#69](https://github.com/roarceus/roarceus.github.io/issues/69)
+* **terminal:** add interactive terminal island ([#87](https://github.com/roarceus/roarceus.github.io/issues/87)) ([816a83b](https://github.com/roarceus/roarceus.github.io/commit/816a83bc1be7fea5eaadc0cba642d2fbfdb86f71))
+* **terminal:** add shared store, run path, and deep links ([#85](https://github.com/roarceus/roarceus.github.io/issues/85)) ([cbe6b0d](https://github.com/roarceus/roarceus.github.io/commit/cbe6b0d381a44866116310efb1c55d41e65b9e34)), closes [#72](https://github.com/roarceus/roarceus.github.io/issues/72)
+* **terminal:** fit the desktop dashboard on one screen ([#88](https://github.com/roarceus/roarceus.github.io/issues/88)) ([ece55a4](https://github.com/roarceus/roarceus.github.io/commit/ece55a4371e82f09f5da0504ff5d6c8bd227bd19))
+* **terminal:** page long output instead of scrolling ([#91](https://github.com/roarceus/roarceus.github.io/issues/91)) ([4faf886](https://github.com/roarceus/roarceus.github.io/commit/4faf8861d580d3a65cf9ccc05f301536c8925a1e)), closes [#73](https://github.com/roarceus/roarceus.github.io/issues/73)
+
+
+### Bug Fixes
+
+* **ui:** show open to work on the dashboard and thicken link hover ([#82](https://github.com/roarceus/roarceus.github.io/issues/82)) ([b7a19e3](https://github.com/roarceus/roarceus.github.io/commit/b7a19e3f8e17d7357347d98d78ce8adeeb74fe81))
+
 ## [0.3.0](https://github.com/roarceus/roarceus.github.io/compare/v0.2.0...v0.3.0) (2026-11-26)
 
 
