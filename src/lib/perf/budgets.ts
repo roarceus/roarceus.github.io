@@ -29,8 +29,9 @@ export function startupScripts(html: string): { entries: string[]; inline: strin
       /<link\b[^>]*\brel="modulepreload"[^>]*\bhref="([^"]+)"[^>]*>|<script\b[^>]*\bsrc="([^"]+)"[^>]*>/gi,
     ),
   ].map((m) => String(m[1] ?? m[2]));
-  // Any case, and closing tags with whitespace (`</script >`), so no script goes uncounted.
-  const inline = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)]
+  // Any case, and end tags the way browsers read them (`</script >`, `</script\n foo>`), so no script
+  // goes uncounted.
+  const inline = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\b[^>]*>/gi)]
     .filter((m) => !/\bsrc=|application\/ld\+json/i.test(String(m[1])))
     .map((m) => String(m[2]));
   return { entries: unique([...tags, ...islandEntries(html)]), inline };

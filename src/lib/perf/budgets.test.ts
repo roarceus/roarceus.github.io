@@ -23,12 +23,13 @@ describe('startupScripts', () => {
     expect(inline).toEqual(['console.log("inline")']);
   });
 
-  it('matches tags in any case and closing tags with spaces', () => {
+  it('matches tags in any case and end tags the way browsers read them', () => {
     const html = `<SCRIPT TYPE="module" SRC="/assets/a.js"></SCRIPT ><Script>run()</Script >
-<LINK REL="modulepreload" HREF="/assets/b.js"><ASTRO-ISLAND COMPONENT-URL="/assets/c.js"></ASTRO-ISLAND>`;
+<LINK REL="modulepreload" HREF="/assets/b.js"><ASTRO-ISLAND COMPONENT-URL="/assets/c.js"></ASTRO-ISLAND>
+<script>two()</script\t\n bar>`;
     expect(startupScripts(html)).toEqual({
       entries: ['/assets/a.js', '/assets/b.js', '/assets/c.js'],
-      inline: ['run()'],
+      inline: ['run()', 'two()'],
     });
   });
 
