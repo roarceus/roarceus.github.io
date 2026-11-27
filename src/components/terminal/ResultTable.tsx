@@ -10,7 +10,7 @@ type Table = Extract<CommandResult, { kind: 'table' }>;
  */
 export function ResultTable({ result, base }: { result: Table; base: string }) {
   return (
-    <table className="w-auto border-collapse font-mono text-sm tabular-nums">
+    <table className="w-auto border-collapse self-start font-mono text-sm tabular-nums">
       <caption className="sr-only">{result.caption}</caption>
       <thead className="text-text-muted">
         <tr>

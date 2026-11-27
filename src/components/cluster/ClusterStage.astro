@@ -21,10 +21,15 @@ const phase = (pod: Pod) => pod.phase.toLowerCase() as 'running' | 'pending' | '
 const podLink = `link ${focusRing} inline-flex min-h-11 items-center break-all font-mono text-sm`;
 ---
 
+<!-- On one-screen desktops the map scrolls inside itself, so it takes focus for the arrow keys. -->
 <section
   aria-label="Cluster map"
   data-renderer="static"
-  class="flex min-h-[24rem] flex-col rounded-lg border border-border bg-(--scene-bg) lg:min-h-[28rem]"
+  tabindex="0"
+  class:list={[
+    'relative flex min-h-[24rem] flex-col rounded-lg border border-border bg-(--scene-bg) lg:min-h-[28rem] desk:min-h-0 desk:overflow-auto',
+    focusRing,
+  ]}
 >
   <header class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-border px-4 py-3 font-mono text-sm text-text-muted">
     <h2 id="cluster-heading" tabindex="-1" class:list={['font-mono text-sm font-normal', focusRing]}>

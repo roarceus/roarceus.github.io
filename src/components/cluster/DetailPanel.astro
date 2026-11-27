@@ -1,6 +1,7 @@
 ---
 // The detail panel (design doc §4.6): `kubectl describe` for the selected node, opening on the
 // pre-selected role (SPEC §9). Built from content; Stage 4 swaps the selection as the map is used.
+import { focusRing } from '@/components/ui/recipes';
 import TagList from '@/components/ui/TagList.astro';
 import { formatRange } from '@/lib/utils/dates';
 import { url } from '@/lib/utils/url';
@@ -14,9 +15,14 @@ interface Props {
 const { data } = Astro.props.entry;
 ---
 
+<!-- On one-screen desktops the panel scrolls inside itself, so it takes focus for the arrow keys. -->
 <section
   aria-label="Details"
-  class="flex flex-col gap-3 rounded-lg border border-border bg-surface-1 p-4 sm:p-5"
+  tabindex="0"
+  class:list={[
+    'relative flex flex-col gap-3 rounded-lg border border-border bg-surface-1 p-4 sm:p-5 desk:min-h-0 desk:flex-1 desk:overflow-auto',
+    focusRing,
+  ]}
 >
   <h2 class="font-mono text-sm font-normal text-text-muted">describe node/{data.node}</h2>
   <h3 class="text-xl font-semibold text-text">

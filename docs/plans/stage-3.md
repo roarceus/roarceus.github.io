@@ -373,7 +373,7 @@ export function runHref(input: string, location: { pathname: string }): string; 
       `LiveRegion` changes only when `announcement` changes; the error state shows a `Retry` button that calls
       `loadSnapshot` again; Collapse toggles `aria-expanded` at 768 to 1023px; a `stream` result reveals lines one by one,
       and all at once under `prefers-reduced-motion`.
-- [ ] **One-screen desktop layout (approved 2026-11-26):** from 1024px wide and 700px tall, the dashboard
+- [x] **One-screen desktop layout (approved 2026-11-26):** from 1024px wide and 700px tall, the dashboard
       fills the window under the top bar with no page scroll: map and detail panel on top, the terminal docked
       at the bottom with a Collapse button (all desktop widths), and each part scrolling inside its own box.
       The footer's content (version, source link) becomes a slim status line inside the dashboard there.
@@ -385,6 +385,11 @@ export function runHref(input: string, location: { pathname: string }): string; 
   - e2e: at 1280×800 and 1920×1080 the page doesn't scroll, the map and the terminal input are both in the
     viewport, each scroll box takes focus with Tab and scrolls with the arrow keys; at 1280×650 the page
     scrolls normally and nothing is clipped.
+  - Edge cases (approved 2026-11-26): `dvh` height with a `vh` fallback; a command run while collapsed
+    expands the terminal; new output follows only a reader at the bottom, otherwise `Jump to latest`;
+    Up/Down in the input stay history; 1024x700 and 2560x1440 fit too; 200% zoom (640x400) and print
+    fall back to the normal page with the footer. The panel's scroll reset on a new `describe` moves to
+    Task 7, where the panel starts changing.
 - [x] Static test: no `innerHTML`, `dangerouslySetInnerHTML`, `eval(`, `new Function` in `src/`.
 - [ ] Budgets script (node, no deps): from `dist-dashboard/index.html`, collect island component and
       renderer URLs and their static `import` graph (skip `import(`), gzip each; report island code (excluding
@@ -409,7 +414,8 @@ markup), `src/pages/index.astro`, `tests/e2e/dashboard.spec.ts`, `tests/smoke/sm
       node or pod (header `describe pod/<slug>`, summary, status pill, tech, links to the project page and
       plain section via `url()`); below 768px it renders the latest `$terminal` result with `ResultView`;
       Copy link writes `runHref(...)` and announces `Link copied`; when the Clipboard API rejects, it selects
-      a read-only text field with the link.
+      a read-only text field with the link. When the panel shows a new item, its scroll goes back to
+      the top (from Task 6b; the one-screen layout scrolls the panel inside its own box).
 - [ ] Deep links: on hydrate, `readRunParam(location.search)` → `runCommand(cmd,'deep-link')`; `describe`
       results `pushState`, others `replaceState`; `popstate` re-reads and runs without pushing; on phones a
       valid `?run=` opens cluster mode (sets `location.hash = 'cluster'` via `replaceState`).

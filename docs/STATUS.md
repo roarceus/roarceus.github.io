@@ -4,7 +4,7 @@ _Last updated: 2026-11-26_
 
 ## Current stage
 
-**Stage 3 — Terminal engine: in progress** (Tasks 1 to 5 of 9: plan #77, parser #78, snapshot #80, commands #84, store #85). v0.3.0 is live. Design:
+**Stage 3 — Terminal engine: in progress** (Tasks 1 to 6a of 9: plan #77, parser #78, snapshot #80, commands #84, store #85, terminal island #87; 6b, the one-screen layout, in review). v0.3.0 is live. Design:
 [`plans/stage-3-design.md`](plans/stage-3-design.md) (approved with changes 2026-11-25). Plan:
 [`plans/stage-3.md`](plans/stage-3.md) (approved) ·
 [milestone](https://github.com/roarceus/roarceus.github.io/milestone/4) (#68 to #76). Store:
@@ -42,8 +42,8 @@ so islands load without `'unsafe-inline'`; CI audits every built page.
 
 ## Next steps
 
-1. Review the terminal island PR (6a, #87), then 6b and 6c (one-screen layout, budgets), then Tasks 7
-   to 9 (`plans/stage-3.md`).
+1. Review the one-screen layout PR (6b), then 6c (budgets and `react-runtime` chunking), then Tasks 7
+   to 9 (`plans/stage-3.md`). Task 7 also resets the detail panel's scroll on a new item.
 2. Carried over: submit the sitemap in Google Search Console; check the share card in a link inspector
    (runbook: `docs/runbooks/share-image.md`); set up the uptime monitor (M10); decide on Renovate's
    queued TypeScript 7 PR.

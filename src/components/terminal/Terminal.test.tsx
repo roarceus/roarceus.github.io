@@ -180,6 +180,67 @@ describe('Terminal', () => {
     expect(button.getAttribute('aria-expanded')).toBe('true');
   });
 
+  it('expands again when a command runs while collapsed, so output never lands out of sight', async () => {
+    setup();
+    fireEvent.click(screen.getByRole('button', { name: 'Collapse' }));
+    await actAsync(() => {
+      fireEvent.click(screen.getByRole('link', { name: 'top skills' }));
+    });
+    const button = screen.getByRole('button', { name: 'Collapse' });
+    expect(button.getAttribute('aria-expanded')).toBe('true');
+    expect(screen.getByRole('log').hidden).toBe(false);
+  });
+
+  it('keeps Up and Down for history, never for scrolling', () => {
+    const input = setup();
+    expect(fireEvent.keyDown(input, { key: 'ArrowUp' })).toBe(false);
+    expect(fireEvent.keyDown(input, { key: 'ArrowDown' })).toBe(false);
+  });
+
+  describe('following the output', () => {
+    /** happy-dom does no layout: give the log a fixed size and a content height. */
+    function size(log: HTMLElement, scrollHeight: number) {
+      Object.defineProperty(log, 'clientHeight', { configurable: true, value: 100 });
+      Object.defineProperty(log, 'scrollHeight', { configurable: true, value: scrollHeight });
+    }
+
+    it('scrolls to the newest result when already at the bottom', async () => {
+      const input = setup();
+      const log = screen.getByRole('log');
+      size(log, 500);
+      log.scrollTop = 400;
+      fireEvent.scroll(log);
+      size(log, 900);
+      await type(input, 'kubectl get nodes');
+      expect(log.scrollTop).toBe(900);
+      expect(screen.queryByRole('button', { name: 'Jump to latest' })).toBeNull();
+    });
+
+    it('stays put when scrolled up to read, and offers a jump to the latest', async () => {
+      const input = setup();
+      const log = screen.getByRole('log');
+      size(log, 500);
+      log.scrollTop = 120;
+      fireEvent.scroll(log);
+      size(log, 900);
+      await type(input, 'kubectl get nodes');
+      expect(log.scrollTop).toBe(120);
+      fireEvent.click(screen.getByRole('button', { name: 'Jump to latest' }));
+      expect(log.scrollTop).toBe(900);
+      fireEvent.scroll(log);
+      expect(screen.queryByRole('button', { name: 'Jump to latest' })).toBeNull();
+    });
+
+    it('offers no jump while scrolled up if nothing new arrived', () => {
+      setup();
+      const log = screen.getByRole('log');
+      size(log, 500);
+      log.scrollTop = 0;
+      fireEvent.scroll(log);
+      expect(screen.queryByRole('button', { name: 'Jump to latest' })).toBeNull();
+    });
+  });
+
   it('opens port-forward targets in a new tab', async () => {
     const open = vi.fn();
     vi.stubGlobal('open', open);
