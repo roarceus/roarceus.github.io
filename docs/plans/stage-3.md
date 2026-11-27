@@ -432,15 +432,16 @@ markup), `src/pages/index.astro`, `tests/e2e/dashboard.spec.ts`, `tests/smoke/sm
       a read-only text field with the link. When the panel shows a new item, its scroll goes back to
       the top (from Task 6b). On the one-screen layout (`desk`) the panel never scrolls: long content splits into
       pages with Previous, Next, and a `1 / 2` count (ADR 0005), and a new item opens on page 1.
-- [ ] Deep links: on hydrate, `readRunParam(location.search)` → `runCommand(cmd,'deep-link')`; `describe`
+- [x] Deep links (7b): on hydrate, `readRunParam(location.search)` → `runCommand(cmd,'deep-link')`; `describe`
       results `pushState`, others `replaceState`; `popstate` re-reads and runs without pushing; on phones a
       valid `?run=` opens cluster mode (sets `location.hash = 'cluster'` via `replaceState`).
-- [ ] e2e `@dashboard`: `/?run=kubectl+describe+pod+asktrace` shows the pod; two describe links + Back twice
+- [x] e2e `@dashboard`: `/?run=kubectl+describe+pod+asktrace` shows the pod; two describe links + Back twice
       restores each view; `?run=%3Cscript%3E` and `?run=apply+-f+contact.yaml` render the default page with no
       console errors; Copy link puts the right URL on the clipboard (Chromium, granted permission).
-- [ ] Smoke: production `/?run=kubectl+describe+pod+asktrace` renders no `Cluster map` region and the same
+- [x] Smoke: production `/?run=kubectl+describe+pod+asktrace` renders no `Cluster map` region and the same
       hero; preview `?run=` shows the pod's details (also proves the JSON loads under the preview base path).
-- [ ] `pnpm check`; commit `feat(cluster): add detail panel island and shareable links`.
+- [x] `pnpm check`; commits `feat(cluster): add the detail panel island` (7a) and
+      `feat(cluster): open views from ?run= links` (7b).
 
 ### Task 8: Contact manifest command (PR 8)
 

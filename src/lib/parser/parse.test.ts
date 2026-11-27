@@ -107,4 +107,17 @@ describe('parse', () => {
     expect(ok('k\tget\tnodes')).toMatchObject({ verb: 'get', args: ['nodes'] });
     expect(ok('kubectl get -o').flags).toEqual({ o: true });
   });
+
+  it('keeps flag names as plain data, never touching object prototypes', () => {
+    // ?run= deep links feed the URL to the parser, so flag names are untrusted.
+    const proto = ok('kubectl get pods --__proto__=polluted');
+    expect(Object.getPrototypeOf(proto.flags)).toBeNull();
+    expect(Object.entries(proto.flags)).toEqual([['__proto__', 'polluted']]);
+    expect('polluted' in {}).toBe(false);
+    const ctor = ok('kubectl get pods --constructor x --toString');
+    expect(Object.entries(ctor.flags)).toEqual([
+      ['constructor', 'x'],
+      ['toString', true],
+    ]);
+  });
 });

@@ -1,8 +1,9 @@
 import { useStore } from '@nanostores/react';
-import { useEffect, useId, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 
+import { startDeepLinks } from '@/components/cluster/deep-link';
 import { button, chip } from '@/components/ui/recipes';
-import { useDesk } from '@/components/ui/useDesk';
+import { useDesk, useHydrated } from '@/components/ui/useDesk';
 import { usePager } from '@/components/ui/usePager';
 import type { CommandContext, CommandResult } from '@/lib/commands/types';
 import { seedTerminal, setRunContext } from '@/lib/state/run';
@@ -31,15 +32,6 @@ interface Props {
   /** Whole command lines; the chip drops the leading `kubectl`. */
   chips: string[];
 }
-
-const subscribeNever = () => () => undefined;
-/** False on the server and during hydration, true after: the input exists only once it can work. */
-const useHydrated = () =>
-  useSyncExternalStore(
-    subscribeNever,
-    () => true,
-    () => false,
-  );
 
 /** Opens `port-forward` targets and follows `config use-context plain`, once per entry. */
 function useActions() {
@@ -92,6 +84,9 @@ export function Terminal({ snapshotHref, build, base, initial, chips }: Props) {
   useEffect(() => {
     if ($snapshot.get().status === 'idle') void loadSnapshot(snapshotHref);
   }, [snapshotHref]);
+
+  // ?run= deep links (design doc stage-3 §5.6). Here, after setRunContext, so runs use the page's base.
+  useEffect(() => startDeepLinks(), []);
 
   const toBottom = () => {
     const box = outputRef.current;

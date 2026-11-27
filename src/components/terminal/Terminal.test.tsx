@@ -20,6 +20,8 @@ const INITIAL: CommandResult = {
 };
 
 beforeEach(() => {
+  // Runs write ?run= into the URL (deep links); every test starts from a clean one.
+  history.replaceState(null, '', BASE);
   $terminal.set({ entries: [], history: [], announcement: '' });
   $selection.set(undefined);
   $snapshot.set({ status: 'ready', data: SNAPSHOT });
@@ -167,6 +169,15 @@ describe('Terminal', () => {
     expect(fetcher).toHaveBeenCalledWith(`${BASE}cluster.abc.json`);
     expect($snapshot.get().status).toBe('ready');
     expect(screen.queryByRole('button', { name: 'Retry' })).toBeNull();
+  });
+
+  it('runs a ?run= deep link on mount, under the page base path', async () => {
+    history.replaceState(null, '', `${BASE}?run=kubectl+describe+pod+asktrace`);
+    setup();
+    await actAsync(() => undefined);
+    expect(entries().at(-1)).toMatchObject({ input: 'kubectl describe pod asktrace', source: 'deep-link' });
+    cleanup();
+    history.replaceState(null, '', BASE);
   });
 
   it('loads the data on mount', async () => {

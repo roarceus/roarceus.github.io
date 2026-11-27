@@ -49,6 +49,21 @@ test('ships the cluster dashboard only where its flag is on', async ({ page }) =
   );
 });
 
+// ?run= deep links (stage-3 plan, Task 7b): a preview opens the pod (which also proves the cluster
+// data loads under the preview base path); production, with the dashboard off, ignores it.
+test('opens a ?run= deep link only where the dashboard is on', async ({ page }) => {
+  test.skip(expectDashboard === undefined, 'SMOKE_EXPECT_DASHBOARD not set');
+  await page.goto('./?run=kubectl+describe+pod+asktrace');
+  if (expectDashboard === 'true') {
+    await expect(
+      page.getByRole('region', { name: 'Details' }).getByText('describe pod/asktrace'),
+    ).toBeVisible();
+    return;
+  }
+  await expect(page.getByRole('heading', { level: 1, name: 'Sohan Patil' })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Cluster map', includeHidden: true })).toHaveCount(0);
+});
+
 test('every asset resolves under the base path', async ({ page, request, baseURL }) => {
   await page.goto('./');
   const base = new URL(baseURL ?? '');

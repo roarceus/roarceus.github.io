@@ -5,7 +5,7 @@ import { ResultView } from '@/components/terminal/ResultView';
 import { RunLink } from '@/components/terminal/RunLink';
 import { focusRing, type Status } from '@/components/ui/recipes';
 import { StatusPill } from '@/components/ui/StatusPill';
-import { useDesk, usePhone } from '@/components/ui/useDesk';
+import { useDesk, useHydrated, usePhone } from '@/components/ui/useDesk';
 import { usePager } from '@/components/ui/usePager';
 import { panelView, type PanelView } from '@/lib/commands/panel';
 import type { PodPhase } from '@/lib/content/cluster';
@@ -173,11 +173,15 @@ export function DetailPanel({ initial, base }: Props) {
   const boxRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
-  const selected = (selection && data && panelView(data, selection)) ?? initial;
+  // Until hydrated, exactly the server view: a deep link may already have run in the terminal island.
+  const hydrated = useHydrated();
+  const live = hydrated && selection && data ? panelView(data, selection) : undefined;
+  const selected = live ?? initial;
   // Phones: the sheet is where output goes, so once a command runs (not the entry shown with the
   // page) it shows that result; a describe shows the details as usual.
   const last = entries.at(-1);
-  const result = phone && last && last.source !== 'page' && last.result.kind !== 'detail' ? last : undefined;
+  const result =
+    hydrated && phone && last && last.source !== 'page' && last.result.kind !== 'detail' ? last : undefined;
   const key = result ? `run-${String(result.id)}` : selected.run;
   const pager = usePager(boxRef, contentRef, desk, key);
 
