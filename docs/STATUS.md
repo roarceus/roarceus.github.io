@@ -4,7 +4,7 @@ _Last updated: 2026-11-26_
 
 ## Current stage
 
-**Stage 3 — Terminal engine: in progress** (Tasks 1 to 6b of 9: plan #77, parser #78, snapshot #80, commands #84, store #85, terminal island #87, one-screen layout #88; direction ADR 0005 #89; budgets #90). v0.3.0 is live. Design:
+**Stage 3 — Terminal engine: in progress** (Tasks 1 to 6 of 9: plan #77, parser #78, snapshot #80, commands #84, store #85, terminal island #87, one-screen layout #88; direction ADR 0005 #89; budgets #90; terminal paging #91). v0.3.0 is live. Design:
 [`plans/stage-3-design.md`](plans/stage-3-design.md) (approved with changes 2026-11-25). Plan:
 [`plans/stage-3.md`](plans/stage-3.md) (approved) ·
 [milestone](https://github.com/roarceus/roarceus.github.io/milestone/4) (#68 to #76). Store:
@@ -44,7 +44,7 @@ inside ([ADR 0005](adr/0005-3d-cluster-one-screen.md); concept: [`concepts/clust
 
 ## Next steps
 
-1. Review the terminal paging PR (6d), then Tasks 7 to 9 (`plans/stage-3.md`). Task 7 pages the detail panel; Task 8 opens
+1. Review the detail panel PR (7a), then 7b (`?run=` deep links), then Tasks 7 to 9 (`plans/stage-3.md`). Task 7 pages the detail panel; Task 8 opens
    Contact in place from the top bar too. Stage 4 is now the 3D scene with a 2D fallback.
 2. Carried over: submit the sitemap in Google Search Console; check the share card in a link inspector
    (runbook: `docs/runbooks/share-image.md`); set up the uptime monitor (M10); decide on Renovate's

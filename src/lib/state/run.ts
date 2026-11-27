@@ -52,7 +52,7 @@ const append = (entry: Entry) => {
 export function seedTerminal(input: string, result: CommandResult): void {
   const { entries, history } = $terminal.get();
   if (entries.length > 0 || history.length > 0) return;
-  append({ id: nextId++, input, source: 'input', result });
+  append({ id: nextId++, input, source: 'page', result });
 }
 
 /** Ctrl+C: echoes the line with `^C` and runs nothing (no history, no announcement). */

@@ -22,6 +22,7 @@ import { buildInfo } from '@/config/build-info';
 import { isEnabled } from '@/config/features';
 import { site } from '@/config/site';
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import { panelView } from '@/lib/commands/panel';
 import { getCluster, getExperience, getProfile, getSnapshot } from '@/lib/content/queries';
 import { url } from '@/lib/utils/url';
 
@@ -35,6 +36,12 @@ const terminal = dashboard
   ? await getSnapshot({ version: buildInfo.version, commit: buildInfo.shortCommit })
   : undefined;
 const snapshotHref = terminal && url(`cluster.${terminal.hash}.json`);
+// The detail panel opens on the pre-selected role, built from the snapshot it reads after hydration.
+const selected = terminal?.snapshot.selected;
+const panel =
+  terminal && selected !== undefined
+    ? panelView(terminal.snapshot, { kind: 'node', name: selected })
+    : undefined;
 const roles = dashboard ? (await getExperience()).filter(({ data }) => onMap.has(data.node)) : [];
 ---
 
@@ -118,9 +125,9 @@ const roles = dashboard ? (await getExperience()).filter(({ data }) => onMap.has
           unscheduled={cluster.unscheduled}
           selected={cluster.selected?.data.node}
         />
-        {cluster.selected && (
+        {panel && (
           <BottomSheet class="desk:flex desk:min-h-0 desk:flex-col">
-            <DetailPanel entry={cluster.selected} />
+            <DetailPanel view={panel} />
           </BottomSheet>
         )}
         {terminal && snapshotHref && (

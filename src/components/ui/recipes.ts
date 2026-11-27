@@ -48,3 +48,28 @@ export function chip(): string {
 export function panel(): string {
   return 'rounded-lg border border-border bg-surface-1';
 }
+
+/** Status pill states (SPEC §5 state language), shared by StatusPill.astro and StatusPill.tsx. */
+export type Status = 'running' | 'completed' | 'pending' | 'failed' | 'in-progress' | 'issued';
+export type StatusShape = 'filled' | 'half' | 'cross' | 'ring';
+
+export const STATUS_LABELS: Record<Status, string> = {
+  running: 'Running',
+  completed: 'Completed',
+  pending: 'Pending',
+  failed: 'Failed',
+  'in-progress': 'In progress',
+  issued: 'Issued',
+};
+
+export const STATUS_LOOK: Record<Status, { shape: StatusShape; color: string; fill: string }> = {
+  running: { shape: 'filled', color: 'text-status-running', fill: 'bg-status-running-soft' },
+  issued: { shape: 'filled', color: 'text-status-running', fill: 'bg-status-running-soft' },
+  pending: { shape: 'half', color: 'text-status-pending', fill: 'bg-status-pending-soft' },
+  'in-progress': { shape: 'half', color: 'text-status-pending', fill: 'bg-status-pending-soft' },
+  failed: { shape: 'cross', color: 'text-status-failed', fill: 'bg-status-failed-soft' },
+  completed: { shape: 'ring', color: 'text-status-completed', fill: 'bg-status-completed-soft' },
+};
+
+export const STATUS_PILL =
+  'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 font-mono text-xs whitespace-nowrap text-text';

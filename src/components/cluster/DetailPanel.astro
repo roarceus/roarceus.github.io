@@ -1,39 +1,17 @@
 ---
-// The detail panel (design doc §4.6): `kubectl describe` for the selected node, opening on the
-// pre-selected role (SPEC §9). Built from content; Stage 4 swaps the selection as the map is used.
-import { focusRing } from '@/components/ui/recipes';
-import TagList from '@/components/ui/TagList.astro';
-import { formatRange } from '@/lib/utils/dates';
+// The detail panel (design doc stage-3 §5.5): an island that opens on the pre-selected role (SPEC §9),
+// rendered on the server from the same view `describe` builds, so no-JS and first paint are complete
+// and the hydrated panel matches. After hydration it follows the selection.
+import type { PanelView } from '@/lib/commands/panel';
 import { url } from '@/lib/utils/url';
 
-import type { CollectionEntry } from 'astro:content';
+import { DetailPanel } from './DetailPanel';
 
 interface Props {
-  entry: CollectionEntry<'experience'>;
+  view: PanelView;
 }
 
-const { data } = Astro.props.entry;
+const { view } = Astro.props;
 ---
 
-<!-- On one-screen desktops the panel scrolls inside itself, so it takes focus for the arrow keys. -->
-<section
-  aria-label="Details"
-  tabindex="0"
-  class:list={[
-    'relative flex flex-col gap-3 rounded-lg border border-border bg-surface-1 p-4 sm:p-5 desk:min-h-0 desk:flex-1 desk:overflow-auto',
-    focusRing,
-  ]}
->
-  <h2 class="font-mono text-sm font-normal text-text-muted">describe node/{data.node}</h2>
-  <h3 class="text-xl font-semibold text-text">
-    {data.role}, <span class="text-text-muted">{data.org}</span>
-  </h3>
-  <p class="font-mono text-sm text-text-muted">{formatRange(data.start, data.end)}</p>
-  <p class="text-text-muted">{data.summary}</p>
-  <TagList items={data.tech} label={`Tech used at ${data.org}`} />
-  <p class="font-mono text-sm">
-    <a href={url('plain/#experience')} class="link inline-flex min-h-11 items-center">
-      All experience
-    </a>
-  </p>
-</section>
+<DetailPanel client:idle initial={view} base={url()} />

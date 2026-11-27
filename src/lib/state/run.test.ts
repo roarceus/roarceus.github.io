@@ -150,7 +150,7 @@ describe('seedTerminal', () => {
     seedTerminal('kubectl get experience', result);
     seedTerminal('kubectl get experience', result);
     expect(entries()).toHaveLength(1);
-    expect(entries()[0]).toMatchObject({ input: 'kubectl get experience', source: 'input', result });
+    expect(entries()[0]).toMatchObject({ input: 'kubectl get experience', source: 'page', result });
     expect($terminal.get().history).toEqual([]);
     expect($terminal.get().announcement).toBe('');
     await runCommand('clear', 'input');
