@@ -2,6 +2,8 @@ import { useStore } from '@nanostores/react';
 import { useEffect, useId, useRef, useState, useSyncExternalStore } from 'react';
 
 import { button, chip } from '@/components/ui/recipes';
+import { useDesk } from '@/components/ui/useDesk';
+import { usePager } from '@/components/ui/usePager';
 import type { CommandContext, CommandResult } from '@/lib/commands/types';
 import { seedTerminal, setRunContext } from '@/lib/state/run';
 import { $snapshot, loadSnapshot } from '@/lib/state/snapshot-loader';
@@ -11,8 +13,6 @@ import { LiveRegion } from './LiveRegion';
 import { ResultView } from './ResultView';
 import { RunLink } from './RunLink';
 import { TerminalInput } from './TerminalInput';
-import { useDesk } from './useDesk';
-import { usePager } from './usePager';
 
 /**
  * The docked terminal island (design doc stage-3 §5.4). The server renders today's
@@ -131,7 +131,8 @@ export function Terminal({ snapshotHref, build, base, initial, chips }: Props) {
       aria-label="Terminal"
       className="flex flex-col gap-3 rounded-lg border border-border bg-surface-2 p-4"
     >
-      <div className="relative" hidden={collapsed}>
+      {/* On phones the bottom sheet (the detail panel island) shows the output instead. */}
+      <div className="relative max-md:hidden" hidden={collapsed}>
         {/* On the one-screen layout the command stays in a header row with the pager, so paging never
             shifts the layout and you always see which result you're reading. CSS (`desk:`) switches
             the layout, so the server-rendered page and the hydrated one match. */}

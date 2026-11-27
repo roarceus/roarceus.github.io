@@ -4,8 +4,8 @@ import type { CommandResult } from '@/lib/commands/types';
 
 /** Terminal output and history (design doc stage-3 §5.3). History lasts for the session only. */
 
-/** Where a run came from, for Stage 6 analytics. Stage 4 adds `'map'`. */
-export type RunSource = 'input' | 'chip' | 'link' | 'deep-link';
+/** Where a run came from, for Stage 6 analytics; `'page'` is the entry shown with the page. Stage 4 adds `'map'`. */
+export type RunSource = 'page' | 'input' | 'chip' | 'link' | 'deep-link';
 
 export interface Entry {
   id: number;

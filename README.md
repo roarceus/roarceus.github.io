@@ -25,7 +25,8 @@ terminal (Stage 3) and the 3D cluster (Stage 4, [ADR 0005](docs/adr/0005-3d-clus
 the UI is the tool, the cluster is the game. In progress: Stage 3, the terminal engine. On previews the
 terminal already runs commands in place: type them, or click chips and names. On desktops at least
 1024 by 700 pixels the dashboard fits one screen: the terminal shows the latest result and pages a long
-one like `less` instead of scrolling ([ADR 0005](docs/adr/0005-3d-cluster-one-screen.md))
+one like `less` instead of scrolling, and the detail panel follows every `describe` and pages long details
+([ADR 0005](docs/adr/0005-3d-cluster-one-screen.md)); on phones the bottom sheet shows the output
 ([design](docs/plans/stage-3-design.md), [plan](docs/plans/stage-3.md)). Progress:
 [`docs/STATUS.md`](docs/STATUS.md) · [project board](https://github.com/users/roarceus/projects/1) ·
 [changelog](CHANGELOG.md) (from v0.1.0).
@@ -126,7 +127,7 @@ an unknown flag name fails the build.
 docs/           SPEC, STATUS, plans, ADRs, runbooks, postmortems, content guide, concepts (design prototypes)
 public/         served as-is: favicon, resume, share image (og-image.png), .nojekyll
 src/
-  components/   cluster/ (dashboard stage and detail panel), layout/ (top bar and site mark, footer, bottom sheet, SEO head
+  components/   cluster/ (dashboard stage, the detail panel island with Copy link), layout/ (top bar and site mark, footer, bottom sheet, SEO head
                 tags), plain/ (plain view sections and jump chips), terminal/ (the terminal island: input, output
                 renderer shared with the detail panel, live region), ui/ (button, chip, panel,
                 kubectl table, expander, status pill, tags, links; shared class recipes in recipes.ts)

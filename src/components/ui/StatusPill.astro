@@ -2,8 +2,7 @@
 // Status is always spelled out, and a shape repeats it, so color only reinforces it (SPEC §5 state
 // language, WCAG 1.4.1). Shapes follow the cluster legend: running filled circle, pending half
 // circle, failed cross, completed ring.
-type Status = 'running' | 'completed' | 'pending' | 'failed' | 'in-progress' | 'issued';
-type Shape = 'filled' | 'half' | 'cross' | 'ring';
+import { STATUS_LABELS, STATUS_LOOK, STATUS_PILL, type Status } from './recipes';
 
 interface Props {
   status: Status;
@@ -11,34 +10,11 @@ interface Props {
   label?: string;
 }
 
-const LABELS: Record<Status, string> = {
-  running: 'Running',
-  completed: 'Completed',
-  pending: 'Pending',
-  failed: 'Failed',
-  'in-progress': 'In progress',
-  issued: 'Issued',
-};
-
-const LOOK: Record<Status, { shape: Shape; color: string; fill: string }> = {
-  running: { shape: 'filled', color: 'text-status-running', fill: 'bg-status-running-soft' },
-  issued: { shape: 'filled', color: 'text-status-running', fill: 'bg-status-running-soft' },
-  pending: { shape: 'half', color: 'text-status-pending', fill: 'bg-status-pending-soft' },
-  'in-progress': { shape: 'half', color: 'text-status-pending', fill: 'bg-status-pending-soft' },
-  failed: { shape: 'cross', color: 'text-status-failed', fill: 'bg-status-failed-soft' },
-  completed: { shape: 'ring', color: 'text-status-completed', fill: 'bg-status-completed-soft' },
-};
-
-const { status, label = LABELS[status] } = Astro.props;
-const { shape, color, fill } = LOOK[status];
+const { status, label = STATUS_LABELS[status] } = Astro.props;
+const { shape, color, fill } = STATUS_LOOK[status];
 ---
 
-<span
-  class:list={[
-    'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 font-mono text-xs whitespace-nowrap text-text',
-    fill,
-  ]}
->
+<span class:list={[STATUS_PILL, fill]}>
   <svg
     aria-hidden="true"
     data-shape={shape}

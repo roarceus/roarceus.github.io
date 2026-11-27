@@ -416,12 +416,16 @@ export function runHref(input: string, location: { pathname: string }): string; 
 
 ### Task 7: Detail panel island and shareable links (PR 7)
 
+> Split into two PRs (approved 2026-11-27): **7a** the panel island, Copy link, paging, and the phone sheet;
+> **7b** `?run=` deep links and the smoke tests. On the dashboard the panel has no "full project page" link:
+> it would leave the page (ADR 0005); the project page stays reachable from the plain view.
+
 **Files:** Create `src/components/cluster/DetailPanel.tsx`, `CopyLink.tsx` (+ tests),
 `src/components/cluster/deep-link.ts` (browser glue: reads `location`, calls `runCommand`, handles
 `pushState`/`replaceState`/`popstate`). Modify `DetailPanel.astro` (wraps the island, keeps the SSR
 markup), `src/pages/index.astro`, `tests/e2e/dashboard.spec.ts`, `tests/smoke/smoke.spec.ts`.
 
-- [ ] **Component tests first:** the panel renders the server role until `$selection` changes, then the
+- [x] **Component tests first (7a):** the panel renders the server role until `$selection` changes, then the
       node or pod (header `describe pod/<slug>`, summary, status pill, tech, links to the project page and
       plain section via `url()`); below 768px it renders the latest `$terminal` result with `ResultView`;
       Copy link writes `runHref(...)` and announces `Link copied`; when the Clipboard API rejects, it selects

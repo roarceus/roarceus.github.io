@@ -193,12 +193,17 @@ test.describe('cluster dashboard without JavaScript @dashboard', () => {
 
 // The terminal island (stage-3 design §5.4): every run happens in place, through one run path.
 test.describe('terminal @dashboard', () => {
-  /** Opens the dashboard (cluster mode on phones) and waits for the input to hydrate. */
+  /**
+   * Opens the dashboard (cluster mode on phones) and waits for the input to hydrate. `output` is where
+   * results show: the terminal, or on phones the bottom sheet (the detail panel island).
+   */
   async function open(page: Page) {
     await page.goto(isMobile(page) ? './#cluster' : './');
     const input = page.getByRole('textbox', { name: 'Command' });
     await expect(input).toBeVisible();
-    return { input, terminal: page.getByRole('region', { name: 'Terminal' }) };
+    const terminal = page.getByRole('region', { name: 'Terminal' });
+    const output = isMobile(page) ? page.getByRole('region', { name: 'Details' }) : terminal;
+    return { input, terminal, output };
   }
 
   async function run(page: Page, command: string) {
@@ -217,34 +222,39 @@ test.describe('terminal @dashboard', () => {
   }
 
   test('runs typed commands and prints real kubectl output', async ({ page }) => {
-    const { input, terminal } = await open(page);
+    const { input, output } = await open(page);
     await input.fill('kubectl get nodes');
     await input.press('Enter');
-    await expect(terminal.getByRole('table', { name: 'kubectl get nodes' })).toBeVisible();
+    await expect(output.getByRole('table', { name: 'kubectl get nodes' })).toBeVisible();
     await expect(input).toHaveValue('');
 
     await input.fill('k get pods -n projects');
     await input.press('Enter');
-    await expect(terminal.getByRole('table', { name: 'k get pods -n projects' })).toBeVisible();
+    await expect(output.getByRole('table', { name: 'k get pods -n projects' })).toBeVisible();
 
     await input.fill('kubectl top skills');
     await input.press('Enter');
-    await expect(terminal.getByRole('table', { name: 'kubectl top skills' })).toBeVisible();
+    await expect(output.getByRole('table', { name: 'kubectl top skills' })).toBeVisible();
 
     await input.fill('help');
     await input.press('Enter');
-    await expect(terminal.getByText('$ help').filter({ visible: true })).toBeVisible();
-    await expect(terminal.getByRole('link', { name: 'kubectl get nodes' }).first()).toBeVisible();
+    await expect(output.getByText('$ help').filter({ visible: true })).toBeVisible();
+    await expect(output.getByRole('link', { name: 'kubectl get nodes' }).first()).toBeVisible();
   });
 
   test('runs chips and table names in place without navigating', async ({ page }) => {
-    const { terminal } = await open(page);
+    const { input, terminal, output } = await open(page);
     const urls = navigations(page);
+    // Phones start with the role in the sheet; the table shows there once a command runs.
+    if (isMobile(page)) {
+      await input.fill('kubectl get experience');
+      await input.press('Enter');
+    }
     // A table name first: on the one-screen layout only the latest result stays on screen.
-    await terminal.getByRole('table', { name: 'kubectl get experience' }).getByRole('link').first().click();
-    await expect(terminal.getByText(/^\$ kubectl describe node /).filter({ visible: true })).toBeVisible();
+    await output.getByRole('table', { name: 'kubectl get experience' }).getByRole('link').first().click();
+    await expect(page.getByRole('region', { name: 'Details' }).getByText(/^describe node\//)).toBeVisible();
     await terminal.getByRole('link', { name: 'top skills' }).click();
-    await expect(terminal.getByText('$ kubectl top skills').filter({ visible: true })).toBeVisible();
+    await expect(output.getByText('$ kubectl top skills').filter({ visible: true })).toBeVisible();
     for (const chip of await terminal.getByRole('navigation', { name: 'Commands' }).getByRole('link').all()) {
       await chip.click();
     }
@@ -253,11 +263,14 @@ test.describe('terminal @dashboard', () => {
   });
 
   test('suggests the closest command for a typo', async ({ page }) => {
-    await run(page, 'kubectl getx nodes');
-    const log = page.getByRole('log', { name: 'Terminal output' });
-    await expect(log.getByText('Did you mean this?')).toBeVisible();
-    await log.getByRole('link', { name: 'kubectl get nodes' }).click();
-    await expect(log.getByRole('table', { name: 'kubectl get nodes' })).toBeVisible();
+    const { input, output } = await open(page);
+    await input.fill('kubectl getx nodes');
+    await input.press('Enter');
+    await expect(
+      output.getByText('Did you mean this?', { exact: true }).filter({ visible: true }),
+    ).toBeVisible();
+    await output.getByRole('link', { name: 'kubectl get nodes' }).filter({ visible: true }).click();
+    await expect(output.getByRole('table', { name: 'kubectl get nodes' })).toBeVisible();
   });
 
   test('clear empties the output', async ({ page }) => {
@@ -267,9 +280,10 @@ test.describe('terminal @dashboard', () => {
   });
 
   test('has no overflow or serious accessibility issues after running commands', async ({ page }) => {
-    await run(page, 'kubectl get pods -n projects -o wide');
-    const terminal = page.getByRole('region', { name: 'Terminal' });
-    await expect(terminal.getByRole('table', { name: 'kubectl get pods -n projects -o wide' })).toBeVisible();
+    const { input, output } = await open(page);
+    await input.fill('kubectl get pods -n projects -o wide');
+    await input.press('Enter');
+    await expect(output.getByRole('table', { name: 'kubectl get pods -n projects -o wide' })).toBeVisible();
     await expectNoHorizontalOverflow(page);
     await expectNoSeriousA11yViolations(page);
   });
@@ -280,22 +294,20 @@ test.describe('terminal @dashboard', () => {
 
     test('shows the error, keeps offline commands working, and recovers with Retry', async ({ page }) => {
       await page.route('**/cluster.*.json', (route) => route.abort());
-      const { input, terminal } = await open(page);
+      const { input, terminal, output } = await open(page);
       await expect(
         terminal.getByText('Unable to connect to the server: failed to load cluster data'),
       ).toBeVisible();
       await input.fill('kubectl version');
       await input.press('Enter');
-      await expect(
-        page.getByRole('log', { name: 'Terminal output' }).getByText(/^Client Version:/),
-      ).toBeVisible();
+      await expect(output.getByText(/^Client Version: v[\d.]+$/).filter({ visible: true })).toBeVisible();
 
       await page.unroute('**/cluster.*.json');
       await terminal.getByRole('button', { name: 'Retry' }).click();
       await expect(terminal.getByRole('button', { name: 'Retry' })).toBeHidden();
       await input.fill('kubectl get nodes');
       await input.press('Enter');
-      await expect(terminal.getByRole('table', { name: 'kubectl get nodes' })).toBeVisible();
+      await expect(output.getByRole('table', { name: 'kubectl get nodes' })).toBeVisible();
     });
   });
 });
@@ -365,9 +377,9 @@ test.describe('one-screen desktop @dashboard', () => {
     const input = await open(page, { width: 1024, height: 700 });
     await fillOutput(page, input);
     const stops = await tabStops(page);
-    // The terminal output pages instead (next test); the map and panel scroll until Stage 4 and Task 7.
-    expect(stops, 'Terminal output takes focus').toContain('Terminal output');
-    for (const name of ['Cluster map', 'Details']) {
+    // The terminal output and the detail panel page instead; the map scrolls until Stage 4 draws it to fit.
+    for (const name of ['Terminal output', 'Details']) expect(stops, `${name} takes focus`).toContain(name);
+    for (const name of ['Cluster map']) {
       expect(stops, `${name} takes focus`).toContain(name);
       const box = page.getByRole('region', { name });
       await box.evaluate((el) => {
@@ -420,7 +432,7 @@ test.describe('one-screen desktop @dashboard', () => {
       await log.focus();
       for (let i = 1; i < pages; i++) await page.keyboard.press('Space');
       await expect(page.getByText(`-- more (${String(pages)}/${String(pages)}) --`)).toBeVisible();
-      await page.getByRole('button', { name: 'Previous page' }).click();
+      await terminal.getByRole('button', { name: 'Previous page' }).click();
       await expect(page.getByText(`-- more (${String(pages - 1)}/${String(pages)}) --`)).toBeVisible();
       expect(await pageScrolls(page)).toBe(false);
     });
@@ -514,5 +526,94 @@ test.describe('one-screen desktop @dashboard', () => {
         .evaluate((el) => getComputedStyle(el).overflowY);
       expect(overflow, `${name} prints in full`).toBe('visible');
     }
+  });
+});
+
+// The detail panel island (stage-3 plan, Task 7): it follows describe runs in place, copies links that
+// reopen a view, pages instead of scrolling on the one-screen layout, and is the output on phones.
+test.describe('detail panel @dashboard', () => {
+  async function open(page: Page) {
+    await page.goto(isMobile(page) ? './#cluster' : './');
+    await expect(page.getByRole('textbox', { name: 'Command' })).toBeVisible();
+    return page.getByRole('region', { name: 'Details' });
+  }
+
+  test('runs a pod from the panel in place and opens outside links in a new tab', async ({ page }) => {
+    test.skip(isMobile(page), 'phones show the role until a command runs (next tests)');
+    const details = await open(page);
+    const urls: string[] = [];
+    page.on('framenavigated', (frame) => {
+      if (frame === page.mainFrame()) urls.push(frame.url());
+    });
+    const pod = details
+      .getByRole('list', { name: /^Pods on / })
+      .getByRole('link')
+      .first();
+    const slug = await pod.innerText();
+    // On the one-screen layout the pods may be on a later page: page forward until it can be clicked.
+    for (let i = 0; i < 12; i++) {
+      try {
+        await pod.click({ trial: true, timeout: 500 });
+        break;
+      } catch {
+        await details.getByRole('button', { name: 'Next page' }).click();
+      }
+    }
+    await pod.click();
+    await expect(details.getByText(`describe pod/${slug}`)).toBeVisible();
+    await expect(
+      page
+        .getByRole('region', { name: 'Terminal' })
+        .getByText(`$ kubectl describe pod ${slug}`)
+        .filter({ visible: true }),
+    ).toBeVisible();
+    for (const link of await details.locator('a[target="_blank"]').all()) {
+      await expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+      expect(await link.getAttribute('href')).toMatch(/^https:\/\//);
+    }
+    expect(urls).toEqual([]);
+  });
+
+  test('copies a link that reopens the view', async ({ page, context, browserName }) => {
+    test.skip(browserName !== 'chromium' || isMobile(page), 'clipboard permissions are Chromium-only');
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    const details = await open(page);
+    await details.getByRole('button', { name: 'Copy link' }).click();
+    await expect(details.getByRole('status')).toHaveText('Link copied');
+    const copied = await page.evaluate(() => navigator.clipboard.readText());
+    const link = new URL(copied);
+    expect(link.origin + link.pathname).toBe(new URL(page.url()).origin + new URL(page.url()).pathname);
+    expect(link.searchParams.get('run')).toMatch(/^kubectl describe node /);
+  });
+
+  test('never scrolls on the one-screen layout: long details page', async ({ page }) => {
+    test.skip(!test.info().project.name.endsWith('-1280'), 'runs in the 1280px project');
+    await page.setViewportSize({ width: 1024, height: 700 });
+    const details = await open(page);
+    const box = page.getByTestId('panel-pages');
+    expect(await box.evaluate((el) => getComputedStyle(el).overflowY)).toBe('hidden');
+    expect(await box.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(0);
+    await box.hover();
+    await page.mouse.wheel(0, 400);
+    expect(await box.evaluate((el) => el.scrollTop), 'the wheel never scrolls it').toBe(0);
+    const count = details.getByText(/^\d+ \/ \d+$/);
+    if ((await count.count()) > 0) {
+      const pages = Number((/\/ (\d+)$/.exec(await count.innerText()) ?? [])[1]);
+      for (let i = 1; i < pages; i++) await details.getByRole('button', { name: 'Next page' }).click();
+      await expect(count).toHaveText(`${String(pages)} / ${String(pages)}`);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollHeight > window.innerHeight)).toBe(false);
+  });
+
+  test('is where output shows on phones', async ({ page }) => {
+    test.skip(!isMobile(page), 'phone layout only');
+    const details = await open(page);
+    await expect(page.getByRole('log', { name: 'Terminal output' })).toBeHidden();
+    await expect(details.getByText(/^describe node\//)).toBeVisible();
+    await page.getByRole('region', { name: 'Terminal' }).getByRole('link', { name: 'top skills' }).click();
+    await expect(details.getByRole('table', { name: 'kubectl top skills' })).toBeVisible();
+    // A wide table scrolls inside its own box; the panel itself never overflows sideways.
+    expect(await details.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(0);
+    await expectNoHorizontalOverflow(page);
   });
 });
