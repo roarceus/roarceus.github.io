@@ -26,6 +26,9 @@ interface Props {
 }
 
 const { view = 'page', wide = false } = Astro.props;
+// On the dashboard, Contact opens the manifest in place (ADR 0005); it stays a link everywhere else.
+const contactRun =
+  view === 'cluster' && isEnabled('clusterDashboard') ? 'kubectl apply -f contact.yaml' : undefined;
 const { data: profile } = await getProfile();
 
 // On the plain view the switch goes back to `/`: "Cluster view" once the dashboard is on, "Home"
@@ -88,7 +91,7 @@ const icon = 'size-4 max-lg:hidden';
           </a>
         </li>
         <li>
-          <a href={url('plain/#contact')} class:list={[button('primary'), compact]}>
+          <a href={url('plain/#contact')} data-run={contactRun} class:list={[button('primary'), compact]}>
             <Mail aria-hidden="true" class={icon} />
             Contact
           </a>

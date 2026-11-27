@@ -4,7 +4,7 @@ _Last updated: 2026-11-26_
 
 ## Current stage
 
-**Stage 3 — Terminal engine: in progress** (Tasks 1 to 6 of 9: plan #77, parser #78, snapshot #80, commands #84, store #85, terminal island #87, one-screen layout #88; direction ADR 0005 #89; budgets #90; terminal paging #91; detail panel #92). v0.3.0 is live. Design:
+**Stage 3 — Terminal engine: in progress** (Tasks 1 to 8 of 9: plan #77, parser #78, snapshot #80, commands #84, store #85, terminal island #87, one-screen layout #88; direction ADR 0005 #89; budgets #90; terminal paging #91; detail panel #92; deep links #93; contact manifest, Task 8). v0.3.0 is live. Design:
 [`plans/stage-3-design.md`](plans/stage-3-design.md) (approved with changes 2026-11-25). Plan:
 [`plans/stage-3.md`](plans/stage-3.md) (approved) ·
 [milestone](https://github.com/roarceus/roarceus.github.io/milestone/4) (#68 to #76). Store:
@@ -44,8 +44,8 @@ inside ([ADR 0005](adr/0005-3d-cluster-one-screen.md); concept: [`concepts/clust
 
 ## Next steps
 
-1. Review the deep links PR (7b), then Tasks 8 and 9 (`plans/stage-3.md`). Task 8 opens Contact in place, from
-   the top bar too. Stage 4 is now the 3D scene with a 2D fallback.
+1. Review the contact manifest PR (Task 8), then Task 9, the Stage 3 wrap-up (`plans/stage-3.md`). Stage 4 is
+   now the 3D scene with a 2D fallback.
 2. Carried over: submit the sitemap in Google Search Console; check the share card in a link inspector
    (runbook: `docs/runbooks/share-image.md`); set up the uptime monitor (M10); decide on Renovate's
    queued TypeScript 7 PR.
@@ -56,6 +56,9 @@ inside ([ADR 0005](adr/0005-3d-cluster-one-screen.md); concept: [`concepts/clust
 - Global `~/.npmrc` uses `registry=http://`; switching it to `https://` is Sohan's call (repo is pinned).
 
 ## Known issues
+
+- The detail panel is cramped at 1024x700: a pod takes 5 pages, and the contact form pages too (focus
+  turns to the right page, so it still works). Revisit when Stage 4 lays out the 3D scene.
 
 - The no-JS contact form post flaked once on WebKit at 320px (not seen in 25 runs before). Watching it.
 - GitHub Pages serves only the root `404.html`, so a missing page under a PR preview shows production's

@@ -18,7 +18,8 @@ export interface Line {
 
 /** What the detail panel shows (design doc §5.3). */
 export interface Selection {
-  kind: 'node' | 'pod';
+  /** `contact` is the manifest form (`apply -f contact.yaml`); its name is `metadata.name`. */
+  kind: 'node' | 'pod' | 'contact';
   name: string;
 }
 
@@ -36,7 +37,7 @@ export type CommandResult =
   | { kind: 'lines'; lines: Line[]; stream?: boolean }
   /** `suggestion` is a whole command line, printed under "Did you mean this?". */
   | { kind: 'error'; message: string; suggestion?: string }
-  | { kind: 'action'; action: 'clear' | 'navigate' | 'open' | 'contact'; href?: string; lines?: Line[] };
+  | { kind: 'action'; action: 'clear' | 'navigate' | 'open'; href?: string; lines?: Line[] };
 
 export interface CommandContext {
   /** Missing until `cluster.<hash>.json` loads (or when it failed). */

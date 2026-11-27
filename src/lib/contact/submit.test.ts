@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
-import { contactPayload, toSubmitResult } from './submit';
+import { contactPayload, sendContact, toSubmitResult } from './submit';
 
 describe('contactPayload', () => {
   it('builds the Web3Forms JSON body', () => {
@@ -40,5 +40,36 @@ describe('toSubmitResult', () => {
 
   it('is offline when the request never got a response', () => {
     expect(toSubmitResult({ error: new TypeError('Failed to fetch') })).toBe('offline');
+  });
+});
+
+describe('sendContact', () => {
+  const payload = { access_key: 'k', name: 'Ada' };
+
+  it('posts JSON and returns the status and body', async () => {
+    const fetcher = vi.fn().mockResolvedValue(new Response('{"success":true}', { status: 200 }));
+    expect(await sendContact('https://api.example.com/submit', payload, fetcher)).toEqual({
+      status: 200,
+      body: { success: true },
+    });
+    expect(fetcher).toHaveBeenCalledWith('https://api.example.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  });
+
+  it('keeps the status when the body is not JSON', async () => {
+    const fetcher = vi.fn().mockResolvedValue(new Response('oops', { status: 502 }));
+    expect(await sendContact('https://api.example.com/submit', payload, fetcher)).toEqual({
+      status: 502,
+      body: null,
+    });
+  });
+
+  it('returns the error when there is no response', async () => {
+    const failure = new TypeError('Failed to fetch');
+    const fetcher = vi.fn().mockRejectedValue(failure);
+    expect(await sendContact('https://api.example.com/submit', payload, fetcher)).toEqual({ error: failure });
   });
 });

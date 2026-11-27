@@ -27,7 +27,8 @@ terminal already runs commands in place: type them, or click chips and names. On
 1024 by 700 pixels the dashboard fits one screen: the terminal shows the latest result and pages a long
 one like `less` instead of scrolling, and the detail panel follows every `describe` and pages long details
 ([ADR 0005](docs/adr/0005-3d-cluster-one-screen.md)); on phones the bottom sheet shows the output. Every view has a shareable `?run=` link,
-and Back and Forward step through what you viewed
+and Back and Forward step through what you viewed. `kubectl apply -f contact.yaml` (or the Contact
+button) opens a contact form shaped like a YAML manifest in the detail panel, without leaving the page
 ([design](docs/plans/stage-3-design.md), [plan](docs/plans/stage-3.md)). Progress:
 [`docs/STATUS.md`](docs/STATUS.md) · [project board](https://github.com/users/roarceus/projects/1) ·
 [changelog](CHANGELOG.md) (from v0.1.0).
@@ -137,7 +138,7 @@ src/
   layouts/      page layouts (BaseLayout sets meta tags; Astro writes the hashed CSP, ADR 0004)
   lib/content/  Zod schemas, query helpers, integrity check, cluster data (nodes, pods, kubectl rows), and the
                 terminal's content snapshot (served as cluster.<hash>.json when the dashboard flag is on)
-  lib/commands/  terminal commands (registry, get/describe/top/logs and friends, Tab completion, a small
+  lib/commands/  terminal commands (registry, get/describe/top/logs/apply and friends, Tab completion, a small
                 YAML writer); each returns plain data the terminal renders, never HTML
   lib/parser/   terminal command parser (pure: tokens, flags, kubectl-style errors)
   lib/state/    shared terminal state (nanostores): output, history, selection, the snapshot loader, the one

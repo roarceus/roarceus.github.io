@@ -28,6 +28,7 @@ function pathFor(run: string): string {
   const parsed = parse(run);
   if (!parsed.ok) return 'plain/';
   const { verb, args } = parsed.command;
+  if (verb === 'apply') return 'plain/#contact';
   const [type = '', name] = splitTypeName(args);
   if (verb === 'describe' && (type === 'pod' || type === 'pods' || type === 'po') && name) {
     return `projects/${name}/`;

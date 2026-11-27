@@ -65,6 +65,11 @@ describe('runCommand', () => {
     expect($selection.get()).toEqual({ kind: 'pod', name: 'asktrace' });
   });
 
+  it('opens the contact manifest in the panel', async () => {
+    await runCommand('kubectl apply -f contact.yaml', 'chip');
+    expect($selection.get()).toEqual({ kind: 'contact', name: 'sohan' });
+  });
+
   it('clear empties the output, keeps history, and resets the selection to the pre-selected node', async () => {
     await runCommand('kubectl describe pod asktrace', 'input');
     await runCommand('clear', 'input');
@@ -126,6 +131,9 @@ describe('summarize', () => {
     );
     expect(entry({ kind: 'detail', target: { kind: 'pod', name: 'asktrace' }, lines: [] })).toBe(
       'Showing pod asktrace',
+    );
+    expect(entry({ kind: 'detail', target: { kind: 'contact', name: 'sohan' }, lines: [] })).toBe(
+      'Showing the contact form',
     );
     expect(entry({ kind: 'yaml', text: 'a: 1\nb: 2\n' })).toBe('YAML output, 2 lines');
     expect(entry({ kind: 'lines', lines: [{ text: 'one' }] })).toBe('one');

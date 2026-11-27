@@ -452,13 +452,18 @@ markup), `src/pages/index.astro`, `tests/e2e/dashboard.spec.ts`, `tests/smoke/sm
 **Files:** Create `src/lib/commands/apply.ts` (+ test), `src/components/terminal/ContactManifest.tsx`
 (+ test), loaded with `import()` from `ResultView` on `action: 'contact'`.
 
-- [ ] **Tests first:** `apply -f contact.yaml` → `action: 'contact'`; other files → `error: the path "x"
+- [x] **Tests first:** `apply -f contact.yaml` → `action: 'contact'`; other files → `error: the path "x"
 does not exist`; the manifest form validates with `validateContact` (errors next to fields, kubectl
       style `error: validation failed: spec.email: invalid`), submits with `contactPayload`, shows
       `contactmessage.v1/sohan created` on `sent` and a retry line on `offline` or `server-error`.
-- [ ] Budgets: the contact chunk is lazy (not in the startup total).
-- [ ] e2e `@dashboard`: fill and submit against a routed Web3Forms mock.
-- [ ] `pnpm check`; commit `feat(commands): add contact manifest command`.
+- [x] Budgets: the contact chunk is lazy (not in the startup total).
+- [x] e2e `@dashboard`: fill and submit against a routed Web3Forms mock.
+- [x] `pnpm check`; commit `feat(commands): add contact manifest command`.
+
+> As built (Task 8 PR): the form opens in the **detail panel** (ADR 0005), not the terminal output, so
+> `apply` returns `detail` with a `contact` target and the `'contact'` action was removed. Success prints
+> `contactmessage/sohan created` (`apiVersion: v1`, so no group). No new chip (a sixth chip wraps the row at 1024px and shrinks the panel); `help` lists it. Phones keep
+> the top bar link to `plain/#contact`. The pager ignores keys typed into fields and turns to a focused field.
 
 ### Task 9: Stage 3 wrap-up (PR 9)
 

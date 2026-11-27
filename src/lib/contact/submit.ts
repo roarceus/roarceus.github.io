@@ -28,3 +28,22 @@ export function toSubmitResult(outcome: SubmitOutcome): SubmitResult {
   if (status === 400 || status === 422) return 'invalid';
   return 'server-error';
 }
+
+/** Posts the payload as JSON. Never throws: a failed request comes back as `{ error }`. */
+export async function sendContact(
+  endpoint: string,
+  payload: Record<string, string>,
+  fetcher: typeof fetch = fetch,
+): Promise<SubmitOutcome> {
+  try {
+    const response = await fetcher(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const body: unknown = await response.json().catch(() => null);
+    return { status: response.status, body };
+  } catch (error) {
+    return { error };
+  }
+}

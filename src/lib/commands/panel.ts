@@ -35,6 +35,7 @@ export type PanelView =
     };
 
 export function panelView(snapshot: ClusterSnapshot, selection: Selection): PanelView | undefined {
+  if (selection.kind === 'contact') return undefined;
   const run = `kubectl describe ${selection.kind} ${selection.name}`;
   if (selection.kind === 'node') {
     const node = snapshot.nodes.find((n) => n.name === selection.name);

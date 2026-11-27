@@ -83,7 +83,7 @@ const inputClass =
 </form>
 
 <script>
-  import { contactPayload, toSubmitResult, type SubmitOutcome } from '@/lib/contact/submit';
+  import { contactPayload, sendContact, toSubmitResult } from '@/lib/contact/submit';
   import { validateContact, type ContactField } from '@/lib/contact/validate';
 
   const FIELDS: ContactField[] = ['name', 'email', 'message'];
@@ -168,7 +168,7 @@ const inputClass =
       sending = true;
       button.disabled = true;
       button.textContent = 'Sending...';
-      void send(contactPayload(result.value, accessKey)).then((outcome) => {
+      void sendContact(endpoint, contactPayload(result.value, accessKey)).then((outcome) => {
         const submitResult = toSubmitResult(outcome);
         showStatus(submitResult);
         if (submitResult === 'sent') form.reset();
@@ -177,20 +177,6 @@ const inputClass =
         button.textContent = LABEL;
       });
     });
-
-    async function send(payload: Record<string, string>): Promise<SubmitOutcome> {
-      try {
-        const response = await fetch(endpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify(payload),
-        });
-        const body: unknown = await response.json().catch(() => null);
-        return { status: response.status, body };
-      } catch (error) {
-        return { error };
-      }
-    }
   }
 
   document.querySelectorAll<HTMLFormElement>('form[data-contact-form]').forEach(setUp);
