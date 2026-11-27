@@ -213,12 +213,18 @@ test.describe('terminal @dashboard', () => {
   }
 
   /** Records every navigation of the main frame after the first load. */
-  function navigations(page: Page): string[] {
-    const urls: string[] = [];
-    page.on('framenavigated', (frame) => {
-      if (frame === page.mainFrame()) urls.push(frame.url());
+  /**
+   * Marks the current document. `stayed()` is true while the same document is still loaded on the same
+   * path: `?run=` updates the URL with pushState, but nothing may reload or leave the page.
+   */
+  async function markDocument(page: Page) {
+    await page.evaluate(() => {
+      (window as Window & { stayHere?: boolean }).stayHere = true;
     });
-    return urls;
+    const path = new URL(page.url()).pathname;
+    return async () =>
+      new URL(page.url()).pathname === path &&
+      (await page.evaluate(() => (window as Window & { stayHere?: boolean }).stayHere === true));
   }
 
   test('runs typed commands and prints real kubectl output', async ({ page }) => {
@@ -244,7 +250,7 @@ test.describe('terminal @dashboard', () => {
 
   test('runs chips and table names in place without navigating', async ({ page }) => {
     const { input, terminal, output } = await open(page);
-    const urls = navigations(page);
+    const stayed = await markDocument(page);
     // Phones start with the role in the sheet; the table shows there once a command runs.
     if (isMobile(page)) {
       await input.fill('kubectl get experience');
@@ -258,7 +264,7 @@ test.describe('terminal @dashboard', () => {
     for (const chip of await terminal.getByRole('navigation', { name: 'Commands' }).getByRole('link').all()) {
       await chip.click();
     }
-    expect(urls).toEqual([]);
+    expect(await stayed()).toBe(true);
     expect(new URL(page.url()).pathname).toMatch(/\/$/);
   });
 
@@ -541,9 +547,8 @@ test.describe('detail panel @dashboard', () => {
   test('runs a pod from the panel in place and opens outside links in a new tab', async ({ page }) => {
     test.skip(isMobile(page), 'phones show the role until a command runs (next tests)');
     const details = await open(page);
-    const urls: string[] = [];
-    page.on('framenavigated', (frame) => {
-      if (frame === page.mainFrame()) urls.push(frame.url());
+    await page.evaluate(() => {
+      (window as Window & { stayHere?: boolean }).stayHere = true;
     });
     const pod = details
       .getByRole('list', { name: /^Pods on / })
@@ -571,7 +576,9 @@ test.describe('detail panel @dashboard', () => {
       await expect(link).toHaveAttribute('rel', 'noopener noreferrer');
       expect(await link.getAttribute('href')).toMatch(/^https:\/\//);
     }
-    expect(urls).toEqual([]);
+    // The same document, still on `/`: nothing reloaded or left the page.
+    expect(await page.evaluate(() => (window as Window & { stayHere?: boolean }).stayHere)).toBe(true);
+    expect(new URL(page.url()).pathname).toMatch(/\/$/);
   });
 
   test('copies a link that reopens the view', async ({ page, context, browserName }) => {
@@ -615,5 +622,83 @@ test.describe('detail panel @dashboard', () => {
     // A wide table scrolls inside its own box; the panel itself never overflows sideways.
     expect(await details.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(0);
     await expectNoHorizontalOverflow(page);
+  });
+});
+
+// ?run= deep links (stage-3 plan, Task 7b; SPEC §4 "One playground"): a link opens a view, Back and
+// Forward step through views, and anything that isn't a read-only command is ignored.
+test.describe('deep links @dashboard', () => {
+  const details = (page: Page) => page.getByRole('region', { name: 'Details' });
+  const run = (page: Page) => new URL(page.url()).searchParams.get('run');
+
+  test('opens the view a ?run= link names, in cluster mode on phones', async ({ page }) => {
+    await page.goto('./?run=kubectl+describe+pod+asktrace');
+    await expect(details(page).getByText('describe pod/asktrace')).toBeVisible();
+    if (isMobile(page)) expect(new URL(page.url()).hash).toBe('#cluster');
+    expect(run(page)).toBe('kubectl describe pod asktrace');
+  });
+
+  test('steps back through each describe, then to the starting view', async ({ page }) => {
+    test.skip(isMobile(page), 'phones start with the role; the sheet shows results (detail panel tests)');
+    await page.goto('./');
+    await expect(page.getByRole('textbox', { name: 'Command' })).toBeVisible();
+    const start = await details(page)
+      .getByText(/^describe node\//)
+      .innerText();
+
+    await page.getByRole('table', { name: 'kubectl get experience' }).getByRole('link').first().click();
+    await expect.poll(() => run(page)).toMatch(/^kubectl describe node /);
+    const node = (run(page) ?? '').replace('kubectl describe node ', '');
+    await expect(details(page).getByText(`describe node/${node}`)).toBeVisible();
+
+    const input = page.getByRole('textbox', { name: 'Command' });
+    await input.fill('kubectl describe pod asktrace');
+    await input.press('Enter');
+    await expect(details(page).getByText('describe pod/asktrace')).toBeVisible();
+    expect(run(page)).toBe('kubectl describe pod asktrace');
+
+    await page.goBack();
+    await expect(details(page).getByText(`describe node/${node}`)).toBeVisible();
+    expect(run(page)).toBe(`kubectl describe node ${node}`);
+    await page.goBack();
+    await expect(details(page).getByText(start)).toBeVisible();
+    expect(run(page)).toBeNull();
+    expect(new URL(page.url()).pathname).toMatch(/\/$/);
+
+    await page.goForward();
+    await expect(details(page).getByText(`describe node/${node}`)).toBeVisible();
+  });
+
+  for (const [label, query] of [
+    ['markup', '?run=%3Cscript%3E'],
+    ['a command that changes something', '?run=apply+-f+contact.yaml'],
+    ['an unknown command', '?run=rm+-rf+%2F'],
+  ] as const) {
+    test(`ignores ${label} and loads the default page`, async ({ page }) => {
+      await page.goto(`./${query}`);
+      if (isMobile(page)) {
+        await expect(page.getByRole('link', { name: 'Launch cluster' })).toBeVisible();
+        expect(new URL(page.url()).hash).toBe('');
+        return;
+      }
+      await expect(page.getByRole('textbox', { name: 'Command' })).toBeVisible();
+      await expect(details(page).getByText(/^describe node\//)).toBeVisible();
+      await expect(
+        page
+          .getByRole('region', { name: 'Terminal' })
+          .getByText('$ kubectl get experience')
+          .filter({ visible: true }),
+      ).toBeVisible();
+    });
+  }
+
+  test('drops ?run= when the terminal is cleared', async ({ page }) => {
+    await page.goto('./?run=kubectl+get+nodes');
+    const input = page.getByRole('textbox', { name: 'Command' });
+    await expect(input).toBeVisible();
+    await expect.poll(() => run(page)).toBe('kubectl get nodes');
+    await input.fill('clear');
+    await input.press('Enter');
+    await expect.poll(() => run(page)).toBeNull();
   });
 });

@@ -1,5 +1,7 @@
 // @vitest-environment happy-dom
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { hydrateRoot } from 'react-dom/client';
+import { renderToString } from 'react-dom/server';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { actAsync } from '@/components/terminal/test-utils';
@@ -59,6 +61,33 @@ describe('DetailPanel', () => {
     expect(screen.getByText('describe node/mastercontrol')).toBeTruthy();
     expect(screen.getByRole('heading', { name: /DevOps Engineer \(Co-op\)/ })).toBeTruthy();
     expect(screen.getByText('Shipped a bot.')).toBeTruthy();
+  });
+
+  it('hydrates with the server view even when a deep link selected something first', async () => {
+    const html = renderToString(<DetailPanel initial={INITIAL} base={BASE} />);
+    const container = document.createElement('div');
+    container.append(document.createRange().createContextualFragment(html));
+    document.body.append(container);
+    // The terminal island hydrated first and ran `?run=kubectl describe pod asktrace`.
+    $selection.set({ kind: 'pod', name: 'asktrace' });
+    const errors: unknown[] = [];
+    let root: ReturnType<typeof hydrateRoot> | undefined;
+    try {
+      await act(async () => {
+        root = hydrateRoot(container, <DetailPanel initial={INITIAL} base={BASE} />, {
+          onRecoverableError: (error) => errors.push(error),
+        });
+        await Promise.resolve();
+      });
+      expect(errors).toEqual([]);
+      // Right after hydration it shows what was selected.
+      expect(container.textContent).toContain('describe pod/asktrace');
+    } finally {
+      act(() => {
+        root?.unmount();
+      });
+      container.remove();
+    }
   });
 
   it('describes the selected pod with its status, tech, and outside links in a new tab', () => {

@@ -26,7 +26,8 @@ the UI is the tool, the cluster is the game. In progress: Stage 3, the terminal 
 terminal already runs commands in place: type them, or click chips and names. On desktops at least
 1024 by 700 pixels the dashboard fits one screen: the terminal shows the latest result and pages a long
 one like `less` instead of scrolling, and the detail panel follows every `describe` and pages long details
-([ADR 0005](docs/adr/0005-3d-cluster-one-screen.md)); on phones the bottom sheet shows the output
+([ADR 0005](docs/adr/0005-3d-cluster-one-screen.md)); on phones the bottom sheet shows the output. Every view has a shareable `?run=` link,
+and Back and Forward step through what you viewed
 ([design](docs/plans/stage-3-design.md), [plan](docs/plans/stage-3.md)). Progress:
 [`docs/STATUS.md`](docs/STATUS.md) · [project board](https://github.com/users/roarceus/projects/1) ·
 [changelog](CHANGELOG.md) (from v0.1.0).
