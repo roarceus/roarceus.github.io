@@ -4,13 +4,15 @@ _Last updated: 2026-11-26_
 
 ## Current stage
 
-**Stage 3 — Terminal engine: in progress** (Tasks 1 to 6a of 9: plan #77, parser #78, snapshot #80, commands #84, store #85, terminal island #87; 6b, the one-screen layout, in review). v0.3.0 is live. Design:
+**Stage 3 — Terminal engine: in progress** (Tasks 1 to 6b of 9: plan #77, parser #78, snapshot #80, commands #84, store #85, terminal island #87, one-screen layout #88). v0.3.0 is live. Design:
 [`plans/stage-3-design.md`](plans/stage-3-design.md) (approved with changes 2026-11-25). Plan:
 [`plans/stage-3.md`](plans/stage-3.md) (approved) ·
 [milestone](https://github.com/roarceus/roarceus.github.io/milestone/4) (#68 to #76). Store:
 [ADR 0003](adr/0003-nanostores-for-island-state.md). The dashboard stays behind `clusterDashboard` until
 Stage 4. The CSP now comes from Astro with hashed inline scripts ([ADR 0004](adr/0004-astro-hashed-csp.md), #86),
-so islands load without `'unsafe-inline'`; CI audits every built page.
+so islands load without `'unsafe-inline'`; CI audits every built page. **Direction (2026-11-26):** the 3D
+cluster becomes the v1.0 desktop experience on one fixed screen where nothing scrolls, with a pod you can step
+inside ([ADR 0005](adr/0005-3d-cluster-one-screen.md); concept: [`concepts/cluster-3d-concept.html`](concepts/cluster-3d-concept.html)).
 
 ## Stage 2 sign-off
 
@@ -42,8 +44,9 @@ so islands load without `'unsafe-inline'`; CI audits every built page.
 
 ## Next steps
 
-1. Review the one-screen layout PR (6b), then 6c (budgets and `react-runtime` chunking), then Tasks 7
-   to 9 (`plans/stage-3.md`). Task 7 also resets the detail panel's scroll on a new item.
+1. Review the ADR 0005 docs PR, then 6c (budgets and `react-runtime` chunking), 6d (terminal output pages
+   instead of scrolling), then Tasks 7 to 9 (`plans/stage-3.md`). Task 7 pages the detail panel; Task 8 opens
+   Contact in place from the top bar too. Stage 4 is now the 3D scene with a 2D fallback.
 2. Carried over: submit the sitemap in Google Search Console; check the share card in a link inspector
    (runbook: `docs/runbooks/share-image.md`); set up the uptime monitor (M10); decide on Renovate's
    queued TypeScript 7 PR.

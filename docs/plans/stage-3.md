@@ -353,6 +353,9 @@ export function runHref(input: string, location: { pathname: string }): string; 
 > Split into three PRs (approved 2026-11-26): **6a** the terminal island (component tests, static test,
 > terminal e2e), **6b** the one-screen desktop layout, **6c** budgets and `react-runtime` chunking. The
 > CSP switch the island needs went first ([ADR 0004](../adr/0004-astro-hashed-csp.md)).
+> [ADR 0005](../adr/0005-3d-cluster-one-screen.md) (2026-11-26) adds **6d**: on the one-screen layout nothing
+> scrolls, so the terminal output pages instead of scrolling (6d below); the detail panel pages when it
+> becomes an island in Task 7.
 
 **Files:**
 
@@ -402,6 +405,14 @@ export function runHref(input: string, location: { pathname: string }): string; 
       console errors at every project size; a routed failure of `cluster.*.json` shows the error and Retry
       recovers.
 - [ ] `pnpm check`; Lighthouse passes; commit `feat(terminal): add interactive terminal island`.
+- [ ] **6d, paged boxes (ADR 0005):** on the one-screen layout (`desk`), the terminal output shows only the
+      latest result and pages a long one (`-- more (1/2) --`, Space or a Next button; Up/Down still walk
+      history). The detail panel pages in Task 7 (it needs the island), and the map stays a focusable scroll
+      box only until Stage 4 draws the scene to fit; without JavaScript both keep their scroll boxes. Below
+      `desk` and in print, nothing changes. Tests: component tests for paging (page count, Space and Next, a
+      new result resets to page 1, the live region still announces the summary); e2e at 1024x700 and 1280x800
+      that the output box never scrolls (`scrollHeight <= clientHeight`) after long commands, and that every
+      page is reachable by keyboard. Commit `feat(terminal): page long output instead of scrolling`.
 
 ### Task 7: Detail panel island and shareable links (PR 7)
 
@@ -415,7 +426,8 @@ markup), `src/pages/index.astro`, `tests/e2e/dashboard.spec.ts`, `tests/smoke/sm
       plain section via `url()`); below 768px it renders the latest `$terminal` result with `ResultView`;
       Copy link writes `runHref(...)` and announces `Link copied`; when the Clipboard API rejects, it selects
       a read-only text field with the link. When the panel shows a new item, its scroll goes back to
-      the top (from Task 6b; the one-screen layout scrolls the panel inside its own box).
+      the top (from Task 6b). On the one-screen layout (`desk`) the panel never scrolls: long content splits into
+      pages with Previous, Next, and a `1 / 2` count (ADR 0005), and a new item opens on page 1.
 - [ ] Deep links: on hydrate, `readRunParam(location.search)` → `runCommand(cmd,'deep-link')`; `describe`
       results `pushState`, others `replaceState`; `popstate` re-reads and runs without pushing; on phones a
       valid `?run=` opens cluster mode (sets `location.hash = 'cluster'` via `replaceState`).
@@ -427,6 +439,10 @@ markup), `src/pages/index.astro`, `tests/e2e/dashboard.spec.ts`, `tests/smoke/sm
 - [ ] `pnpm check`; commit `feat(cluster): add detail panel island and shareable links`.
 
 ### Task 8: Contact manifest command (PR 8)
+
+> ADR 0005: on the dashboard the top bar's Contact button also runs `kubectl apply -f contact.yaml` in place
+> (it stays a link to `plain/#contact` without JavaScript and on every other page). Add an e2e check that
+> clicking it keeps `page.url()` on `/`.
 
 **Files:** Create `src/lib/commands/apply.ts` (+ test), `src/components/terminal/ContactManifest.tsx`
 (+ test), loaded with `import()` from `ResultView` on `action: 'contact'`.

@@ -14,3 +14,6 @@ docs/SPEC.md
 CLAUDE.md
 # Verbatim exports from GitHub; keep byte-for-byte.
 docs/github/rulesets/
+
+# The standalone 3D concept page Sohan reviewed (ADR 0005); not part of the site build.
+docs/concepts/

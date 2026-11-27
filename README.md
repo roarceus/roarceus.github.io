@@ -21,7 +21,7 @@ Coming next, already in PR previews behind a flag: the cluster dashboard on `/`.
 (AA-checked), UI components, a top bar on every page, a shorter plain view (jump chips and expanders), and
 the cluster dashboard shell on `/` (map placeholder, detail panel, terminal dock, phone cluster mode). The
 dashboard stays behind the `clusterDashboard` flag, on in PR previews and off in production, until the
-terminal (Stage 3) and the map (Stage 4) make it real. Direction: [ADR 0002](docs/adr/0002-design-direction-tool-and-game.md),
+terminal (Stage 3) and the 3D cluster (Stage 4, [ADR 0005](docs/adr/0005-3d-cluster-one-screen.md)) make it real. Direction: [ADR 0002](docs/adr/0002-design-direction-tool-and-game.md),
 the UI is the tool, the cluster is the game. In progress: Stage 3, the terminal engine. On previews the
 terminal already runs commands in place: type them, or click chips and names. On desktops at least
 1024 by 700 pixels the dashboard fits one screen, with the map, the details, and the terminal each
@@ -123,7 +123,7 @@ an unknown flag name fails the build.
 ```
 .github/        workflows, composite setup action, issue/PR templates, labels, commit convention
 .husky/         pre-commit (lint-staged) and commit-msg (commitlint) hooks
-docs/           SPEC, STATUS, plans, ADRs, runbooks, postmortems, content guide
+docs/           SPEC, STATUS, plans, ADRs, runbooks, postmortems, content guide, concepts (design prototypes)
 public/         served as-is: favicon, resume, share image (og-image.png), .nojekyll
 src/
   components/   cluster/ (dashboard stage and detail panel), layout/ (top bar and site mark, footer, bottom sheet, SEO head
