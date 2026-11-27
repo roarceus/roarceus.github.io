@@ -18,19 +18,20 @@ const attr = (html: string, pattern: RegExp): string[] =>
 
 /** Island component and renderer URLs (`<astro-island>` attributes). */
 export function islandEntries(html: string): string[] {
-  const tags = attr(html, /<astro-island\b([^>]*)>/g);
-  return unique(tags.flatMap((tag) => attr(tag, /\b(?:component|renderer)-url="([^"]+)"/g)));
+  const tags = attr(html, /<astro-island\b([^>]*)>/gi);
+  return unique(tags.flatMap((tag) => attr(tag, /\b(?:component|renderer)-url="([^"]+)"/gi)));
 }
 
 /** Every script URL a page loads at startup, and the bodies of its inline scripts (JSON-LD excluded). */
 export function startupScripts(html: string): { entries: string[]; inline: string[] } {
   const tags = [
     ...html.matchAll(
-      /<link\b[^>]*\brel="modulepreload"[^>]*\bhref="([^"]+)"[^>]*>|<script\b[^>]*\bsrc="([^"]+)"[^>]*>/g,
+      /<link\b[^>]*\brel="modulepreload"[^>]*\bhref="([^"]+)"[^>]*>|<script\b[^>]*\bsrc="([^"]+)"[^>]*>/gi,
     ),
   ].map((m) => String(m[1] ?? m[2]));
-  const inline = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)]
-    .filter((m) => !/\bsrc=|application\/ld\+json/.test(String(m[1])))
+  // Any case, and closing tags with whitespace (`</script >`), so no script goes uncounted.
+  const inline = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)]
+    .filter((m) => !/\bsrc=|application\/ld\+json/i.test(String(m[1])))
     .map((m) => String(m[2]));
   return { entries: unique([...tags, ...islandEntries(html)]), inline };
 }

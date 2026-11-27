@@ -23,6 +23,15 @@ describe('startupScripts', () => {
     expect(inline).toEqual(['console.log("inline")']);
   });
 
+  it('matches tags in any case and closing tags with spaces', () => {
+    const html = `<SCRIPT TYPE="module" SRC="/assets/a.js"></SCRIPT ><Script>run()</Script >
+<LINK REL="modulepreload" HREF="/assets/b.js"><ASTRO-ISLAND COMPONENT-URL="/assets/c.js"></ASTRO-ISLAND>`;
+    expect(startupScripts(html)).toEqual({
+      entries: ['/assets/a.js', '/assets/b.js', '/assets/c.js'],
+      inline: ['run()'],
+    });
+  });
+
   it('skips JSON-LD and does not count a URL twice', () => {
     const html = `${PAGE}<astro-island component-url="/assets/Terminal.js" renderer-url="/assets/client.js"></astro-island>`;
     expect(startupScripts(html).entries).toHaveLength(4);
