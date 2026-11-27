@@ -1,6 +1,6 @@
 # 0002. Design direction: the UI is the tool, the cluster is the game
 
-- **Status:** accepted
+- **Status:** accepted; the roadmap in point 5 is superseded by [0005](0005-3d-cluster-one-screen.md) (3D moves into v1.0)
 - **Date:** 2026-11-25
 - **Deciders:** Sohan Patil
 

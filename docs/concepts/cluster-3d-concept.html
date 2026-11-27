@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sohan Cluster 3D Concept</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* One fixed screen: top bar, scene + detail panel, terminal. Nothing scrolls on desktop; long content pages. */
+:root{
+  --bg:#0a0e14;--surface:#111823;--surface-2:#162030;--line:#243145;--line-2:#33435c;
+  --text:#e7edf5;--muted:#97a5b8;--accent:#3d7bff;--accent-soft:#8fb3ff;
+  --ok:#3fb950;--warn:#e3a12f;--bad:#f2554b;--done:#9aabc3;--cfg:#2fbf8f;--sec:#a594f9;--gold:#d9b85c;
+  --font-sans:"Inter",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 var(--font-sans);overflow:hidden;
+  display:grid;grid-template-rows:auto minmax(0,1fr) auto;
+  padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px))}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent-soft);outline-offset:2px}
+.muted{color:var(--muted)}
+header{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--line);min-width:0}
+.brand{display:flex;align-items:center;gap:8px;font:500 15px var(--font-mono);white-space:nowrap}
+.hexmark{width:20px;height:20px;color:var(--accent)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:2px 10px;border-radius:999px;font:500 12px var(--font-mono);white-space:nowrap}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.pill.ok{background:#11301c;color:#7fe29d}.pill.bad{background:#3a1414;color:#ff9a92}
+.who{display:flex;align-items:baseline;gap:10px;min-width:0;overflow:hidden;white-space:nowrap}
+.who b{font:600 16px var(--font-sans)}
+.spacer{flex:1}
+.btn{border:1px solid var(--line-2);background:transparent;border-radius:8px;padding:6px 12px;cursor:pointer;white-space:nowrap;font-size:13px;min-height:36px;text-decoration:none;display:inline-flex;align-items:center}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:#2f6aea}
+.concept{font:500 11px var(--font-mono);color:var(--warn);border:1px dashed #6b5016;border-radius:6px;padding:2px 8px;white-space:nowrap}
+main{display:grid;grid-template-columns:minmax(0,1fr) 360px;min-height:0}
+#stage{position:relative;min-height:0;background:#0d121a;overflow:hidden}
+#stage canvas{display:block;width:100%;height:100%;cursor:grab}
+.tag{position:absolute;pointer-events:none;transform:translate(-50%,-100%);font:500 11px var(--font-mono);white-space:nowrap;padding:3px 8px;border-radius:6px;background:rgba(10,14,20,.85);border:1px solid var(--line-2)}
+.tag.comp{color:var(--accent-soft);border-color:#22365c}
+.tag.node{font-size:12px}
+.tag.cordon{color:var(--muted);border-style:dashed}
+.tag.cfg{color:var(--cfg);border-color:#1d5a45}.tag.sec{color:var(--sec);border-color:#3f3a7a}.tag.svc{color:var(--accent-soft)}.tag.evt{color:var(--muted)}
+.tag.cert,.tag.award{color:var(--gold);border-color:#5b4c22;font-size:10px}
+#flabel{position:absolute;pointer-events:none;transform:translate(-50%,calc(-100% - 10px));padding:6px 10px;border-radius:8px;background:var(--surface-2);border:1px solid var(--accent);font:12px var(--font-mono);white-space:nowrap;transition:opacity .2s}
+#flabel::after{content:"";position:absolute;left:50%;bottom:-6px;width:10px;height:10px;background:var(--surface-2);border-right:1px solid var(--accent);border-bottom:1px solid var(--accent);transform:translateX(-50%) rotate(45deg)}
+#crumbs{position:absolute;left:14px;top:12px;font:12px var(--font-mono);color:var(--muted);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+#crumbs button{background:none;border:0;padding:2px 0;color:var(--accent-soft);cursor:pointer;text-decoration:underline;text-underline-offset:3px;font:inherit}
+#crumbs b{color:var(--text);font-weight:500}
+#filter{position:absolute;left:14px;top:38px;font:12px var(--font-mono);color:var(--cfg)}
+#legend{position:absolute;left:14px;bottom:12px;display:flex;gap:12px;font:11px var(--font-mono);color:var(--muted);pointer-events:none;flex-wrap:wrap}
+#legend span::before{content:"";display:inline-block;width:9px;height:9px;margin-right:5px;border-radius:2px;background:var(--c);vertical-align:-1px}
+#skip{position:absolute;right:14px;bottom:12px;font:11px var(--font-mono)}
+#dive{position:absolute;right:14px;top:12px;font:12px var(--font-mono)}
+aside{border-left:1px solid var(--line);background:var(--surface);display:grid;grid-template-rows:minmax(0,1fr) auto;min-height:0}
+.page{padding:16px 18px;overflow:hidden;min-height:0;display:flex;flex-direction:column;gap:10px}
+.pager{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;border-top:1px solid var(--line);font:12px var(--font-mono);color:var(--muted)}
+.pager .btn{padding:4px 10px;min-height:32px;font-size:12px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;font:12px var(--font-mono);margin:0}
+.kv dt{color:var(--muted)}.kv dd{margin:0}
+.title{font:600 19px/1.3 var(--font-sans);text-wrap:balance;margin:0}
+.eyebrow{font:12px var(--font-mono);color:var(--muted)}
+.prose{margin:0;color:var(--muted);font-size:13.5px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:11px var(--font-mono);padding:2px 8px;border-radius:6px;background:var(--surface-2);border:1px solid var(--line);cursor:pointer;color:var(--text)}
+.chip:hover{border-color:var(--cfg);color:var(--cfg)}
+.row{display:flex;justify-content:space-between;gap:10px;font:12px var(--font-mono);align-items:baseline}
+.row button{background:none;border:0;padding:0;color:var(--accent-soft);cursor:pointer;text-decoration:underline;text-underline-offset:3px;text-align:left;font:inherit}
+.bar{display:grid;grid-template-columns:110px 1fr 28px;gap:8px;align-items:center;font:12px var(--font-mono)}
+.bar i{display:block;height:8px;border-radius:2px;background:linear-gradient(90deg,var(--accent) var(--w),#1b2536 var(--w))}
+.yaml{font:12px/1.65 var(--font-mono);white-space:pre-wrap;margin:0;color:var(--text)}
+.yaml .k{color:var(--accent-soft)}.yaml .c{color:var(--muted)}
+.decoded{border-left:2px solid var(--sec);padding-left:10px}
+.st-Completed{color:var(--done)}.st-Running{color:var(--ok)}.st-CrashLoopBackOff,.st-Terminating{color:var(--bad)}.st-ContainerCreating,.st-Pending{color:var(--warn)}
+form.manifest{font:12px/1.9 var(--font-mono);display:flex;flex-direction:column}
+form.manifest input{min-width:0;background:var(--bg);border:1px solid var(--line-2);border-radius:6px;padding:4px 8px;font:12px var(--font-mono)}
+#term{border-top:1px solid var(--line);background:var(--surface);padding:10px 16px 12px;display:grid;gap:8px}
+#out{height:120px;overflow:hidden;font:12.5px/1.6 var(--font-mono);white-space:pre}
+#out .cmd{color:var(--muted)}#out .ok{color:var(--ok)}#out .bad{color:var(--bad)}#out .warn{color:var(--warn)}#out .more{color:var(--accent-soft)}
+.prompt{display:flex;gap:8px;align-items:center;font-family:var(--font-mono)}
+.prompt span{color:var(--accent-soft)}
+#cmd{flex:1;min-width:0;background:var(--bg);border:1px solid var(--line-2);border-radius:8px;padding:8px 10px;font:14px var(--font-mono)}
+.chipbar{display:flex;gap:6px;flex-wrap:wrap}
+.cbtn{border:1px solid var(--line-2);background:transparent;border-radius:8px;padding:4px 10px;cursor:pointer;display:grid;text-align:left;min-height:40px}
+.cbtn:hover{background:var(--surface-2)}
+.cbtn b{font:500 12.5px var(--font-sans)}.cbtn small{font:10.5px var(--font-mono);color:var(--muted)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (max-width:900px){
+  body{overflow:auto;height:auto;display:block}
+  main{grid-template-columns:1fr}
+  #stage{height:58vh}
+  aside{border-left:0;border-top:1px solid var(--line);min-height:420px}
+  .who span{display:none}
+}
+@media (max-width:560px){.who,.concept{display:none}}
+</style>
+
+<header>
+  <div class="brand"><svg class="hexmark" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8.66 5v10L12 22l-8.66-5V7z" fill="none" stroke="currentColor" stroke-width="2"/></svg>sohan-cluster</div>
+  <span id="health" class="pill ok">All pods healthy</span>
+  <span style="font:12px var(--font-mono)" class="muted">v1.3.0</span>
+  <div class="who"><b>Sohan Patil</b><span class="muted">Software Engineer (DevOps, Cloud, Full Stack)</span></div>
+  <div class="spacer"></div>
+  <span class="concept">concept, not final UI</span>
+  <button class="btn" type="button" data-run="config use-context plain">Plain view</button>
+  <button class="btn primary" type="button" data-run="apply -f contact.yaml">Contact</button>
+</header>
+
+<main>
+  <section id="stage" aria-label="Cluster map. Everything here is also reachable from the chips and the terminal.">
+    <nav id="crumbs" aria-label="Where you are"></nav>
+    <div id="filter"></div>
+    <button id="dive" class="btn" type="button" hidden>Step inside</button>
+    <div id="legend"><span style="--c:var(--done)">Completed</span><span style="--c:var(--ok)">Running</span><span style="--c:var(--warn)">Creating</span><span style="--c:var(--bad)">Failing</span><span style="--c:var(--gold)">Award, cert</span><span style="--c:#7aa7ff">request</span></div>
+    <button id="skip" class="btn" type="button">Skip boot</button>
+    <div id="flabel" style="opacity:0"></div>
+  </section>
+  <aside aria-label="Details">
+    <div class="page" id="panel"></div>
+    <div class="pager" id="ppager" hidden><button class="btn" type="button" id="pprev">Previous</button><span id="pnum">1 / 1</span><button class="btn" type="button" id="pnext">Next</button></div>
+  </aside>
+</main>
+
+<section id="term" aria-label="Terminal">
+  <div id="out" role="log" aria-live="polite"></div>
+  <form class="prompt" id="pform" autocomplete="off"><span aria-hidden="true">$</span><label class="sr" for="cmd">Command</label><input id="cmd" spellcheck="false" placeholder="kubectl exec -it asktrace -- sh"></form>
+  <div class="chipbar" id="chips"></div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js" integrity="sha384-wagZhIFgY4hD+7awjQjR4e2E294y6J2HSnd8eTNc15ZubTeQeVRZwhQJ+W6hnBsf" crossorigin="anonymous"></script>
+<script>
+const D = {"projects": {"ai-migration-agents": {"name": "AI migration agent framework", "tagline": "LangGraph and Claude Code agents that migrated about 55 Java services and got 100+ PRs merged.", "status": "completed", "node": "mastercontrol", "tech": ["LangGraph", "Claude Code", "Java", "Gradle", "GitHub", "Slack"], "links": {}, "start": "2025-06", "end": "2025-12", "story": ["The platform team wanted about 55 Java/Gradle services on their standard Gradle plugins (base Java setup, static analysis, and Sonar). By hand that meant a lot of near-identical PRs, so I built agents to do it.", "Over three rollouts it made 100 to 150 repo changes and got over 100 PRs merged, from about 350 agent sessions in 63 repos. People only reviewed PRs that were already green. It's internal to MasterControl, so the code isn't public."], "bullets": ["LangGraph runs a fixed, auditable workflow for each repo: clone it, check whether it needs the update,", "Claude Code makes the actual edits inside each repo.", "I wrote the prompts (a manager agent plus subagents, 17 to 50 KB each) and revised them about 20", "I also wrote scripts to promote passing PRs and track rollout status for the handoff."]}, "analog-clock": {"name": "Analog Clock", "tagline": "Vanilla JS analog clock with light and dark modes.", "status": "completed", "node": "mumbai", "tech": ["JavaScript", "HTML", "CSS"], "links": {"repo": "https://github.com/roarceus/analog-clock"}, "start": "", "end": "", "story": ["An analog clock in vanilla JavaScript, with light and dark modes and a background that changes with the time of day."], "bullets": []}, "asktrace": {"name": "askTRACE", "tagline": "Pulls insights out of Northeastern's course evaluation surveys with Kafka, GKE, and RAG.", "status": "completed", "node": "northeastern", "tech": ["Go", "Python", "Kafka", "Kubernetes", "Helm", "GKE", "GCP", "Terraform", "Jenkins", "RAG"], "links": {"repo": "https://github.com/trace-survey-analysis", "demo": "https://www.youtube.com/watch?v=VntctukuTwA"}, "start": "2025-01", "end": "2025-04", "story": ["askTRACE processes Northeastern's TRACE (Teacher Rating And Course Evaluation) survey data and answers questions about it using retrieval-augmented generation (RAG).", "We were a team of two for CSYE 7125, and I worked on almost all of the 13 repos:"], "bullets": ["Go and Python services talking over Kafka, running on Google Kubernetes Engine.", "GCP infrastructure in Terraform.", "Helm charts for the services, plus a Kubernetes operator for backups.", "Jenkins CI for the whole system."]}, "aws-iaas": {"name": "AWS infrastructure for a web app", "tagline": "A Node.js app on AWS with all of its infrastructure in Terraform and email verification in a serverless function.", "status": "completed", "node": "northeastern", "tech": ["Terraform", "AWS", "Node.js", "GitHub Actions"], "links": {"repo": "https://github.com/user-profile-terraform-iac"}, "start": "2024-09", "end": "2024-12", "story": ["I built this on my own for CSYE 6225 (Network Structures and Cloud Computing) at Northeastern. It's three repos:", "CI/CD runs on GitHub Actions."], "bullets": ["`tf-aws-infra`: the AWS infrastructure, all in Terraform.", "`webapp`: a Node.js back end for user profiles.", "`serverless`: a serverless function that verifies new users by email."]}, "book-review-system": {"name": "Book Review System", "tagline": "Python web app to find, rate, and review books, with Goodreads integration.", "status": "completed", "node": null, "tech": ["Python", "MySQL", "Heroku"], "links": {"repo": "https://github.com/roarceus/book-reviews-system-cloud-computing"}, "start": "", "end": "", "story": ["A book review web app built with Python: find books, rate them, and write reviews. It used the Goodreads API for cross-platform ratings and reviews."], "bullets": []}, "credit-management-system": {"name": "Credit Management System", "tagline": "CRUD app that simulates a credit management system.", "status": "completed", "node": "sparks-foundation", "tech": ["PHP", "MySQL", "CSS"], "links": {"repo": "https://github.com/roarceus/php-credit-management"}, "start": "2020-08", "end": "2020-09", "story": ["A CRUD application that simulates a credit management system, built with PHP and MySQL during my web development internship at The Sparks Foundation."], "bullets": []}, "deployment-gating-bot": {"name": "Deployment gating bot", "tagline": "A GitHub App that pauses merges or deployments across 60+ GitOps repos with one switch per repo.", "status": "completed", "node": "mastercontrol", "tech": ["TypeScript", "Probot", "GitHub Apps", "Kubernetes", "Helm", "Argo CD", "Vitest", "cosign"], "links": {}, "start": "2025-06", "end": "2025-12", "story": ["Release managers needed a way to freeze merges to main before a release, or stop dev deployments during an incident. Before this, that meant editing workflows or branch protection in every repo. This GitHub App gives them one switch per repo for two gates, merges to main and dev deployments, across 60+ GitOps-deployed repos.", "How it works:"], "bullets": ["Written in TypeScript on Probot. It hooks into GitHub deployment protection rules and the Checks API.", "Gate state lives in repo custom properties, so there's no database. The bot is stateless, so restarts", "It fails open. If the bot is down, teams can still ship.", "Runs on Kubernetes from a Helm chart deployed by Argo CD."]}, "google-maps-clone": {"name": "Maps Clone", "tagline": "Front-end map app built on the Mapbox API.", "status": "completed", "node": "mumbai", "tech": ["JavaScript", "HTML", "Mapbox"], "links": {"repo": "https://github.com/roarceus/google-maps-clone"}, "start": "", "end": "", "story": ["A simple front-end map application, modeled on Google Maps, built with the Mapbox API."], "bullets": []}, "huskyhub": {"name": "HuskyHub", "tagline": "Java Swing app supporting student housing and well-being.", "status": "completed", "node": "northeastern", "tech": ["Java", "Java Swing", "DB4O"], "links": {"repo": "https://github.com/roarceus/HuskyHub"}, "start": "2024-01", "end": "2024-04", "story": ["A Java Swing application backed by DB4O, built as a collaborative system that supports students' well-being at a university and helps them find housing."], "bullets": []}, "kounsellor": {"name": "Kounsellor", "tagline": "Counselling website with user management.", "status": "completed", "node": "mumbai", "tech": ["PHP", "HTML", "CSS"], "links": {"repo": "https://github.com/roarceus/kounsellor-counselling-website"}, "start": "", "end": "", "story": ["A counselling website built with PHP, with a user management system."], "bullets": []}, "meeting-notes-react": {"name": "Meeting Notes (React)", "tagline": "MERN app to create and browse meeting notes.", "status": "completed", "node": null, "tech": ["TypeScript", "React", "Node.js", "Express.js", "MongoDB"], "links": {"repo": "https://github.com/roarceus/meeting-notes-react"}, "start": "", "end": "", "story": ["A dynamic meeting notes app on the MERN stack with TypeScript: create new notes or browse existing ones."], "bullets": []}, "meeting-notes": {"name": "Meeting Notes", "tagline": "Static meeting notes app.", "status": "completed", "node": "mumbai", "tech": ["JavaScript", "Sass", "HTML"], "links": {"repo": "https://github.com/roarceus/meeting-notes"}, "start": "", "end": "", "story": ["A static meeting notes app: create new notes or view existing ones."], "bullets": []}, "neu-grade-calculator": {"name": "Grade Calculator", "tagline": "JavaFX app for engineering students to track and analyze their grades.", "status": "completed", "node": "northeastern", "tech": ["Java", "JavaFX", "SQLite"], "links": {"repo": "https://github.com/roarceus/NEUGradeCalculator"}, "start": "2025-01", "end": "2025-04", "story": ["A JavaFX application for Northeastern University College of Engineering students to track, calculate, and analyze their academic performance."], "bullets": []}, "oct-data-api": {"name": "OCT data API", "tagline": "Node.js APIs serving the OCT imaging dashboards, with large images in object storage.", "status": "completed", "node": "capgemini", "tech": ["Node.js", "PostgreSQL", "Redis"], "links": {}, "start": "2021-05", "end": "", "story": ["Node.js APIs that served the OCT imaging dashboards. Large images lived in object storage, and the database held their metadata and pointers to them.", "I built them at Capgemini with Node.js, PostgreSQL, and Redis. The code isn't public."], "bullets": ["About 40% faster data retrieval, from Redis caching and PostgreSQL indexes tuned with EXPLAIN ANALYZE.", "About 25% lower API latency, by returning only new readings and sending smaller payloads per update."]}, "oct-imaging-dashboard": {"name": "OCT imaging dashboard", "tagline": "React dashboards for an OCT medical imaging system used in heart procedures.", "status": "completed", "node": "capgemini", "tech": ["React", "TypeScript"], "links": {}, "start": "2021-05", "end": "", "story": ["React dashboards for an OCT (optical coherence tomography) medical imaging system used in heart procedures. They showed patient and physician data, heart imaging data, and DICOM images, with filtering. A real-time monitoring dashboard was used by internal and testing teams.", "I built them at Capgemini in React and TypeScript, on top of the Node.js APIs in the OCT data API project. The code isn't public."], "bullets": []}, "roarceus-github-io": {"name": "This portfolio", "tagline": "This site: my career as a Kubernetes cluster you can explore with kubectl or a click.", "status": "running", "node": null, "tech": ["Astro", "React", "TypeScript", "Tailwind CSS", "GitHub Actions", "Playwright", "Vitest"], "links": {"repo": "https://github.com/roarceus/roarceus.github.io", "demo": "https://roarceus.github.io/"}, "start": "2026-11", "end": "", "story": ["The site you're on. My career is modeled as a Kubernetes cluster: organizations are nodes, projects are pods, and you can explore it with `kubectl`-style commands, a clickable cluster map, or a plain view."], "bullets": ["Static Astro site with React islands; content is YAML and Markdown validated by Zod schemas.", "Every pull request gets a preview deployment; releases are versioned by release-please.", "CI runs lint, type checks, unit and end-to-end tests on three browser engines, accessibility checks,"]}, "safehaven": {"name": "SafeHaven", "tagline": "MERN web portal that helps refugees find suitable camps and the resources they need.", "status": "completed", "node": "northeastern", "tech": ["MongoDB", "Express.js", "React", "Node.js"], "links": {"repo": "https://github.com/roarceus/SafeHaven"}, "start": "2024-03", "end": "2024-04", "story": ["SafeHaven is a MERN-stack refugee assistance portal that helps refugees find suitable camps and access necessary resources, with a RESTful back end.", "Built for INFO 6150 at Northeastern University."], "bullets": []}, "travel-website": {"name": "Travel Website", "tagline": "Front-end travel site for browsing destinations.", "status": "completed", "node": "mumbai", "tech": ["HTML", "CSS", "Sass"], "links": {"repo": "https://github.com/roarceus/travel-website"}, "start": "", "end": "", "story": ["A front-end travel website where visitors browse and choose destinations."], "bullets": []}}, "experience": {"experience/capgemini": {"org": "Capgemini", "role": "Software Engineer", "type": "work", "location": "Mumbai, India", "start": "2021-05", "end": "2023-10", "summary": "Built the web side of an OCT (optical coherence tomography) imaging system used in heart procedures: Node.js APIs and React dashboards for patient and physician data, heart imaging data, and DICOM images, including a real-time monitoring dashboard. Internal and testing teams used it, and physicians used it to look at data away from the lab.", "highlights": [{"text": "Sped up data retrieval with Redis caching and PostgreSQL indexing.", "metric": "40% faster"}, {"text": "Cut API latency by sending only new readings in smaller updates.", "metric": "25% lower"}, {"text": "Kept terabytes of patient imaging data in object storage, with metadata and pointers in the database."}, {"text": "Set up CI/CD with Jenkins, Git, and Terraform for Dockerized services."}, {"text": "Automated infrastructure and test work with Bash, Python, and Cypress."}], "tech": ["React", "Node.js", "Express.js", "Python", "PostgreSQL", "Redis", "Jenkins", "Terraform", "Docker", "Cypress"], "node": "capgemini"}, "experience/mastercontrol": {"org": "MasterControl", "role": "DevOps Engineer (Co-op)", "type": "work", "location": "Salt Lake City, UT (remote)", "start": "2025-06", "end": "2025-12", "summary": "DevOps and platform work for teams shipping services through GitOps: CI/CD pipelines, Kubernetes environments, and internal tools that took manual work out of releases and deployments.", "highlights": [{"text": "Built a GitHub App that lets release managers pause merges to main or dev deployments with one switch per repo, instead of editing every repo's workflows during freezes and incidents.", "metric": "60+ repos"}, {"text": "Built an AI agent framework on LangGraph and Claude Code that moved Java/Gradle services onto the platform team's standard Gradle plugins, opening PRs and retrying on CI failures.", "metric": "~55 services, 100+ merged PRs"}, {"text": "Maintained CI/CD pipelines and Kubernetes environments used by several development teams."}], "tech": ["Kubernetes", "Helm", "Argo CD", "Docker", "Jenkins", "Artifactory", "TypeScript", "Gradle", "LangGraph", "Claude Code"], "node": "mastercontrol"}, "experience/northeastern-ta": {"org": "Northeastern University", "role": "Teaching Assistant, Network Structures & Cloud Computing (CSYE 6225)", "type": "teaching", "location": "Boston, MA", "start": "2026-01", "end": "2026-04", "summary": "Supported course instruction and guided students through cloud architectures, networking fundamentals, and hands-on AWS assignments.", "highlights": [], "tech": ["AWS"], "node": "northeastern"}, "experience/sparks-foundation": {"org": "The Sparks Foundation", "role": "Web Development Intern", "type": "work", "location": "Remote (Mumbai, India)", "start": "2020-08", "end": "2020-09", "summary": "Worked on the front end and back end of a credit management system, integrating third-party services and moving data processing into cloud functions.", "highlights": [], "tech": ["React", "Node.js", "Express.js", "PHP", "MySQL", "Bootstrap", "Material UI", "Heroku"], "node": "sparks-foundation", "cluster": false}, "education/mumbai": {"school": "University of Mumbai", "degree": "Bachelor of Engineering", "field": "Computer Engineering", "location": "Mumbai, India", "start": "2016-08", "end": "2020-10", "highlights": ["Coursework in web development, data structures and algorithms, object-oriented programming, machine learning, and NLP."], "node": "mumbai", "cluster": false}, "education/northeastern": {"school": "Northeastern University", "degree": "Master of Science", "field": "Information Systems", "location": "Boston, MA", "start": "2024-01", "end": "2026-04", "highlights": ["Focus on DevOps and application development.", "Coursework in web application development, cloud computing and infrastructure, and data structures and algorithms."], "node": "northeastern"}}, "skills": [{"id": "languages", "category": "Languages", "order": 1, "items": [{"name": "TypeScript", "level": 4}, {"name": "Python", "level": 4}, {"name": "JavaScript", "level": 4}, {"name": "Java"}, {"name": "Go", "level": 3}, {"name": "Bash", "level": 3}, {"name": "SQL", "level": 3}]}, {"id": "cloud-devops", "category": "Cloud and DevOps", "order": 2, "items": [{"name": "Kubernetes", "level": 4}, {"name": "Docker", "level": 4}, {"name": "Helm", "level": 4}, {"name": "Argo CD", "level": 3}, {"name": "Terraform", "level": 4}, {"name": "AWS", "level": 4}, {"name": "GCP", "level": 3}, {"name": "Jenkins", "level": 3}, {"name": "GitHub Actions", "level": 4}, {"name": "Artifactory"}, {"name": "Gradle"}, {"name": "Kafka", "level": 3}]}, {"id": "backend-data", "category": "Back end and data", "order": 3, "items": [{"name": "Node.js", "level": 4}, {"name": "Express.js"}, {"name": "PostgreSQL", "level": 3}, {"name": "Redis"}, {"name": "MySQL"}, {"name": "MongoDB"}, {"name": "PHP"}]}, {"id": "frontend", "category": "Front end", "order": 4, "items": [{"name": "React", "level": 3}, {"name": "Next.js"}, {"name": "HTML"}, {"name": "CSS"}, {"name": "Sass"}, {"name": "Tailwind CSS"}, {"name": "Bootstrap"}]}, {"id": "ai-tooling", "category": "AI and tooling", "order": 5, "items": [{"name": "LangGraph", "level": 3}, {"name": "Claude Code", "level": 4}, {"name": "RAG"}, {"name": "Git"}, {"name": "Cypress"}]}], "certifications": [{"id": "cka", "name": "Certified Kubernetes Administrator (CKA)", "issuer": "The Linux Foundation", "status": "in-progress"}, {"id": "ckad", "name": "Certified Kubernetes Application Developer (CKAD)", "issuer": "The Linux Foundation", "status": "in-progress"}], "achievements": [{"id": "labs-intern-award", "title": "Labs Intern Award", "org": "MasterControl", "date": "2025-12", "description": "Recognized for outstanding contributions and performance during my DevOps co-op."}, {"id": "star-award", "title": "Star Award", "org": "Capgemini", "date": "2022-05", "description": "Recognized for innovative work optimizing front-end and back-end systems."}, {"id": "best-final-year-project", "title": "Best Final Year Project", "org": "University of Mumbai", "date": "2020-10", "description": "A machine learning model for price prediction with blockchain-based payments.", "link": "https://github.com/roarceus/nayamandi"}, {"id": "sciencefest-first-place", "title": "1st Place, ScienceFest", "org": "University of Mumbai", "date": "2017-02", "description": "Built a heartbeat monitor that took first place at the undergraduate science fest."}], "updates": [{"title": "Completed AWS infrastructure for a web app", "date": "2024-12-15", "tags": ["projects", "aws", "terraform"], "slug": "completed-aws-iaas"}, {"title": "Completed SafeHaven", "date": "2024-04-22", "tags": ["projects"], "slug": "completed-safehaven"}, {"title": "Joined MasterControl as a DevOps co-op", "date": "2025-06-26", "tags": ["work", "devops"], "slug": "joined-mastercontrol"}, {"title": "Launched askTRACE", "date": "2025-04-26", "tags": ["projects", "kubernetes"], "slug": "launched-asktrace"}, {"title": "Launched my design portfolio", "date": "2024-11-20", "tags": ["design"], "slug": "launched-design-portfolio"}, {"title": "Launched my first personal website", "date": "2025-01-22", "tags": ["projects"], "slug": "launched-personal-website"}, {"title": "Moved to the US for my Master's", "date": "2023-12-29", "tags": ["life", "northeastern"], "slug": "relocated-to-usa"}, {"title": "Started my LeetCode practice", "date": "2024-05-01", "tags": ["learning"], "slug": "started-leetcode"}, {"title": "Started a teaching assistantship in cloud computing", "date": "2026-01-01", "tags": ["teaching", "northeastern"], "slug": "started-teaching-assistantship"}], "profile": {"name": "Sohan Patil", "title": "Software Engineer (DevOps, Cloud, Full Stack)", "location": "San Francisco Bay Area", "tagline": "I build backend services, CI/CD pipelines, and Kubernetes tooling.", "openToWork": true}};
+(() => {
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const ym = (s) => { if (!s) return 'now'; const [y, m] = String(s).split('-'); return m ? `${MON[+m - 1]} ${y}` : y; };
+const b64 = (s) => btoa(unescape(encodeURIComponent(s)));
+
+/* ---------- content model: nodes from roles and degrees, pods from projects ---------- */
+const LAYOUT = { northeastern: [-10, 3.5, 4.2], mastercontrol: [7, -8, 4.2], capgemini: [8.5, 6.5, 4.2], mumbai: [-19, -10, 3.2], 'sparks-foundation': [-6, -18, 2.6] };
+const NODES = {};
+for (const [key, e] of Object.entries(D.experience)) {
+  const n = (NODES[e.node] ||= { name: e.node, cordoned: e.cluster === false, entries: [] });
+  n.entries.push({ kind: key.split('/')[0], title: e.role || `${e.degree}, ${e.field}`, org: e.org || e.school, start: e.start, end: e.end, summary: e.summary, highlights: e.highlights || [] });
+}
+for (const n of Object.values(NODES)) { n.entries.sort((a, b) => (b.start > a.start ? 1 : -1)); n.label = n.entries.some((e) => e.kind === 'experience') ? 'role=work' : 'role=education'; if (n.name === 'northeastern') n.label = 'role=education,teaching'; }
+const STATUS = { completed: 'Completed', running: 'Running' };
+const ORG_NODE = { MasterControl: 'mastercontrol', Capgemini: 'capgemini', 'University of Mumbai': 'mumbai' };
+const UPDATE_NODE = (t) => /MasterControl/.test(t) ? 'mastercontrol' : /AWS|SafeHaven|askTRACE|teaching|Master/.test(t) ? 'northeastern' : null;
+const UPDATE_POD = (t) => /AWS/.test(t) ? 'aws-iaas' : /SafeHaven/.test(t) ? 'safehaven' : /askTRACE/.test(t) ? 'asktrace' : null;
+const ALL_SKILLS = D.skills.flatMap((g) => g.items.map((i) => ({ ...i, cat: g.category })));
+
+/* ---------- three.js ---------- */
+const stage = $('#stage');
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+stage.prepend(renderer.domElement); renderer.domElement.setAttribute('aria-hidden', 'true');
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x0d121a); scene.fog = new THREE.Fog(0x0d121a, 48, 90);
+const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 200);
+const HOME = { pos: new THREE.Vector3(-2, 27, 33), target: new THREE.Vector3(-2, 0, -2) };
+camera.position.copy(HOME.pos);
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.target.copy(HOME.target); controls.enablePan = false; controls.enableDamping = true; controls.dampingFactor = 0.08;
+controls.minDistance = 6; controls.maxDistance = 60; controls.maxPolarAngle = 1.25;
+scene.add(new THREE.HemisphereLight(0xbcd2ff, 0x0b0f15, 0.7));
+const sun = new THREE.DirectionalLight(0xffffff, 0.85); sun.position.set(-12, 26, 14); sun.castShadow = true; sun.shadow.mapSize.set(1024, 1024);
+Object.assign(sun.shadow.camera, { left: -30, right: 30, top: 30, bottom: -30 }); scene.add(sun);
+
+const clusterG = new THREE.Group(); scene.add(clusterG);
+const podG = new THREE.Group(); podG.visible = false; scene.add(podG);
+const ground = new THREE.Mesh(new THREE.CircleGeometry(70, 6), new THREE.MeshStandardMaterial({ color: 0x0e141d, roughness: 1 }));
+ground.rotation.x = -Math.PI / 2; ground.position.y = -0.6; ground.receiveShadow = true; scene.add(ground);
+for (let q = -8; q <= 8; q++) for (let r = -8; r <= 8; r++) {
+  const x = 3.4 * (q + r / 2), z = 2.95 * r; if (Math.hypot(x, z) > 30) continue;
+  const l = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.CylinderGeometry(1.7, 1.7, 0.01, 6)), new THREE.LineBasicMaterial({ color: 0x18212f }));
+  l.position.set(x, -0.58, z); clusterG.add(l);
+}
+const C = { plat: 0x1c2533, platSel: 0x0f2a5c, edge: 0x34445e, edgeSel: 0x5b8fff, cp: 0x182033, comp: 0x2b4f99, done: 0x9aabc3, ok: 0x3fb950, warn: 0xe3a12f, bad: 0xf2554b, packet: 0x7aa7ff, gold: 0xd9b85c, cfg: 0x2fbf8f, sec: 0xa594f9 };
+const tags = [];
+function tag(text, cls, world, level = 'cluster') { const d = document.createElement('div'); d.className = 'tag ' + cls; d.textContent = text; stage.appendChild(d); const t = { el: d, world, level }; tags.push(t); return t; }
+const clusterPick = [], podPick = [];
+
+function hexPlatform(radius, color, cordoned) {
+  const g = new THREE.Group();
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, 0.7, 6), new THREE.MeshStandardMaterial({ color, roughness: 0.85, transparent: cordoned, opacity: cordoned ? 0.45 : 1 }));
+  body.castShadow = !cordoned; body.receiveShadow = true; g.add(body);
+  const edgeMat = cordoned ? new THREE.LineDashedMaterial({ color: 0x8a6a2a, dashSize: 0.4, gapSize: 0.3 }) : new THREE.LineBasicMaterial({ color: C.edge });
+  const edge = new THREE.LineSegments(new THREE.EdgesGeometry(body.geometry), edgeMat); if (cordoned) edge.computeLineDistances();
+  g.add(edge); g.userData = { body, edge, cordoned }; return g;
+}
+const nodeObjs = {};
+for (const [name, [x, z, r]] of Object.entries(LAYOUT)) {
+  if (!NODES[name]) continue;
+  const cord = NODES[name].cordoned;
+  const p = hexPlatform(r, C.plat, cord); p.position.set(x, 0, z); clusterG.add(p);
+  p.userData.body.userData = { kind: 'node', name }; clusterPick.push(p.userData.body);
+  const kubelet = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 0.5, 6), new THREE.MeshStandardMaterial({ color: 0x3a4d6e, transparent: cord, opacity: cord ? 0.5 : 1 }));
+  const dir = new THREE.Vector3(-x, 0, -z).normalize().multiplyScalar(r - 0.8); kubelet.position.set(dir.x, 0.6, dir.z); p.add(kubelet);
+  nodeObjs[name] = { group: p, kubelet, r, slots: [], awards: [] };
+  tag(cord ? `${name}  SchedulingDisabled` : name, 'node' + (cord ? ' cordon' : ''), new THREE.Vector3(x, 1.2, z + r + 0.4));
+  if (!cord) { const pts = [new THREE.Vector3(0, 0.45, 0), p.position.clone().add(kubelet.position).setY(0.45)]; clusterG.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineDashedMaterial({ color: 0x3a475c, dashSize: 0.5, gapSize: 0.4 })).computeLineDistances()); }
+}
+const cp = hexPlatform(4.8, C.cp, false); clusterG.add(cp); tag('control-plane', 'node', new THREE.Vector3(0, 1.2, 5.2));
+const COMPONENTS = {
+  'kube-apiserver': { pos: [0, 0], y: 1.55, geo: new THREE.CylinderGeometry(1.1, 1.1, 2.4, 6), text: 'The front door. Every command you run on this page goes kubectl, apiserver, etcd, and back.' },
+  etcd: { pos: [-2.4, -1.3], y: 1.0, geo: new THREE.CylinderGeometry(0.72, 0.72, 1.3, 20), text: 'Where the cluster state lives. Here it holds the whole portfolio as one content snapshot.' },
+  'kube-scheduler': { pos: [2.4, -1.3], y: 1.3, geo: new THREE.OctahedronGeometry(0.85), text: 'Places new pods on nodes. Watch it work when you scale a deployment.' },
+  'kube-controller-manager': { pos: [0, 2.5], y: 1.0, geo: new THREE.TorusGeometry(0.65, 0.24, 10, 6), text: 'Runs the reconciliation loops. Delete a pod and it brings it back.' },
+};
+const compObjs = {};
+for (const [name, c] of Object.entries(COMPONENTS)) {
+  const m = new THREE.Mesh(c.geo, new THREE.MeshStandardMaterial({ color: C.comp, roughness: 0.5, emissive: 0x0a1a40 }));
+  m.position.set(c.pos[0], c.y, c.pos[1]); m.castShadow = true; if (name === 'kube-controller-manager') m.rotation.x = Math.PI / 2;
+  m.userData = { kind: 'component', name }; clusterPick.push(m); clusterG.add(m);
+  compObjs[name] = { mesh: m }; tag(name.replace('kube-', ''), 'comp', m.position.clone().setY(c.y + 1.6));
+}
+// certificates: badges on the control plane rim (cert-manager style)
+const certObjs = {};
+D.certifications.forEach((c, i) => {
+  const short = (c.name.match(/\((\w+)\)/) || [, c.id])[1];
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.55, 0.14, 6), new THREE.MeshStandardMaterial({ color: C.gold, roughness: 0.35, metalness: 0.4, emissive: 0x2a1e00 }));
+  m.rotation.x = Math.PI / 2; m.position.set(3.4 + i * 1.3, 1.05, 2.2 - i * 0.2); m.castShadow = true;
+  m.userData = { kind: 'cert', name: c.id }; clusterPick.push(m); clusterG.add(m);
+  certObjs[c.id] = { mesh: m, cert: c, short }; tag(`${short} ${c.status}`, 'cert', m.position.clone().setY(1.9));
+});
+
+const SLOT = [[0, 0], [1.4, 0], [-1.4, 0], [0.7, 1.2], [-0.7, 1.2], [0.7, -1.2], [-0.7, -1.2], [2.1, 1.2], [-2.1, -1.2], [2.1, -1.2], [-2.1, 1.2], [0, 2.4]];
+const podGeo = new THREE.BoxGeometry(1, 1, 1);
+const podObjs = {};
+function makePod(slug, node, status, extra = {}) {
+  const proj = D.projects[slug.replace(/-r\d+$/, '')];
+  let pos, size = 1, faded = false;
+  if (node && nodeObjs[node]) {
+    const o = nodeObjs[node]; const i = o.slots.length; if (i >= SLOT.length) return null; o.slots.push(slug);
+    const k = o.r / 4.2; size = Math.min(1, k + 0.05); faded = NODES[node].cordoned;
+    pos = new THREE.Vector3(o.group.position.x + SLOT[i][0] * k, 0.35 + size / 2, o.group.position.z + SLOT[i][1] * k);
+  } else { const i = Object.values(podObjs).filter((p) => !p.node).length; pos = new THREE.Vector3(5.2 + i * 1.5, 3.2, -4.8 - i * 0.4); }
+  const mat = new THREE.MeshStandardMaterial({ color: status === 'Running' ? C.ok : C.done, roughness: 0.55, transparent: true, opacity: faded ? 0.45 : 1, emissive: 0x000000 });
+  const mesh = new THREE.Mesh(podGeo, mat); mesh.castShadow = !faded; mesh.position.copy(pos);
+  mesh.userData = { kind: 'pod', name: slug }; clusterPick.push(mesh); clusterG.add(mesh);
+  mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(podGeo), new THREE.LineBasicMaterial({ color: 0x0b0f15, transparent: true, opacity: 0.6 })));
+  podObjs[slug] = { mesh, node, status, proj, base: pos.y, size, scale: 1, target: 1, faded, pending: !node, ...extra };
+  return podObjs[slug];
+}
+Object.entries(D.projects).forEach(([slug, p]) => makePod(slug, p.node, STATUS[p.status] || 'Completed'));
+tag('unscheduled', 'node cordon', new THREE.Vector3(7.4, 4.6, -5.4));
+// awards: small gold markers on the node where they were earned
+D.achievements.forEach((a, i) => {
+  const node = ORG_NODE[a.org]; if (!node || !nodeObjs[node]) return; const o = nodeObjs[node]; const j = o.awards.length; o.awards.push(a.id);
+  const m = new THREE.Mesh(new THREE.ConeGeometry(0.32, 0.8, 6), new THREE.MeshStandardMaterial({ color: C.gold, metalness: 0.5, roughness: 0.3, emissive: 0x2a1e00 }));
+  const ang = 2.4 + j * 0.5; m.position.set(o.group.position.x + Math.cos(ang) * (o.r - 0.7), 0.8, o.group.position.z + Math.sin(ang) * (o.r - 0.7));
+  m.userData = { kind: 'award', name: a.id }; clusterPick.push(m); clusterG.add(m);
+});
+
+/* ---------- packets, pulses ---------- */
+const packets = [], pulses = [], flows = [];
+const packetGeo = new THREE.SphereGeometry(0.22, 12, 12);
+const arc = (a, b) => { const m = a.clone().lerp(b, 0.5); m.y += 2 + a.distanceTo(b) * 0.12; return new THREE.QuadraticBezierCurve3(a.clone(), m, b.clone()); };
+const P = {
+  api: () => new THREE.Vector3(0, 2.9, 0), etcd: () => new THREE.Vector3(-2.4, 1.7, -1.3), sched: () => new THREE.Vector3(2.4, 2.2, -1.3),
+  ctrl: () => new THREE.Vector3(0, 1.4, 2.5), kubectl: () => new THREE.Vector3(0, 2, 16),
+  kubelet: (n) => nodeObjs[n].group.position.clone().add(nodeObjs[n].kubelet.position).setY(1.0),
+};
+function send(points, color = C.packet, hop = 0.42) {
+  return new Promise((done) => { if (reduce || level !== 'cluster') { done(); return; }
+    const m = new THREE.Mesh(packetGeo, new THREE.MeshBasicMaterial({ color })); clusterG.add(m);
+    const curves = []; for (let i = 0; i < points.length - 1; i++) curves.push(arc(points[i], points[i + 1]));
+    packets.push({ m, curves, t: 0, hop, done }); });
+}
+const request = (extra = []) => send([P.kubectl(), P.api(), P.etcd(), P.api(), ...extra]);
+function pulse(pos, color = C.gold) { if (reduce) return; const m = new THREE.Mesh(new THREE.RingGeometry(0.6, 0.85, 6), new THREE.MeshBasicMaterial({ color, transparent: true, side: THREE.DoubleSide })); m.rotation.x = -Math.PI / 2; m.position.copy(pos).setY(0.5); clusterG.add(m); pulses.push({ m, t: 0 }); }
+setInterval(() => { if (reduce || booting || level !== 'cluster') return; const live = Object.keys(nodeObjs).filter((n) => !NODES[n].cordoned); const n = live[Math.floor(Math.random() * live.length)]; send([P.kubelet(n), P.api()], 0x3f6e52, 0.9); }, 1800);
+
+/* ---------- camera ---------- */
+let glide = null;
+function glideTo(target, dist, ms = 900) {
+  return new Promise((done) => {
+    const dir = camera.position.clone().sub(controls.target).normalize();
+    const endPos = target.clone().add(dir.multiplyScalar(dist)); endPos.y = Math.max(endPos.y, target.y + dist * 0.45);
+    if (reduce) { controls.target.copy(target); camera.position.copy(endPos); done(); return; }
+    glide = { t: 0, ms, fromP: camera.position.clone(), toP: endPos, fromT: controls.target.clone(), toT: target.clone(), done };
+  });
+}
+function goHome() { return new Promise((done) => { if (reduce) { camera.position.copy(HOME.pos); controls.target.copy(HOME.target); done(); return; } glide = { t: 0, ms: 900, fromP: camera.position.clone(), toP: HOME.pos.clone(), fromT: controls.target.clone(), toT: HOME.target.clone(), done }; }); }
+
+/* ---------- state ---------- */
+let level = 'cluster', selected = null, inside = null, filter = null, booting = !reduce, bootT = 0;
+function paintScene() {
+  for (const [n, o] of Object.entries(nodeObjs)) {
+    const on = selected && ((selected.kind === 'node' && selected.name === n) || (selected.kind === 'pod' && podObjs[selected.name]?.node === n));
+    o.group.userData.body.material.color.setHex(on ? C.platSel : C.plat);
+    if (!o.group.userData.cordoned) o.group.userData.edge.material.color.setHex(on ? C.edgeSel : C.edge);
+  }
+  for (const [n, o] of Object.entries(compObjs)) o.mesh.material.emissive.setHex(selected?.name === n ? 0x2a55c8 : 0x0a1a40);
+  for (const [, p] of Object.entries(podObjs)) {
+    const match = filter && p.proj && p.proj.tech.some((t) => t.toLowerCase() === filter.toLowerCase());
+    p.mesh.material.opacity = filter ? (match ? 1 : 0.12) : (p.faded ? 0.45 : 1);
+    p.mesh.material.emissive.setHex(match ? 0x0f5a3e : 0x000000);
+  }
+  $('#filter').textContent = filter ? `label selector: skill=${filter.toLowerCase()}  (Esc to clear)` : '';
+  const isPod = selected?.kind === 'pod' && podObjs[selected.name] && !podObjs[selected.name].clone;
+  $('#dive').hidden = !(isPod && level === 'cluster'); if (isPod) $('#dive').textContent = `Step inside ${esc(selected.name)}`;
+  floatingLabel(); crumbs();
+}
+const flabel = $('#flabel');
+function floatingLabel() {
+  if (level !== 'cluster' || !selected || selected.kind !== 'pod' || !podObjs[selected.name]) { flabel.style.opacity = 0; return; }
+  const p = podObjs[selected.name]; flabel.innerHTML = `<span style="color:var(--accent-soft)">pod/${esc(selected.name)}</span> <span class="st-${p.status}">${p.status}</span>`; flabel.style.opacity = 1;
+}
+function crumbs() {
+  const c = $('#crumbs');
+  if (level === 'pod') { const p = podObjs[inside]; c.innerHTML = `<button type="button" data-run="cluster-info">sohan-cluster</button>/ ${p.node ? `<button type="button" data-run="describe node ${esc(p.node)}">${esc(p.node)}</button>/` : ''} <b>pod/${esc(inside)}</b> <span class="muted">(exec, Esc to leave)</span>`; }
+  else c.innerHTML = `<b>sohan-cluster</b> <span>namespace: career</span>`;
+  c.querySelectorAll('[data-run]').forEach((b) => b.onclick = () => run(b.dataset.run, true));
+}
+
+/* ---------- panel: paged, never scrolls ---------- */
+const panel = $('#panel'), ppager = $('#ppager'); let pages = [], pageIx = 0;
+function setPanel(blocks) {
+  ppager.hidden = false; panel.innerHTML = ''; const out = [[]];
+  for (const html of blocks) { const el = document.createElement('div'); el.innerHTML = html; panel.appendChild(el);
+    if (panel.scrollHeight > panel.clientHeight + 1 && out[out.length - 1].length) { out.push([html]); panel.innerHTML = ''; panel.appendChild(el); } else out[out.length - 1].push(html); }
+  pages = out; showPage(0);
+}
+function showPage(i) { pageIx = Math.max(0, Math.min(pages.length - 1, i)); panel.innerHTML = pages[pageIx].map((h) => `<div>${h}</div>`).join(''); ppager.hidden = pages.length < 2; $('#pnum').textContent = `${pageIx + 1} / ${pages.length}`; wire(panel); }
+$('#pprev').onclick = () => showPage(pageIx - 1); $('#pnext').onclick = () => showPage(pageIx + 1);
+function wire(root) {
+  root.querySelectorAll('[data-run]').forEach((b) => b.onclick = () => run(b.dataset.run, true));
+  const f = root.querySelector('form.manifest'); if (f) f.onsubmit = (e) => { e.preventDefault();
+    const v = (id) => f.querySelector(id).value.trim(); const err = !v('#cname') ? 'spec.name: required' : !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v('#cmail')) ? 'spec.email: invalid' : !v('#cmsg') ? 'spec.message: required' : '';
+    if (err) return print([['$ kubectl apply -f contact.yaml', 'cmd'], [`error: validation failed: ${err}`, 'bad']]);
+    request(); print([['$ kubectl apply -f contact.yaml', 'cmd'], ['contactmessage.v1/sohan created', 'ok'], ['(concept demo: nothing was sent)', 'warn']]); f.reset(); };
+}
+const kv = (rows) => `<dl class="kv">${rows.filter(Boolean).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl>`;
+const head = (eyebrow, title) => `<div class="eyebrow">${esc(eyebrow)}</div><h2 class="title">${esc(title)}</h2>`;
+const skillChips = (tech) => `<div class="chips">${tech.map((t) => `<button class="chip" type="button" data-run="get pods -l skill=${esc(t.toLowerCase())}">skill=${esc(t.toLowerCase())}</button>`).join('')}</div>`;
+const podRow = (s) => `<div class="row"><button type="button" data-run="describe pod ${esc(s)}">${esc(s)}</button><span class="st-${esc(podObjs[s].status)}">${esc(podObjs[s].status)}</span></div>`;
+
+const panels = {
+  home: () => [head('cluster-info', D.profile.name), `<p class="prose">${esc(D.profile.tagline)} ${esc(D.profile.title)}, ${esc(D.profile.location)}.</p>`,
+    kv([['Status', D.profile.openToWork ? 'Open to work' : 'Not looking'], ['Nodes', `${Object.values(NODES).filter((n) => !n.cordoned).length} Ready, ${Object.values(NODES).filter((n) => n.cordoned).length} cordoned`], ['Pods', String(Object.keys(D.projects).length) + ' projects']]),
+    `<p class="prose" style="font-size:12.5px">Nodes are places I worked and studied. Pods are projects. Click one, or step inside a pod to see its config, secrets, and endpoints.</p>`],
+  node: (name) => { const n = NODES[name]; return [head(`describe node/${esc(name)}`, n.entries[0].org), kv([['Labels', n.label], n.cordoned && ['Taints', 'SchedulingDisabled (past era)'], ['Pods', String(nodeObjs[name].slots.length)], ['Awards', String(nodeObjs[name].awards.length)]]),
+    ...n.entries.flatMap((e) => [`<div><div style="font-weight:600">${esc(e.title)}</div><div class="eyebrow">${ym(e.start)} - ${ym(e.end)}</div></div>`, e.summary ? `<p class="prose">${esc(e.summary)}</p>` : '', ...e.highlights.map((h) => `<p class="prose">- ${esc(h)}</p>`)]).filter(Boolean),
+    ...(nodeObjs[name].awards.length ? [`<div class="eyebrow">awards</div>`, ...nodeObjs[name].awards.map((id) => { const a = D.achievements.find((x) => x.id === id); return `<div class="row"><button type="button" data-run="describe achievement ${esc(id)}">${esc(a.title)}</button><span class="muted">${ym(a.date)}</span></div>`; })] : []),
+    `<div class="eyebrow">pods</div>`, ...nodeObjs[name].slots.map(podRow)]; },
+  pod: (slug) => { const p = podObjs[slug]; const j = p.proj; return [head(`describe pod/${esc(slug)}`, j.name), `<p class="prose">${esc(j.tagline)}</p>`,
+    kv([['Node', p.node || '<none> (unscheduled)'], ['Status', p.status], ['Started', ym(j.start)], ['Finished', j.status === 'running' ? 'still running' : ym(j.end)]]), `<div class="eyebrow">labels</div>`, skillChips(j.tech),
+    `<div class="chips"><button class="btn primary" type="button" data-run="exec -it ${esc(slug)} -- sh">Step inside</button><button class="btn" type="button" data-run="delete pod ${esc(slug)}">delete pod</button><button class="btn" type="button" data-run="scale deploy/${esc(slug)} --replicas=3">scale to 3</button></div>`]; },
+  component: (name) => [head(`describe pod/${esc(name)} -n kube-system`, name), kv([['Namespace', 'kube-system'], ['Status', 'Running'], ['Node', 'control-plane']]), `<p class="prose">${esc(COMPONENTS[name].text)}</p>`],
+  cert: (id) => { const c = certObjs[id].cert; return [head(`describe certificate/${esc(id)}`, c.name), kv([['Issuer', c.issuer], ['Ready', c.status === 'in-progress' ? 'False (in progress)' : 'True'], ['Status', c.status]]), `<p class="prose">Certificates sit on the control plane, the way cert-manager keeps them in a real cluster.</p>`]; },
+  certs: () => [head('get certificates', 'Certifications'), ...D.certifications.map((c) => `<div class="row"><button type="button" data-run="describe certificate ${esc(c.id)}">${esc(c.name)}</button><span class="st-Pending">${esc(c.status)}</span></div>`)],
+  award: (id) => { const a = D.achievements.find((x) => x.id === id); return [head(`describe achievement/${esc(id)}`, a.title), kv([['Org', a.org], ['Date', ym(a.date)], ['Node', ORG_NODE[a.org] || '-']]), `<p class="prose">${esc(a.description)}</p>`]; },
+  awards: () => [head('get achievements', 'Achievements'), ...D.achievements.map((a) => `<div class="row"><button type="button" data-run="describe achievement ${esc(a.id)}">${esc(a.title)}</button><span class="muted">${esc(a.org)}, ${ym(a.date)}</span></div>`)],
+  skills: () => [head('top skills', 'Skills'), `<p class="prose" style="font-size:12.5px">Click a skill to light up every project that used it.</p>`,
+    ...D.skills.flatMap((g) => [`<div class="eyebrow">${esc(g.category)}</div>`, ...g.items.map((i) => `<button type="button" class="bar" style="background:none;border:0;padding:0;cursor:pointer;width:100%;color:inherit;text-align:left" data-run="get pods -l skill=${esc(i.name.toLowerCase())}"><span>${esc(i.name)}</span><i style="--w:${(i.level || 0) * 20}%"></i><span class="muted">${i.level ? i.level + '/5' : ''}</span></button>`)])],
+  projects: () => [head('get pods -n projects', 'Projects'), ...Object.keys(podObjs).filter((s) => !podObjs[s].clone).map(podRow)],
+  experience: () => [head('get nodes', 'Experience and education'), ...Object.values(NODES).flatMap((n) => n.entries.map((e) => `<div class="row"><button type="button" data-run="describe node ${esc(n.name)}">${esc(e.title)}</button><span class="muted">${ym(e.start)}</span></div><div class="eyebrow" style="margin-top:-4px">${esc(e.org)}${n.cordoned ? ', cordoned' : ''}</div>`))],
+  updates: () => [head('logs updates', 'Updates'), ...D.updates.slice().sort((a, b) => (b.date > a.date ? 1 : -1)).map((u) => `<div><div class="eyebrow">${esc(u.date)}</div><div>${esc(u.title)}</div></div>`)],
+  contact: () => [head('apply -f contact.yaml', 'Send a message'), `<form class="manifest" novalidate><span class="muted">apiVersion: v1</span><span class="muted">kind: ContactMessage</span><span class="muted">spec:</span><label for="cname">&nbsp;&nbsp;name:</label><input id="cname" placeholder="Ada Lovelace"><label for="cmail">&nbsp;&nbsp;email:</label><input id="cmail" placeholder="ada@example.com"><label for="cmsg">&nbsp;&nbsp;message:</label><input id="cmsg" placeholder="Saw your cluster. Let's talk."><button class="btn primary" type="submit" style="margin-top:10px;align-self:flex-start">kubectl apply</button></form>`, `<p class="prose" style="font-size:12px">Concept demo. Nothing is sent from this page.</p>`],
+};
+/* inside a pod */
+const yaml = (lines) => `<pre class="yaml">${lines.map(([k, v, c]) => c ? `<span class="c">${esc(k)}</span>` : `<span class="k">${esc(k)}</span>${v !== undefined ? ' ' + esc(v) : ''}`).join('\n')}</pre>`;
+const story = (j) => [...(j.story || []), ...(j.bullets || []).map((b) => '- ' + b)].join('\n');
+const inner = {
+  container: (s) => { const j = podObjs[s].proj; return [head(`describe pod/${esc(s)}  container main`, j.name), kv([['Image', `${esc(s)}:${j.status === 'running' ? 'latest' : (j.end || '').slice(0, 4)}`], ['State', podObjs[s].status], ['Purpose', j.tagline]]),
+    `<p class="prose" style="font-size:12.5px">Attached to this pod: a ConfigMap (the stack), a Secret (the story behind it), a Service (where to see it) and its Events. Click them in the scene.</p>`,
+    `<div class="chips"><button class="btn" type="button" data-run="get configmap ${esc(s)}-config -o yaml">ConfigMap</button><button class="btn" type="button" data-run="get secret ${esc(s)}-story -o yaml">Secret</button><button class="btn" type="button" data-run="describe svc ${esc(s)}">Service</button><button class="btn" type="button" data-run="get events --for pod/${esc(s)}">Events</button></div>`]; },
+  configmap: (s) => { const j = podObjs[s].proj; return [head(`get configmap ${esc(s)}-config -o yaml`, 'ConfigMap: the stack'), yaml([['apiVersion:', 'v1'], ['kind:', 'ConfigMap'], ['metadata:'], ['  name:', `${esc(s)}-config`], ['data:']]),
+    ...chunk(j.tech, 6).map((g) => yaml(g.map((t) => [`  ${t.toLowerCase().replace(/[^a-z0-9]+/g, '-')}:`, '"true"']))), `<div class="eyebrow">click a key to find it across the cluster</div>`, skillChips(j.tech)]; },
+  secret: (s, decoded) => { const j = podObjs[s].proj; const text = story(j);
+    if (!decoded) return [head(`get secret ${esc(s)}-story -o yaml`, 'Secret: the story'), yaml([['apiVersion:', 'v1'], ['kind:', 'Secret'], ['type:', 'Opaque'], ['data:'], ['  story:', b64(text).slice(0, 96) + '...']]),
+      `<button class="btn primary" type="button" data-run="decode ${esc(s)}">Decode (base64 -d)</button>`];
+    return [head(`get secret ${esc(s)}-story | base64 -d`, j.name), ...(j.story || []).map((p) => `<p class="prose decoded">${esc(p)}</p>`), ...(j.bullets || []).map((b) => `<p class="prose decoded">- ${esc(b)}</p>`)]; },
+  service: (s) => { const j = podObjs[s].proj; const links = Object.entries(j.links || {});
+    return [head(`describe svc ${esc(s)}`, 'Service: endpoints'), kv([['Type', links.length ? 'LoadBalancer' : 'ClusterIP'], ['Selector', `app=${esc(s)}`]]),
+      ...(links.length ? links.map(([k, u]) => `<div class="row"><span>${esc(k)}  443/TCP</span><a class="btn" href="${esc(u)}" target="_blank" rel="noopener noreferrer">port-forward</a></div><div class="eyebrow" style="margin-top:-4px;overflow-wrap:anywhere">${esc(u)}</div>`) : [`<p class="prose">ClusterIP only: no public endpoints for this one.</p>`])]; },
+  events: (s) => { const j = podObjs[s].proj; const ups = D.updates.filter((u) => UPDATE_POD(u.title) === s);
+    const rows = [['Normal', 'Scheduled', ym(j.start), `assigned to ${podObjs[s].node || 'no node'}`], ...ups.map((u) => ['Normal', 'Update', u.date.slice(0, 7), u.title]), j.status === 'running' ? ['Normal', 'Started', 'now', 'still running'] : ['Normal', 'Completed', ym(j.end), 'project finished']];
+    return [head(`get events --for pod/${esc(s)}`, 'Events'), ...rows.map(([t, r, w, m]) => `<div style="font:12px var(--font-mono)"><span class="muted">${esc(w)}</span>  <span style="color:var(--ok)">${t}</span>  ${esc(r)}<div class="prose" style="font-size:12.5px">${esc(m)}</div></div>`)]; },
+};
+const chunk = (a, n) => { const o = []; for (let i = 0; i < a.length; i += n) o.push(a.slice(i, i + n)); return o; };
+
+/* ---------- pod interior (the dive) ---------- */
+const interior = { objs: {}, tags: [] };
+function buildInterior(slug) {
+  podG.clear(); flows.length = 0; podPick.length = 0; interior.tags.forEach((t) => { t.el.remove(); tags.splice(tags.indexOf(t), 1); }); interior.tags = [];
+  const p = podObjs[slug];
+  const floor = new THREE.Mesh(new THREE.CylinderGeometry(8, 8, 0.2, 6), new THREE.MeshStandardMaterial({ color: 0x121a27, roughness: 1 })); floor.position.y = -0.1; floor.receiveShadow = true; podG.add(floor);
+  const wall = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.CylinderGeometry(8, 8, 6, 6)), new THREE.LineBasicMaterial({ color: 0x2b3c58 })); wall.position.y = 3; podG.add(wall);
+  const col = p.status === 'Running' ? C.ok : p.status === 'CrashLoopBackOff' ? C.bad : C.done;
+  const box = new THREE.Mesh(new THREE.BoxGeometry(2.6, 2.6, 2.6), new THREE.MeshStandardMaterial({ color: col, roughness: 0.5 })); box.position.y = 1.3; box.castShadow = true;
+  box.userData = { kind: 'res', name: 'container' }; podG.add(box); podPick.push(box);
+  interior.tags.push(tag(`container: main`, 'comp', new THREE.Vector3(0, 3.3, 0), 'pod'));
+  const res = [
+    ['configmap', `ConfigMap ${slug}-config`, 'cfg', new THREE.BoxGeometry(1.8, 0.25, 2.3), C.cfg, [-4.6, 0.4, -1.6]],
+    ['secret', `Secret ${slug}-story`, 'sec', new THREE.BoxGeometry(1.4, 1.4, 1.4), C.sec, [4.4, 0.9, -1.8]],
+    ['service', `Service ${slug}`, 'svc', new THREE.TorusGeometry(0.9, 0.22, 10, 6), 0x5b8fff, [3.4, 1.1, 3.6]],
+    ['events', 'Events', 'evt', new THREE.CylinderGeometry(0.8, 0.8, 0.9, 6), 0x8fa1bb, [-3.6, 0.5, 3.6]],
+  ];
+  for (const [name, label, cls, geo, color, [x, y, z]] of res) {
+    const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color, roughness: 0.45, metalness: 0.1 })); m.position.set(x, y, z); m.castShadow = true;
+    if (name === 'service') m.rotation.x = Math.PI / 2;
+    if (name === 'secret') { const lock = new THREE.Mesh(new THREE.TorusGeometry(0.4, 0.09, 8, 16, Math.PI), new THREE.MeshStandardMaterial({ color: 0xd8d2ff })); lock.position.y = 0.8; m.add(lock); }
+    m.userData = { kind: 'res', name }; podG.add(m); podPick.push(m); interior.objs[name] = m;
+    interior.tags.push(tag(label, cls, new THREE.Vector3(x, y + 1.5, z), 'pod'));
+    const curve = new THREE.QuadraticBezierCurve3(new THREE.Vector3(x, y + 0.3, z), new THREE.Vector3(x / 2, 2.6, z / 2), new THREE.Vector3(0, 1.3, 0));
+    podG.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(curve.getPoints(24)), new THREE.LineDashedMaterial({ color: 0x3a475c, dashSize: 0.3, gapSize: 0.25 })).computeLineDistances());
+    if (!reduce) { const dot = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 8), new THREE.MeshBasicMaterial({ color })); podG.add(dot); flows.push({ curve, dot, t: Math.random() }); }
+  }
+}
+async function enterPod(slug) {
+  if (level === 'pod') await leavePod(true);
+  selected = { kind: 'pod', name: slug }; paintScene();
+  await glideTo(podObjs[slug].mesh.position.clone(), 3.2, 700);
+  buildInterior(slug); inside = slug; level = 'pod'; clusterG.visible = false; podG.visible = true; flabel.style.opacity = 0;
+  camera.position.set(0, 3, 4); controls.target.set(0, 1.3, 0);
+  if (reduce) camera.position.set(0, 10, 15); else glide = { t: 0, ms: 1100, fromP: camera.position.clone(), toP: new THREE.Vector3(0, 10, 15), fromT: controls.target.clone(), toT: new THREE.Vector3(0, 1.3, 0), done: () => {} };
+  paintScene(); setPanel(inner.container(slug));
+}
+async function leavePod(quiet) {
+  if (level !== 'pod') return; const slug = inside; level = 'cluster'; inside = null; podG.visible = false; clusterG.visible = true;
+  const p = podObjs[slug].mesh.position; camera.position.set(p.x, p.y + 2, p.z + 3); controls.target.copy(p);
+  selected = { kind: 'pod', name: slug }; paintScene();
+  if (!quiet) { setPanel(panels.pod(slug)); await glideTo(p.clone(), 19, 900); }
+}
+
+/* ---------- terminal: latest result only, paged ---------- */
+const out = $('#out'); let tpages = [], tix = 0;
+function print(lines) { const rows = Math.max(3, Math.floor(out.clientHeight / 20) - 1); tpages = chunk(lines, rows); tix = 0; showT(); }
+function showT() { const pg = tpages[tix] || []; out.innerHTML = pg.map(([t, c]) => `<div class="${c || ''}">${esc(t)}</div>`).join('') + (tpages.length > 1 ? `<div class="more">-- more (${tix + 1}/${tpages.length}) -- Space for next page</div>` : ''); }
+const table = (headRow, rows) => { const w = headRow.map((h, i) => Math.max(h.length, ...rows.map((r) => String(r[i]).length)) + 3); const f = (r) => r.map((c, i) => String(c).padEnd(w[i])).join(''); return [[f(headRow), 'cmd'], ...rows.map((r) => [f(r)])]; };
+
+function updateHealth() { const bad = Object.values(podObjs).filter((p) => p.status === 'CrashLoopBackOff').length; const h = $('#health'); h.className = 'pill ' + (bad ? 'bad' : 'ok'); h.textContent = bad ? `${bad} pod failing` : 'All pods healthy'; }
+function setStatus(name, s) { const p = podObjs[name]; if (!p) return; p.status = s; p.mesh.material.color.setHex({ Completed: C.done, Running: C.ok, CrashLoopBackOff: C.bad, Terminating: C.bad, ContainerCreating: C.warn, Pending: C.warn }[s]); updateHealth(); floatingLabel(); }
+async function select(kind, name, view) {
+  selected = { kind, name }; paintScene();
+  const targets = { node: () => [nodeObjs[name].group.position.clone(), 24], pod: () => [podObjs[name].mesh.position.clone(), 19], component: () => [compObjs[name].mesh.position.clone(), 19], cert: () => [certObjs[name].mesh.position.clone(), 16] };
+  setPanel(view); if (targets[kind]) { const [t, d] = targets[kind](); await glideTo(t, d); }
+}
+const wait = (ms) => new Promise((r) => setTimeout(r, reduce ? 0 : ms));
+const pick = (a) => a[Math.floor(Math.random() * a.length)];
+const hist = []; let hix = 0;
+
+async function run(raw, fromUi) {
+  const line = raw.trim(); if (!line) return; skipBoot();
+  if (fromUi) $('#cmd').value = '';
+  hist.push(line); hix = hist.length;
+  const parts = line.replace(/^(kubectl|k)\s+/, '').split(/\s+/); const [verb, a, b] = parts; const cmd = ['$ kubectl ' + parts.join(' '), 'cmd'];
+  if (verb === 'decode' && level === 'pod' && a !== inside) return print([cmd, [`Error from server (NotFound): secrets "${a}-story" not found`, 'bad']]);
+  if (verb === 'decode') { if (level === 'pod' && a === inside) { setPanel(inner.secret(a, true)); return print([[`$ kubectl get secret ${a}-story -o jsonpath='{.data.story}' | base64 -d`, 'cmd'], ['decoded the story behind this project', 'ok']]); } }
+  if (verb === 'exit' && level === 'pod') { await leavePod(); return print([cmd, ['exit', '']]); }
+  if (verb === 'exec') { const slug = parts.find((x, i) => i > 0 && !x.startsWith('-') && podObjs[x.replace('pod/', '')])?.replace('pod/', ''); if (!slug) return print([cmd, ['error: pod not found. Try: kubectl exec -it asktrace -- sh', 'bad']]);
+    if (podObjs[slug].clone) return print([cmd, ['error: replicas share the same insides, step into the original pod', 'bad']]);
+    filter = null; await request(podObjs[slug].node ? [P.kubelet(podObjs[slug].node)] : []); await enterPod(slug);
+    return print([cmd, [`Defaulted container "main" in pod "${slug}"`, 'cmd'], ['you are inside the pod. Click its ConfigMap, Secret, Service, or Events. Esc or "exit" to leave.', 'ok']]); }
+  if (level === 'pod' && (verb === 'get' || verb === 'describe')) {
+    const s = inside;
+    if (a === 'configmap' || a === 'cm') { setPanel(inner.configmap(s)); return print([cmd, [`configmap/${s}-config  ${podObjs[s].proj.tech.length} keys`, '']]); }
+    if (a === 'secret') { setPanel(inner.secret(s)); return print([cmd, [`secret/${s}-story  Opaque  1 key`, ''], ['hint: press Decode to base64 -d it', 'warn']]); }
+    if (a === 'svc' || a === 'service') { setPanel(inner.service(s)); return print([cmd, [`service/${s}  ${Object.keys(podObjs[s].proj.links || {}).length} ports`, '']]); }
+    if (a === 'events') { setPanel(inner.events(s)); return print([cmd, ['events listed in the panel', '']]); }
+    if (a === 'pod' && b === s) { setPanel(inner.container(s)); return print([cmd, [`Name: ${s}   Containers: main   Volumes: ${s}-config, ${s}-story`, '']]); }
+    await leavePod(true);
+  }
+  if (level === 'pod' && verb !== 'help' && verb !== 'clear') await leavePod(true);
+  if (verb === 'help') return print([cmd, ['about | get nodes | get pods | top skills | get certificates', ''], ['get achievements | logs updates | describe node|pod <name>', ''], ['exec -it <pod> -- sh   step inside a pod', 'ok'], ['get pods -l skill=<name> | delete pod | scale | chaos start', ''], ['apply -f contact.yaml | clear', '']]);
+  if (verb === 'clear') { out.innerHTML = ''; return; }
+  if (verb === 'about' || verb === 'cluster-info') { filter = null; selected = null; paintScene(); setPanel(panels.home()); goHome(); return print([cmd, ['Kubernetes control plane is running at https://roarceus.github.io', 'ok'], [D.profile.tagline, '']]); }
+  if (verb === 'config') return print([cmd, ['Switched to context "plain" (the plain view would open here)', 'warn']]);
+  if (verb === 'get' && a === 'nodes') { request(); selected = null; paintScene(); setPanel(panels.experience()); goHome(); return print([cmd, ...table(['NAME', 'STATUS', 'ROLES', 'PODS'], [['control-plane', 'Ready', 'control-plane', '4'], ...Object.values(NODES).map((n) => [n.name, n.cordoned ? 'Ready,SchedulingDisabled' : 'Ready', n.label.split('=')[1], nodeObjs[n.name]?.slots.length ?? 0])])]); }
+  if (verb === 'get' && (a === 'pods' || a === 'projects') && parts.includes('-l')) { const sel = (parts[parts.indexOf('-l') + 1] || '').replace('skill=', ''); const sk = ALL_SKILLS.find((s) => s.name.toLowerCase() === sel) || { name: sel };
+    filter = sk.name; selected = null; paintScene(); request(); goHome();
+    const hits = Object.entries(podObjs).filter(([, p]) => p.proj && p.proj.tech.some((t) => t.toLowerCase() === sel));
+    setPanel([head(`get pods -l skill=${sel}`, sk.name), kv([['Category', sk.cat || '-'], ['Level', sk.level ? `${sk.level}/5` : 'not rated'], ['Used in', `${hits.length} projects`]]), ...hits.map(([s]) => podRow(s))]);
+    return print([cmd, ...(hits.length ? table(['NAME', 'NODE', 'STATUS'], hits.map(([s, p]) => [s, p.node || '<none>', p.status])) : [['No resources found in projects namespace.', 'warn']])]); }
+  if (verb === 'get' && (a === 'pods' || a === 'projects')) { request(); filter = null; selected = null; paintScene(); setPanel(panels.projects()); goHome(); return print([cmd, ...table(['NAME', 'READY', 'STATUS', 'NODE'], Object.entries(podObjs).map(([n, p]) => [n, p.status === 'CrashLoopBackOff' ? '0/1' : '1/1', p.status, p.node || '<none>']))]); }
+  if (verb === 'top' && a === 'skills') { request(); filter = null; selected = null; paintScene(); setPanel(panels.skills()); return print([cmd, ...table(['SKILL', 'LEVEL'], ALL_SKILLS.filter((s) => s.level).sort((x, y) => y.level - x.level).slice(0, 12).map((s) => [s.name, '#'.repeat(s.level * 2).padEnd(10, '.') + ` ${s.level}/5`]))]); }
+  if (verb === 'get' && (a === 'certificates' || a === 'certs')) { request(); await select('cert', D.certifications[0].id, panels.certs()); return print([cmd, ...table(['NAME', 'READY', 'STATUS'], D.certifications.map((c) => [c.id, 'False', c.status]))]); }
+  if (verb === 'describe' && a === 'certificate' && certObjs[b]) { request(); await select('cert', b, panels.cert(b)); return print([cmd, [`Name: ${b}   Issuer: ${certObjs[b].cert.issuer}   Status: ${certObjs[b].cert.status}`, '']]); }
+  if (verb === 'get' && a === 'achievements') { request(); selected = null; paintScene(); setPanel(panels.awards()); goHome(); D.achievements.forEach((x, i) => { const n = ORG_NODE[x.org]; if (n && nodeObjs[n]) setTimeout(() => pulse(nodeObjs[n].group.position), i * 350); }); return print([cmd, ...table(['NAME', 'ORG', 'DATE'], D.achievements.map((x) => [x.id, x.org, x.date]))]); }
+  if (verb === 'describe' && a === 'achievement') { const x = D.achievements.find((y) => y.id === b); if (x) { const n = ORG_NODE[x.org]; n && nodeObjs[n] ? await select('node', n, panels.award(b)) : setPanel(panels.award(b)); if (n && nodeObjs[n]) pulse(nodeObjs[n].group.position); return print([cmd, [`${x.title}, ${x.org}, ${ym(x.date)}`, '']]); } }
+  if ((verb === 'logs' && a === 'updates') || (verb === 'get' && a === 'events')) { request(); selected = null; paintScene(); setPanel(panels.updates()); goHome();
+    const ups = D.updates.slice().sort((x, y) => (y.date > x.date ? 1 : -1));
+    ups.forEach((u, i) => setTimeout(() => { const n = UPDATE_NODE(u.title); pulse(n ? nodeObjs[n].group.position : new THREE.Vector3(0, 0, 0), n ? C.gold : C.packet); }, i * 300));
+    return print([cmd, ...ups.map((u) => [`${u.date}  ${u.title}`, ''])]); }
+  if (verb === 'describe' && a === 'node' && nodeObjs[b]) { await request(NODES[b].cordoned ? [] : [P.kubelet(b)]); await select('node', b, panels.node(b)); return print([cmd, [`Name: ${b}   Labels: ${NODES[b].label}   Pods: ${nodeObjs[b].slots.length}${NODES[b].cordoned ? '   Taints: SchedulingDisabled' : ''}`, '']]); }
+  if (verb === 'describe' && a === 'pod' && COMPONENTS[b]) { await request(); await select('component', b, panels.component(b)); return print([cmd, [`Name: ${b}   Namespace: kube-system   Status: Running`, '']]); }
+  if (verb === 'describe' && a === 'pod' && podObjs[b]) { const p = podObjs[b]; await request(p.node && !NODES[p.node].cordoned ? [P.kubelet(p.node)] : []); await select('pod', b, panels.pod(p.clone || b)); return print([cmd, [`Name: ${b}   Node: ${p.node || '<none>'}   Status: ${p.status}`, ''], [`hint: kubectl exec -it ${b} -- sh to step inside`, 'warn']]); }
+  if (verb === 'apply' && /contact/.test(line)) { request(); selected = null; paintScene(); setPanel(panels.contact()); return print([cmd, ['opened contact.yaml in the panel', '']]); }
+  if (verb === 'delete' && a === 'pod' && podObjs[b]) {
+    const p = podObjs[b]; if (!p.node || NODES[p.node].cordoned) return print([cmd, ['error: only pods on Ready nodes can be recreated here', 'bad']]);
+    print([cmd, [`pod "${b}" deleted`, 'warn'], ['controller-manager: replicaset wants 1, has 0', 'cmd']]); select('pod', b, panels.pod(p.clone || b)); setStatus(b, 'Terminating'); p.target = 0.05;
+    await request(); await send([P.api(), P.ctrl(), P.api()]); await send([P.api(), P.sched(), P.api()]); await send([P.api(), P.kubelet(p.node)]);
+    p.target = 1; setStatus(b, 'ContainerCreating'); await wait(900); setStatus(b, 'Running'); setPanel(panels.pod(p.clone || b));
+    return print([cmd, [`pod "${b}" deleted`, 'warn'], [`${b}   Terminating > ContainerCreating > Running`, 'ok'], ['the controller recreated it: self-healing', 'cmd']]); }
+  if (verb === 'chaos') { const live = Object.keys(podObjs).filter((n) => podObjs[n].node && !NODES[podObjs[n].node].cordoned && podObjs[n].status !== 'CrashLoopBackOff'); const v = pick(live); setStatus(v, 'CrashLoopBackOff'); await select('pod', v, panels.pod(podObjs[v].clone || v)); return print([cmd, [`chaos: ${v} is in CrashLoopBackOff`, 'bad'], [`hint: kubectl rollout restart deploy/${v}`, 'warn']]); }
+  if (verb === 'rollout' && a === 'restart') { const n = (b || '').replace('deploy/', ''); const p = podObjs[n]; if (!p || !p.node) return print([cmd, [`Error from server (NotFound): deployments.apps "${n}" not found`, 'bad']]);
+    print([cmd, [`deployment.apps/${n} restarted`, 'ok']]); select('pod', n, panels.pod(p.clone || n)); p.target = 0.05; setStatus(n, 'Terminating');
+    await request(); await send([P.api(), P.ctrl(), P.api(), P.sched(), P.api(), P.kubelet(p.node)]); p.target = 1; setStatus(n, 'ContainerCreating'); await wait(800); setStatus(n, 'Running'); setPanel(panels.pod(p.clone || n));
+    return print([cmd, [`deployment.apps/${n} restarted`, 'ok'], [`${n}   1/1   Running`, 'ok'], ['badge unlocked: survived chaos', 'warn']]); }
+  if (verb === 'scale') { const base = (a || '').replace('deploy/', ''); const n = parseInt((line.match(/--replicas=(\d+)/) || [])[1], 10); const src = podObjs[base];
+    if (!src || !src.node || NODES[src.node].cordoned || !(n >= 1 && n <= 4)) return print([cmd, ['error: try scale deploy/<pod on a Ready node> --replicas=1..4', 'bad']]);
+    const have = [base, ...Object.keys(podObjs).filter((p) => podObjs[p].clone === base)]; await request();
+    for (let i = have.length; i < n; i++) { const id = `${base}-r${i + 1}`; await send([P.api(), P.sched(), P.api(), P.kubelet(src.node)]); const p = makePod(id, src.node, 'ContainerCreating', { clone: base }); if (!p) break; setStatus(id, 'ContainerCreating'); p.scale = 0.01; setTimeout(() => setStatus(id, 'Running'), reduce ? 0 : 700); }
+    for (let i = have.length; i > n; i--) { const id = have[i - 1]; const p = podObjs[id]; clusterG.remove(p.mesh); clusterPick.splice(clusterPick.indexOf(p.mesh), 1); nodeObjs[p.node].slots.splice(nodeObjs[p.node].slots.indexOf(id), 1); delete podObjs[id]; }
+    await select('node', src.node, panels.node(src.node)); return print([cmd, [`deployment.apps/${base} scaled to ${n}`, 'ok']]); }
+  const words = ['get nodes', 'get pods', 'top skills', 'exec -it asktrace -- sh', 'logs updates', 'help'];
+  return print([cmd, [`error: unknown command "${parts.join(' ')}"`, 'bad'], [`Did you mean this? kubectl ${words.find((w) => w.startsWith(verb)) || 'help'}`, 'warn']]);
+}
+
+/* ---------- chips, keys, picking ---------- */
+const CHIPS = [['About', 'cluster-info'], ['Experience', 'get nodes'], ['Projects', 'get pods -n projects'], ['Skills', 'top skills'], ['Certifications', 'get certificates'], ['Achievements', 'get achievements'], ['Updates', 'logs updates'], ['Step inside a pod', 'exec -it asktrace -- sh'], ['Break something', 'chaos start'], ['Self-heal', 'delete pod safehaven']];
+$('#chips').innerHTML = CHIPS.map(([l, c]) => `<button class="cbtn" type="button" data-run="${c}"><b>${l}</b><small>kubectl ${c}</small></button>`).join('');
+document.querySelectorAll('[data-run]').forEach((b) => b.onclick = () => run(b.dataset.run, true));
+$('#dive').onclick = () => selected && run(`exec -it ${selected.name} -- sh`, true);
+$('#pform').onsubmit = (e) => { e.preventDefault(); const v = $('#cmd').value; $('#cmd').value = ''; run(v); };
+$('#cmd').addEventListener('keydown', (e) => { if (e.key === 'ArrowUp') { e.preventDefault(); hix = Math.max(0, hix - 1); $('#cmd').value = hist[hix] || ''; } if (e.key === 'ArrowDown') { e.preventDefault(); hix = Math.min(hist.length, hix + 1); $('#cmd').value = hist[hix] || ''; } });
+document.addEventListener('keydown', (e) => {
+  if (e.key === ' ' && document.activeElement !== $('#cmd') && tpages.length > 1) { e.preventDefault(); tix = (tix + 1) % tpages.length; showT(); }
+  if (e.key === 'Escape') { if (level === 'pod') { run('exit'); return; } if (filter) { filter = null; paintScene(); return; } selected = null; paintScene(); setPanel(panels.home()); goHome(); }
+});
+const ray = new THREE.Raycaster(), mouse = new THREE.Vector2(); let downAt = null, hover = null, lastClick = 0;
+const toNDC = (e) => { const r = renderer.domElement.getBoundingClientRect(); mouse.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1); };
+const hitAt = (e) => { toNDC(e); ray.setFromCamera(mouse, camera); return ray.intersectObjects(level === 'pod' ? podPick : clusterPick)[0]; };
+renderer.domElement.addEventListener('pointerdown', (e) => { downAt = [e.clientX, e.clientY]; skipBoot(); });
+renderer.domElement.addEventListener('pointermove', (e) => { const h = hitAt(e); hover = h ? h.object : null; renderer.domElement.style.cursor = hover ? 'pointer' : 'grab'; });
+renderer.domElement.addEventListener('pointerup', (e) => {
+  if (!downAt || Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 5) return; const hit = hitAt(e); if (!hit) return;
+  const { kind, name } = hit.object.userData; const now = performance.now(); const dbl = now - lastClick < 350 && selected?.name === name; lastClick = now;
+  if (kind === 'res') { const map = { container: `describe pod ${inside}`, configmap: 'get configmap', secret: 'get secret', service: 'describe svc', events: 'get events' }; run(map[name]); return; }
+  if (kind === 'pod' && dbl && !podObjs[name].clone) { run(`exec -it ${name} -- sh`); return; }
+  run({ node: `describe node ${name}`, pod: `describe pod ${name}`, component: `describe pod ${name}`, cert: `describe certificate ${name}`, award: `describe achievement ${name}` }[kind]);
+});
+
+/* ---------- boot ---------- */
+function skipBoot() { if (!booting) return; booting = false; bootT = 99; $('#skip')?.remove(); }
+$('#skip').onclick = skipBoot;
+async function boot() {
+  setPanel(panels.home()); crumbs();
+  if (!booting) { $('#skip')?.remove(); print([['$ kubectl cluster-info', 'cmd'], ['Kubernetes control plane is running', 'ok'], ['Try a chip below, or double-click a pod to step inside it', '']]); return; }
+  const lines = []; const steps = [['control-plane', 'Ready'], ['node/capgemini', 'Ready'], ['node/mastercontrol', 'Ready'], ['node/northeastern', 'Ready'], ['node/mumbai', 'Ready,SchedulingDisabled'], [`pods`, `${Object.keys(D.projects).length} scheduled`], ['cluster sohan-cluster', 'Ready']];
+  for (const [n, s] of steps) { if (!booting) return; lines.push([`${n.padEnd(24)}${s}`, s.startsWith('Ready') ? 'ok' : '']); print([['$ kubectl get nodes --watch', 'cmd'], ...lines.slice(-5)]); await wait(400); }
+  booting = false; $('#skip')?.remove(); print([['$ kubectl cluster-info', 'cmd'], ['Kubernetes control plane is running', 'ok'], ['Try a chip below, or double-click a pod to step inside it', '']]);
+}
+
+/* ---------- loop ---------- */
+function resize() { const r = stage.getBoundingClientRect(); renderer.setSize(r.width, r.height, false); camera.aspect = r.width / Math.max(1, r.height); camera.updateProjectionMatrix(); }
+addEventListener('resize', () => { resize(); const blocks = pages.flat(); if (blocks.length) setPanel(blocks); });
+const v = new THREE.Vector3();
+function place(el, world, show = true) { if (!show) { el.style.visibility = 'hidden'; return; } v.copy(world).project(camera); const r = stage.getBoundingClientRect(); el.style.left = ((v.x + 1) / 2) * r.width + 'px'; el.style.top = ((1 - v.y) / 2) * r.height + 'px'; el.style.visibility = v.z > 1 ? 'hidden' : 'visible'; }
+let last = performance.now(), visible = true; document.addEventListener('visibilitychange', () => { visible = !document.hidden; });
+const ease = (x) => 1 - Math.pow(1 - x, 3);
+function frame(now) {
+  requestAnimationFrame(frame); if (!visible) return; const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  if (bootT < 4) bootT += dt * (booting ? 1 : 8);
+  const rise = (d) => Math.max(0.001, ease(Math.min(1, Math.max(0, (bootT - d) * 1.6))));
+  cp.scale.setScalar(rise(0)); Object.values(compObjs).forEach((o, i) => o.mesh.scale.setScalar(rise(0.3 + i * 0.1)));
+  Object.values(nodeObjs).forEach((o, i) => o.group.scale.setScalar(rise(0.6 + i * 0.22)));
+  for (const [n, p] of Object.entries(podObjs)) {
+    p.scale += (p.target - p.scale) * Math.min(1, dt * 6); p.mesh.scale.setScalar(Math.max(0.001, p.scale * p.size * rise(1.4 + (n.length % 7) * 0.08)));
+    const sel = selected?.kind === 'pod' && selected.name === n; const match = filter && p.proj?.tech.some((t) => t.toLowerCase() === filter.toLowerCase());
+    p.mesh.position.y = p.base + (sel ? 0.5 : 0) + (hover === p.mesh ? 0.2 : 0) + (match && !reduce ? 0.35 + Math.sin(now / 300 + p.base) * 0.1 : 0) + (p.pending && !reduce ? Math.sin(now / 600 + p.mesh.position.x) * 0.15 : 0);
+    p.mesh.rotation.z = p.status === 'CrashLoopBackOff' && !reduce ? Math.sin(now / 90) * 0.12 : 0;
+  }
+  if (!reduce) compObjs['kube-scheduler'].mesh.rotation.y += dt * 0.8;
+  for (let i = packets.length - 1; i >= 0; i--) { const k = packets[i]; k.t += dt / k.hop; const seg = Math.floor(k.t); if (seg >= k.curves.length) { clusterG.remove(k.m); packets.splice(i, 1); k.done(); continue; } k.m.position.copy(k.curves[seg].getPoint(k.t - seg)); }
+  for (let i = pulses.length - 1; i >= 0; i--) { const k = pulses[i]; k.t += dt; k.m.scale.setScalar(1 + k.t * 6); k.m.material.opacity = Math.max(0, 1 - k.t / 1.2); if (k.t > 1.2) { clusterG.remove(k.m); pulses.splice(i, 1); } }
+  for (const f of flows) { f.t = (f.t + dt * 0.45) % 1; f.dot.position.copy(f.curve.getPoint(f.t)); }
+  if (level === 'pod' && !reduce) { const s = interior.objs.secret; if (s) s.rotation.y += dt * 0.5; const svc = interior.objs.service; if (svc) svc.rotation.z += dt * 0.7; }
+  if (glide) { glide.t = Math.min(1, glide.t + (dt * 1000) / glide.ms); const e = ease(glide.t); camera.position.lerpVectors(glide.fromP, glide.toP, e); controls.target.lerpVectors(glide.fromT, glide.toT, e); if (glide.t >= 1) { const d = glide.done; glide = null; d && d(); } }
+  controls.update();
+  for (const t of tags) place(t.el, t.world, t.level === level);
+  if (level === 'cluster' && selected?.kind === 'pod' && podObjs[selected.name]) place(flabel, podObjs[selected.name].mesh.position.clone().setY(podObjs[selected.name].mesh.position.y + 0.7));
+  renderer.render(scene, camera);
+}
+resize(); updateHealth(); requestAnimationFrame(frame); boot();
+})();
+</script>

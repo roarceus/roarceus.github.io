@@ -2,7 +2,7 @@
 
 Personal portfolio for **Sohan Patil**, software engineer (DevOps / cloud / full stack).
 Theme: an interactive Kubernetes cluster. Visitors explore my career with `kubectl`-style
-commands or by clicking a live cluster map. A plain, recruiter-friendly view is always one click away.
+commands or by clicking a live 3D cluster ([ADR 0005](adr/0005-3d-cluster-one-screen.md)). A plain, recruiter-friendly view is always one click away.
 
 This document is the source of truth. If something here conflicts with a quick instruction in chat,
 ask before deviating. Record any significant deviation as an ADR in `docs/adr/`.
@@ -149,16 +149,20 @@ The cluster experience on mobile is tap-first; typing is optional.
 
 **No-JS:** `/` must show the hero and links to all sections without JavaScript.
 
-**One playground:** with JavaScript on, the cluster view never sends visitors to another page. Command chips,
-table names, map nodes, and pods run their command in place: output in the terminal, details in the detail
-panel (the bottom sheet on phones). The URL follows along as `?run=<command>` (for example
+**One playground** ([ADR 0005](adr/0005-3d-cluster-one-screen.md)): with JavaScript on, the cluster view never
+sends visitors to another page. Command chips, table names, nodes, pods, and control plane components run
+their command in place: output in the terminal, details in the detail panel (the bottom sheet on phones).
+On desktop the whole portfolio lives on one fixed screen: no page scroll, and no scrolling inside any panel
+(long content pages instead, see "Responsive and mobile requirements"). The URL follows along as `?run=<command>` (for example
 `/?run=kubectl+describe+pod+asktrace`) through the History API, so Back and Forward step through what was
 viewed and links can be shared. A query string, not a hash, because phones use `#cluster` for cluster mode.
 `?run=` accepts only read-only commands (`get`, `describe`, `top`, `logs` without `-f`, `version`, `help`,
 `cluster-info`) up to 200 characters; anything else is ignored and the page loads normally. While
 `clusterDashboard` is off, `?run=` is ignored. Only the `Plain view` toggle and
-`kubectl config use-context plain` go to `/plain/`, plus real outbound links (`port-forward`, Resume). Chips
-and names stay real links underneath, so without JavaScript they still reach the plain view.
+`kubectl config use-context plain` go to `/plain/`, plus real outbound links (`port-forward`, project repos
+and demos, Resume), which open in a new tab. Contact runs `kubectl apply -f contact.yaml` and opens the form
+in the panel, from the chip, the terminal, and the top bar. Chips and names stay real links underneath, so
+without JavaScript they still reach the plain view.
 
 ### Responsive and mobile requirements
 Mobile is a first-class target, not an afterthought. Build mobile-first and scale up.
@@ -170,7 +174,12 @@ Mobile is a first-class target, not an afterthought. Build mobile-first and scal
     tap-first: map on top, detail panel as a bottom sheet, terminal collapsed to a command-chip bar with an
     optional expandable input.
   - 768–1023px (tablet): map and detail panel stacked; terminal docked and collapsible.
-  - ≥ 1024px: full dashboard (map + detail panel side by side, terminal docked at the bottom).
+  - ≥ 1024px: full dashboard (3D scene + detail panel side by side, terminal docked at the bottom).
+  - **One fixed screen** from 1024×700 ([ADR 0005](adr/0005-3d-cluster-one-screen.md)): the dashboard fills the
+    window and nothing scrolls, neither the page nor any panel. The scene draws to fit its box; the detail
+    panel splits long content into pages (Previous, Next, `1 / 2`); the terminal shows only the latest result
+    and pages a long one like `less`. Smaller windows and browser zoom (1280×800 at 200% is 640×400) fall back
+    to the normal scrolling page, because content must never be cut off (WCAG 1.4.10). Print uses normal flow.
 - **No horizontal page scroll at any width.** Wide content (tables, YAML, code) scrolls inside its own container.
   Terminal tables reflow or switch to a stacked "card" format on narrow screens.
 - **Touch:** tap targets ≥ 44×44px with adequate spacing; nothing depends on hover (hover only enhances);
@@ -198,7 +207,7 @@ No glow effects, no heavy gradients. One accent color, used with restraint.
 **The UI is the tool, the cluster is the game** ([ADR 0002](adr/0002-design-direction-tool-and-game.md)).
 Everything above applies to the chrome: top bar, panels, tables, terminal, plain view, forms, and content
 pages. Flair is allowed only inside the cluster scene (`src/components/cluster/`, `src/components/game/`).
-That means subtle status-driven glow on pods and packets, motion, 3D (Stage 8), and game mechanics. It
+That means subtle status-driven glow on pods and packets, motion, 3D (Stage 4, ADR 0005), and game mechanics. It
 uses the `--scene-*` tokens, and a test keeps them and glow effects out of everything else.
 
 **Starting palette** (tune freely, but every text/background pair must pass WCAG AA; document final values):
@@ -275,14 +284,25 @@ Collections (adjust fields as needed, but keep this shape):
 ## 7. Cluster metaphor and command reference
 
 ### Mapping
-- **Cluster** = Sohan's career. Name: `sohan-cluster`.
-- **Nodes** = organizations/eras on the map: `capgemini`, `northeastern`, `mastercontrol` (labels: `role=work|education|teaching`).
-  A node is declared by the `node` field of an experience or education entry. Older eras (`mumbai` for the
-  Bachelor's, `sparks-foundation` for the 2020 internship) set `cluster: false`: they stay in the plain view
-  but not on the map or in `kubectl get nodes`, and their projects appear only in the plain view.
+Full table: [ADR 0005](adr/0005-3d-cluster-one-screen.md) §5. Every kind of content has a thing in the scene, a
+view in the panel, and a real command.
+- **Cluster** = Sohan's career. Name: `sohan-cluster`. The **control plane** (apiserver, etcd, scheduler,
+  controller-manager) sits in the middle and animates real request flows.
+- **Nodes** = organizations/eras, drawn as hexagon platforms: `capgemini`, `northeastern`, `mastercontrol`
+  (labels: `role=work|education|teaching`). A node is declared by the `node` field of an experience or
+  education entry. Older eras (`mumbai` for the Bachelor's, `sparks-foundation` for the 2020 internship) set
+  `cluster: false`: they appear as faded, cordoned nodes at the edge (`Ready,SchedulingDisabled`), with
+  their projects on them.
 - **Pods** = projects, scheduled on the node where they were built. Pod status mirrors project status.
+  Projects with no node wait as Pending pods next to the scheduler ("unscheduled").
+- **Inside a pod** (`kubectl exec -it <pod> -- sh`): the container (name, purpose), a ConfigMap (the tech
+  stack), a Secret (the project write-up, base64 until decoded), a Service (links as ports), and Events
+  (dates and related updates).
+- **Skills** = labels: `get pods -l skill=<name>` lights up every pod that used it.
+- **Certifications** = badges on the control plane, like cert-manager certificates.
 - **Namespaces** = sections: `career`, `projects`, `skills`, `updates`.
-- Real achievements = `achievements` resource. Game unlocks = **badges** (different word on purpose).
+- Real achievements = `achievements` resource, shown as markers on their node. Game unlocks = **badges**
+  (different word on purpose).
 
 ### Commands (v1)
 `k` is an alias for `kubectl`. Unknown commands get a realistic error plus a suggestion (`did you mean ...?`).
@@ -310,11 +330,20 @@ Collections (adjust fields as needed, but keep this shape):
 | `kubectl get all` | Overview of everything |
 | `clear`, Ctrl+L | Clear terminal |
 
+**Scene commands** ([ADR 0005](adr/0005-3d-cluster-one-screen.md)), added with the stage that needs them:
+`get pods -l skill=<name>` and `get cs` (Stage 4); `exec -it <pod> -- sh`, `exit`, and inside a pod
+`get configmap`, `get secret` (with a decode step), `describe svc`, `get events` (Stage 5);
+`describe certificate <id>`, `describe achievement <id>` (Stage 4); `delete pod`, `scale`,
+`rollout restart` (Stage 6, with self-healing and chaos).
+
 ### Terminal behavior
 - History (Up/Down), Tab autocomplete for commands, resources, and slugs.
 - Clickable output: names in tables open details; links are real links.
 - Command chips under the input (`get experience`, `get pods -n projects`, `top skills`, `help`); clicking runs the command visibly.
-- Clicking anything on the map types and runs the equivalent command in the terminal (shows visitors the CLI).
+- Clicking anything in the scene types and runs the equivalent command in the terminal (shows visitors the
+  CLI), glides the camera to it, and shows a floating label on the selected pod.
+- On the one-screen desktop layout the output shows only the latest result; a long result pages
+  (`-- more (1/2) --`, Space or Next), and Up/Down bring back earlier commands.
 - Nothing in the terminal or on the map loads a new page (see "One playground" in section 4); an e2e test
   fails if clicking a chip, a table name, a node, or a pod navigates away.
 - Output region uses `aria-live="polite"`; input is a real labeled `<input>`; full keyboard support.
@@ -338,8 +367,8 @@ Collections (adjust fields as needed, but keep this shape):
 
 ## 9. Boot sequence (Stage 5)
 
-On first load of `/` (not on mobile, not with reduced motion): about 2–3 seconds of nodes joining
-(`NotReady` → `Ready`) and pods starting, with a few terminal lines. Skippable with any key or click,
+On first load of `/` (not on mobile, not with reduced motion): about 2–3 seconds of the 3D cluster coming
+up: the control plane, then nodes joining (`NotReady` → `Ready`) and pods starting, with a few terminal lines. Skippable with any key or click,
 and skipped on repeat visits within a session. The page must be usable immediately: content is never
 blocked behind the animation. After boot, auto-select the most recent role so passive visitors see content.
 
@@ -601,17 +630,24 @@ Parser, registry, all v1 commands (section 7), structured output renderer, histo
 chips, accessibility. **Done when:** every command works and is unit-tested; e2e covers the core ones; chips
 and table names run in place without leaving `/` (section 4, "One playground").
 
-### Stage 4 — Cluster visualization → v0.5.0
-SVG map of nodes and pods from content data, status colors, hover/selection, detail panel, two-way sync
-between map and terminal. The map replaces the Stage 2 placeholder cards: each node is sized to its pods and
-the layout uses the space it has, so there are no empty boxes at any width from 768px to 2560px (a node
-with no pods is drawn small). **Done when:** everything in the map is clickable and keyboard reachable, and clicks echo commands in the terminal.
+### Stage 4 — 3D cluster → v0.5.0
+The 3D scene ([ADR 0005](adr/0005-3d-cluster-one-screen.md)) behind the `cluster3d` flag, lazy-loaded on screens of
+at least 1024×700 with WebGL: hexagon nodes, pods, the control plane, cordoned past eras, unscheduled pods,
+certificates and achievement markers, request packets and kubelet heartbeats, selection with camera glide and
+a floating label, skills as label selectors, and two-way sync with the terminal, panel, and `?run=` URL. A 2D
+map with the same data is the fallback for phones, tablets, and browsers without WebGL, and replaces the Stage
+2 placeholder cards (nodes sized to their pods, no empty boxes from 768px to 2560px). Likely split into
+several PRs at planning. **Done when:** everything in the scene is clickable and keyboard reachable (an
+accessible list mirrors it), clicks echo commands in the terminal, nothing on the one-screen layout scrolls,
+and the phone and plain-view budgets are unchanged.
 
-### Stage 5 — Boot sequence and polish → v0.6.0
-Boot animation (section 9), transitions, empty/loading/error states, OG images, mobile tap-first cluster mode.
+### Stage 5 — Boot sequence, pod dive, and polish → v0.6.0
+The 3D boot sequence (section 9), going inside a pod (`exec`: container, ConfigMap, Secret, Service, Events),
+transitions, empty/loading/error states, OG images, mobile tap-first cluster mode.
 
 ### Stage 6 — Game layer → v0.7.0
-Self-healing, chaos mode, badges, easter eggs (section 8), GoatCounter command events.
+Self-healing with the full reconciliation loop in the scene (delete, controller-manager, scheduler, kubelet,
+Running), chaos mode, a visible `kubectl scale`, badges, easter eggs (section 8), GoatCounter command events.
 
 ### Stage 7 — Hardening → v1.0.0
 Full accessibility audit, performance pass, cross-browser check (Chrome, Firefox, Safari, mobile Safari),
@@ -620,15 +656,15 @@ content final review with Sohan, docs pass, release `1.0.0`.
 ### Post-1.0 stages ([ADR 0002](adr/0002-design-direction-tool-and-game.md))
 Each ships behind a feature flag, off in production until approved.
 
-### Stage 8 — 3D cluster view → v1.1.0
-React Three Fiber + drei, as progressive enhancement over the 2D map: same data and state, lazy-loaded only
-when the cluster view opens, desktop/capable devices only, WebGL detection with automatic 2D fallback, a
-2D/3D toggle, low-poly instanced meshes, render-on-demand, capped pixel ratio, paused when hidden. Includes
-a 3D boot sequence, camera glide on node click, physical chaos mode, and a visible `kubectl scale`.
+### Stage 8 — 3D cluster view (moved)
+Moved into Stages 4 to 6 by [ADR 0005](adr/0005-3d-cluster-one-screen.md): the 3D scene is now the v1.0 desktop
+experience. The performance rules stay: React Three Fiber + drei (confirmed at Stage 4's design), lazy-loaded,
+WebGL detection with automatic 2D fallback, low-poly instanced meshes, render on demand, a capped pixel
+ratio, and paused when hidden.
 
-### Stage 9 — Missions → v1.2.0
+### Stage 9 — Missions → v1.1.0
 A guided tour ("Take the 60-second tour"), visitor rank (Intern to Cluster Admin), and XP.
 
-### Stage 10 — Incidents → v1.3.0
-A timed incident mini-game (best time stored locally), a hidden `kube-system` namespace, and optional sound
+### Stage 10 — Incidents → v1.2.0
+A timed incident mini-game (best time stored locally), a hidden namespace (the control plane itself is visible from Stage 4), and optional sound
 effects (off by default).
