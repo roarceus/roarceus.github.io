@@ -318,10 +318,13 @@ test.describe('one-screen desktop @dashboard', () => {
   const pageScrolls = (page: Page) =>
     page.evaluate(() => document.documentElement.scrollHeight > window.innerHeight);
 
-  /** Tabs from the top of the page and collects the accessible names of the focused elements. */
+  /**
+   * Tabs from the top of the page and collects the accessible names of the focused elements. Starts
+   * on the skip link: Firefox ignores body.focus(), which would leave focus where it was.
+   */
   async function tabStops(page: Page): Promise<string[]> {
     const names: string[] = [];
-    await page.locator('body').focus();
+    await page.getByRole('link', { name: 'Skip to content' }).focus();
     for (let i = 0; i < 60; i++) {
       await page.keyboard.press('Tab');
       names.push(await page.evaluate(() => document.activeElement?.getAttribute('aria-label') ?? ''));
