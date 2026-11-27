@@ -35,6 +35,15 @@ const ALIASES: Record<string, string> = {
 /** Flags that never take a value. */
 const BOOLEAN = new Set(['help', 'follow']);
 
+/**
+ * Flags from untrusted input. `Object.fromEntries` defines each name as a plain own property (even
+ * `__proto__`), never through a setter, and the object has no prototype, so a lookup like
+ * `flags.constructor` can't reach `Object.prototype`. A repeated flag keeps its last value.
+ */
+function toFlags(pairs: [string, string | true][]): Record<string, string | true> {
+  return Object.setPrototypeOf(Object.fromEntries(pairs), null) as Record<string, string | true>;
+}
+
 type Tokens = { ok: true; tokens: string[] } | { ok: false };
 
 function tokenize(input: string): Tokens {
@@ -86,9 +95,9 @@ export function parse(input: string): ParseResult {
   }
 
   const positional: string[] = [];
-  // Flag names come from the input (and from ?run= links): a null prototype keeps any name, even
-  // `__proto__` or `constructor`, a plain key.
-  const flags = Object.create(null) as Record<string, string | true>;
+  // Flag names come from the input (and from ?run= links), so they are collected as pairs and never
+  // written as property keys one by one (see `toFlags`).
+  const pairs: [string, string | true][] = [];
   for (let i = 0; i < rest.length; i++) {
     const token = rest[i] ?? '';
     if (!isFlag(token)) {
@@ -100,21 +109,21 @@ export function parse(input: string): ParseResult {
     const rawName = eq === -1 ? body : body.slice(0, eq);
     const name = Object.hasOwn(ALIASES, rawName) ? (ALIASES[rawName] ?? rawName) : rawName;
     if (eq !== -1) {
-      flags[name] = body.slice(eq + 1);
+      pairs.push([name, body.slice(eq + 1)]);
       continue;
     }
     const next = rest[i + 1];
     if (!BOOLEAN.has(rawName) && name !== 'help' && next !== undefined && !isFlag(next)) {
-      flags[name] = next;
+      pairs.push([name, next]);
       i++;
     } else {
-      flags[name] = true;
+      pairs.push([name, true]);
     }
   }
 
   const [verb, ...args] = positional;
   return {
     ok: true,
-    command: { program: 'kubectl', verb: verb?.toLowerCase(), args, flags, raw },
+    command: { program: 'kubectl', verb: verb?.toLowerCase(), args, flags: toFlags(pairs), raw },
   };
 }
