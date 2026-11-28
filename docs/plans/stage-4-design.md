@@ -153,13 +153,14 @@ scene picks / keyboard list -> runCommand (never the stores or three objects dir
     `aws-iaas`, `completed-safehaven` to `safehaven`, `launched-asktrace` to `asktrace` (projects);
     `joined-mastercontrol` to `mastercontrol`, `relocated-to-usa` and `started-teaching-assistantship` to
     `northeastern` (nodes); `launched-design-portfolio` and `started-leetcode` link to nothing;
-    `launched-personal-website` stays unlinked until I confirm it (§16);
+    `launched-personal-website` to `roarceus-github-io` (this site);
   - each certification's stable `id` (a slug of its name, or a new optional `id` field).
 - **A `personal` node (accuracy):** a pod without a node can't be Running or Completed. Side projects get a
   `personal` node (`role=personal`), a new content entry. Only genuinely planned, unstarted projects sit by
   the scheduler, as `Pending` with reason `Unschedulable` in `describe`. Today three projects have no node:
-  `roarceus-github-io` (running), `book-review-system` and `meeting-notes-react` (completed); 4a moves them
-  to `personal` once I confirm they are side projects, so nothing is unscheduled today. The layout model,
+  `roarceus-github-io` (running) and `meeting-notes-react` (completed) are side projects and move to
+  `personal`; `book-review-system` (completed) was built during my undergrad and moves to `mumbai` (shown on
+  the cordoned era, faded). Nothing is unscheduled today. The layout model,
   the 2D map, and their tests cover both cases (a fixture keeps a Pending pod).
 - **Control plane names:** kubeadm-style static pod names: `kube-apiserver-control-plane`,
   `etcd-control-plane`, `kube-scheduler-control-plane`, `kube-controller-manager-control-plane`. The short
@@ -317,9 +318,8 @@ issue in STATUS.
 
 ## 16. Open, needs me
 
-- **`launched-personal-website`:** this site (project `roarceus-github-io`) or my old site (no link).
-- **Side projects on `personal`:** confirm `book-review-system` and `meeting-notes-react` are side
-  projects (asked in the 4a PR before moving them).
+Nothing open. Answered 2026-11-27: `launched-personal-website` links to `roarceus-github-io`;
+`meeting-notes-react` and `roarceus-github-io` go on `personal`; `book-review-system` goes on `mumbai`.
 
 ## 17. Left to the builder
 

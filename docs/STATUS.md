@@ -42,8 +42,7 @@ the dashboard off, as intended). Next: Stage 4, the
 
 1. Stage 4 (3D cluster): design [`plans/stage-4-design.md`](plans/stage-4-design.md) and plan
    [`plans/stage-4.md`](plans/stage-4.md) are in review. Then 4a: content model, commands, layout model, and
-   the 2D map. Open for me: `launched-personal-website` link, and whether `book-review-system` and
-   `meeting-notes-react` are side projects (`personal` node).
+   the 2D map.
 2. Carried over: submit the sitemap in Google Search Console; check the share card in a link inspector
    (runbook: `docs/runbooks/share-image.md`); set up the uptime monitor (M10); decide on Renovate's
    queued TypeScript 7 PR.

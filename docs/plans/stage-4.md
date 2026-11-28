@@ -94,9 +94,9 @@ Two PRs if it passes about 500 lines: 4a-1 (Tasks 1 and 2), 4a-2 (Tasks 3 to 5).
 - [ ] **Step 2: Run** `pnpm exec vitest run src/lib/content` and see them fail.
 - [ ] **Step 3: Implement** the schema fields, `clusterNodes`/`unscheduledPods` changes, integrity rule,
       and snapshot fields. Story paragraphs: split the body on blank lines, strip Markdown syntax to text.
-- [ ] **Step 4: Content:** set `node`/`project` on the six confirmed updates (design §7). Ask me about
-      `launched-personal-website`, `book-review-system`, and `meeting-notes-react` before moving them; until
-      then the integrity rule is the failing test that waits on the answer.
+- [ ] **Step 4: Content:** set `node`/`project` on the seven linked updates (design §7, including
+      `launched-personal-website` to `roarceus-github-io`); set `node: personal` on `roarceus-github-io`
+      and `meeting-notes-react`, and `node: mumbai` on `book-review-system`.
 - [ ] **Step 5: Run** `pnpm exec vitest run src/lib/content` and see them pass; fix any existing test that
       expected cordoned nodes to be dropped (map callers filter `cordoned` until Task 4).
 - [ ] **Step 6: Commit** `feat(content): add cordoned and personal nodes and scene links`
