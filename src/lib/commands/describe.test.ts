@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { SNAPSHOT } from './fixtures';
 import { as, exec } from './test-utils';
 
 describe('describe node', () => {
@@ -112,5 +113,164 @@ describe('describe errors', () => {
       message: 'error: the server doesn\'t have a resource type "secret"',
     });
     expect(await exec('kubectl describe nod x')).toMatchObject({ suggestion: 'kubectl describe node x' });
+  });
+});
+
+describe('describe pod in kube-system', () => {
+  it.each(['etcd', 'etcd-control-plane', 'ETCD'])('%s gives the etcd view', async (name) => {
+    const result = as(await exec(`kubectl describe pod ${name} -n kube-system`), 'detail');
+    expect(result.target).toEqual({ kind: 'component', name: 'etcd-control-plane' });
+    expect(result.lines.slice(0, 4)).toEqual([
+      { text: 'Name:         etcd-control-plane' },
+      { text: 'Namespace:    kube-system' },
+      { text: 'Labels:       component=etcd, tier=control-plane' },
+      { text: 'Status:       Running' },
+    ]);
+  });
+
+  it('is not found outside kube-system, with a suggestion that adds the namespace', async () => {
+    expect(as(await exec('kubectl describe pod etcd'), 'error')).toEqual({
+      kind: 'error',
+      message: 'Error from server (NotFound): pods "etcd" not found',
+      suggestion: 'kubectl describe pod etcd -n kube-system',
+    });
+  });
+
+  it('suggests a close component name in kube-system', async () => {
+    expect(as(await exec('kubectl describe pod kube-schedular -n kube-system'), 'error').suggestion).toBe(
+      'kubectl describe pod kube-scheduler-control-plane -n kube-system',
+    );
+  });
+});
+
+describe('describe pod (pending)', () => {
+  it('shows Pending, PodScheduled False, and a FailedScheduling event', async () => {
+    const pending = {
+      summary: 'A planned lab.',
+      tech: ['Go'],
+      repo: undefined,
+      demo: undefined,
+      story: [],
+      slug: 'homelab',
+      name: 'Homelab',
+      phase: 'Pending' as const,
+      node: undefined,
+      start: undefined,
+      end: undefined,
+    };
+    const snapshot = {
+      ...SNAPSHOT,
+      nodes: [
+        ...SNAPSHOT.nodes,
+        { name: 'mumbai', label: 'Mumbai', role: 'education' as const, cordoned: true, pods: [] },
+      ],
+      projects: [...SNAPSHOT.projects, pending],
+    };
+    const { lines } = as(await exec('kubectl describe pod homelab', { snapshot }), 'detail');
+    const text = lines.map((line) => line.text);
+    expect(text).toContain('Status:       Pending');
+    expect(text.slice(-6)).toEqual([
+      'Conditions:',
+      '  Type           Status  Reason',
+      '  PodScheduled   False   Unschedulable',
+      'Events:',
+      '  Type     Reason            From               Message',
+      "  Warning  FailedScheduling  default-scheduler  0/3 nodes are available: 1 node(s) were unschedulable, 2 node(s) didn't match Pod's node affinity/selector.",
+    ]);
+  });
+});
+
+describe('describe certificate and achievement', () => {
+  it('selects a certificate by id', async () => {
+    const result = as(await exec('kubectl describe certificate aws-saa'), 'detail');
+    expect(result.target).toEqual({ kind: 'certificate', name: 'aws-saa' });
+    expect(result.lines).toEqual([
+      { text: 'Name:         aws-saa' },
+      { text: 'Title:        AWS Solutions Architect' },
+      { text: 'Issuer:       AWS' },
+      { text: 'Status:       issued' },
+      { text: 'Date:         2024-03' },
+    ]);
+  });
+
+  it('selects an achievement by id, linking its node', async () => {
+    const snapshot = {
+      ...SNAPSHOT,
+      achievements: [
+        {
+          id: 'hackathon-win',
+          title: 'Hackathon win',
+          org: 'NEU',
+          date: '2025-02',
+          summary: 'Won it.',
+          node: 'northeastern',
+          link: 'https://example.com/win',
+        },
+      ],
+    };
+    const result = as(await exec('kubectl describe achievement/hackathon-win', { snapshot }), 'detail');
+    expect(result.target).toEqual({ kind: 'achievement', name: 'hackathon-win' });
+    expect(result.lines).toEqual([
+      { text: 'Name:         hackathon-win' },
+      { text: 'Title:        Hackathon win' },
+      { text: 'Org:          NEU' },
+      { text: 'Node:         northeastern', run: 'kubectl describe node northeastern' },
+      { text: 'Date:         2025-02' },
+      { text: 'Summary:      Won it.' },
+      { text: 'Link:         https://example.com/win', href: 'https://example.com/win' },
+    ]);
+  });
+
+  it('suggests close ids for unknown ones', async () => {
+    expect(as(await exec('kubectl describe cert ckaa'), 'error')).toEqual({
+      kind: 'error',
+      message: 'Error from server (NotFound): certificates "ckaa" not found',
+      suggestion: 'kubectl describe certificate cka',
+    });
+    expect(as(await exec('kubectl describe achievement hackaton-win'), 'error').suggestion).toBe(
+      'kubectl describe achievement hackathon-win',
+    );
+  });
+});
+
+describe('describe node (schools and cordoned eras)', () => {
+  it('prints the degree on its node and marks cordoned eras Unschedulable', async () => {
+    const snapshot = {
+      ...SNAPSHOT,
+      nodes: [
+        {
+          name: 'mumbai',
+          label: 'University of Mumbai',
+          role: 'education' as const,
+          cordoned: true,
+          pods: [],
+        },
+      ],
+      experience: [],
+      education: [
+        {
+          name: 'mumbai',
+          school: 'University of Mumbai',
+          degree: 'Bachelor of Engineering',
+          field: 'Computer Engineering',
+          node: 'mumbai',
+          start: '2016-08',
+          end: '2020-10',
+          highlights: ['Built a book review system.'],
+        },
+      ],
+    };
+    const { lines } = as(await exec('kubectl describe node mumbai', { snapshot }), 'detail');
+    expect(lines.map((line) => line.text)).toEqual([
+      'Name:         mumbai',
+      'Roles:        education',
+      'Labels:       org=University of Mumbai',
+      'Unschedulable: true',
+      'Degree:       Bachelor of Engineering, Computer Engineering',
+      'Period:       2016-08 to 2020-10',
+      'Highlights:',
+      '  - Built a book review system.',
+      'Pods:         <none>',
+    ]);
   });
 });

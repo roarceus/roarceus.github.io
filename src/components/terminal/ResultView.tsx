@@ -73,7 +73,14 @@ function Lines({
 export function ResultView({ result, base }: { result: CommandResult; base: string }) {
   switch (result.kind) {
     case 'table':
-      return <ResultTable result={result} base={base} />;
+      return result.warning === undefined ? (
+        <ResultTable result={result} base={base} />
+      ) : (
+        <>
+          <p className="font-mono text-sm text-text-muted">{result.warning}</p>
+          <ResultTable result={result} base={base} />
+        </>
+      );
     case 'yaml':
       return <pre className="font-mono text-sm text-text desk:whitespace-pre-wrap">{result.text}</pre>;
     case 'lines':

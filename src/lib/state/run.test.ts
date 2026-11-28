@@ -4,6 +4,7 @@ import { SNAPSHOT } from '@/lib/commands/fixtures';
 import type { CommandResult } from '@/lib/commands/types';
 
 import { clearTerminal, echoCancel, runCommand, seedTerminal, setRunContext } from './run';
+import { $sceneFilter } from './scene';
 import { $selection } from './selection';
 import { $snapshot, loadSnapshot } from './snapshot-loader';
 import { $terminal, MAX_ENTRIES, summarize } from './terminal';
@@ -178,5 +179,27 @@ describe('echoCancel', () => {
     });
     expect($terminal.get().history).toEqual(['kubectl version']);
     expect($terminal.get().announcement).toBe(announcement);
+  });
+});
+
+describe('runCommand and the skill filter', () => {
+  beforeEach(() => {
+    $sceneFilter.set(undefined);
+  });
+
+  it('sets the filter from a skill selector, and keeps it through commands that select nothing', async () => {
+    await runCommand('kubectl get pods -l skill=Kafka -n projects', 'input');
+    expect($sceneFilter.get()).toEqual({ skill: 'kafka' });
+    await runCommand('kubectl get nodes', 'input');
+    expect($sceneFilter.get()).toEqual({ skill: 'kafka' });
+  });
+
+  it('clears it when a command selects something, or on clear', async () => {
+    await runCommand('kubectl get pods -l skill=go -n projects', 'input');
+    await runCommand('kubectl describe node mastercontrol', 'input');
+    expect($sceneFilter.get()).toBeUndefined();
+    await runCommand('kubectl get pods -l skill=go -n projects', 'input');
+    await runCommand('clear', 'input');
+    expect($sceneFilter.get()).toBeUndefined();
   });
 });

@@ -4,6 +4,7 @@ import { kubectlAgeClamped } from '@/lib/utils/kubectl';
 import { joinBase } from '@/lib/utils/url';
 
 import { error, notFound, unknownType } from './format';
+import { COMPONENTS, COMPONENT_STATUSES, CS_WARNING, KUBE_SYSTEM } from './kube-system';
 
 import type { Cell, Column, Command, CommandResult, DataContext, Line } from './types';
 
@@ -11,6 +12,10 @@ import type { Cell, Column, Command, CommandResult, DataContext, Line } from './
 
 interface Item {
   name: string;
+  /** Other names `get <type> <name>` accepts (a component's short name). */
+  aliases?: readonly string[];
+  /** Lowercased skills, for `-l skill=<name>`. */
+  skills?: readonly string[];
   row: Record<string, Cell>;
   wide?: Record<string, Cell>;
   manifest: Record<string, unknown>;
@@ -22,18 +27,20 @@ interface Resource {
   aliases: readonly string[];
   /** YAML `kind` and the `-o name` prefix (lowercased). */
   kind: string;
-  /** Only in the `projects` namespace (`get pods` needs `-n projects`). */
-  namespaced?: boolean;
+  /** The namespaces it lives in (`get pods` needs `-n projects` or `-n kube-system`). */
+  namespaces?: readonly string[];
   columns: Column[];
   wide?: Column[];
-  items(ctx: DataContext): Item[];
+  /** kubectl's warning line, printed above the table. */
+  warning?: string;
+  items(ctx: DataContext, namespace?: string): Item[];
 }
 
 const col = (label: string): Column => ({ key: label.toLowerCase().replace(/ /g, '-'), label });
 const cols = (...labels: string[]): Column[] => labels.map(col);
-const describeLink = (type: 'node' | 'pod', name: string): Cell => ({
+const describeLink = (type: string, name: string, scope = ''): Cell => ({
   text: name,
-  run: `kubectl describe ${type} ${name}`,
+  run: `kubectl describe ${type} ${name}${scope}`,
 });
 const age = (start: string | undefined, now: Date): string =>
   start === undefined ? '<unknown>' : kubectlAgeClamped(start, now);
@@ -97,6 +104,7 @@ const projectItems = ({ snapshot, now }: DataContext): Item[] =>
       restarts: '0',
       age: age(spec.start, now),
     },
+    skills: tech.map((skill) => skill.toLowerCase()),
     wide: { node: node ?? '<none>', tech: tech.join(',') },
     manifest: {
       ...manifest('Pod', slug, { nodeName: node, tech, ...spec }, { namespace: 'projects' }),
@@ -104,33 +112,82 @@ const projectItems = ({ snapshot, now }: DataContext): Item[] =>
     },
   }));
 
+/** The control plane is as old as the cluster: the first role or degree. */
+function clusterStart({ snapshot }: DataContext): string | undefined {
+  return [...snapshot.experience, ...snapshot.education].map((entry) => entry.start).sort()[0];
+}
+
+const componentItems = (ctx: DataContext): Item[] =>
+  COMPONENTS.map(({ name, short, description }) => ({
+    name,
+    aliases: [short],
+    row: {
+      name: describeLink('pod', name, ` -n ${KUBE_SYSTEM}`),
+      ready: '1/1',
+      status: 'Running',
+      restarts: '0',
+      age: age(clusterStart(ctx), ctx.now),
+    },
+    wide: { node: '<none>', tech: '' },
+    manifest: {
+      ...manifest(
+        'Pod',
+        name,
+        { description },
+        { namespace: KUBE_SYSTEM, labels: { component: short, tier: 'control-plane' } },
+      ),
+      status: { phase: 'Running' },
+    },
+  }));
+
 const pods: Resource = {
   plural: 'pods',
   aliases: ['pods', 'pod', 'po'],
   kind: 'Pod',
-  namespaced: true,
+  namespaces: ['projects', KUBE_SYSTEM],
+  columns: PROJECT_COLUMNS,
+  wide: cols('NODE', 'TECH'),
+  items: (ctx, namespace) => (namespace === KUBE_SYSTEM ? componentItems(ctx) : projectItems(ctx)),
+};
+
+const projects: Resource = {
+  plural: 'projects',
+  aliases: ['projects', 'project'],
+  kind: 'Pod',
   columns: PROJECT_COLUMNS,
   wide: cols('NODE', 'TECH'),
   items: projectItems,
 };
 
-const projects: Resource = {
-  ...pods,
-  plural: 'projects',
-  aliases: ['projects', 'project'],
-  namespaced: false,
+const componentStatuses: Resource = {
+  plural: 'componentstatuses',
+  aliases: ['componentstatuses', 'componentstatus', 'cs'],
+  kind: 'ComponentStatus',
+  columns: cols('NAME', 'STATUS', 'MESSAGE', 'ERROR'),
+  warning: CS_WARNING,
+  items: () =>
+    COMPONENT_STATUSES.map((name) => ({
+      name,
+      row: { name, status: 'Healthy', message: 'ok', error: '' },
+      manifest: {
+        apiVersion: 'v1',
+        kind: 'ComponentStatus',
+        metadata: { name },
+        conditions: [{ type: 'Healthy', status: 'True', message: 'ok' }],
+      },
+    })),
 };
 
 const certificates: Resource = {
   plural: 'certificates',
   aliases: ['certificates', 'certificate', 'certs', 'cert', 'certifications'],
   kind: 'Certificate',
-  columns: cols('NAME', 'ISSUER', 'STATUS', 'DATE'),
+  columns: cols('NAME', 'TITLE', 'ISSUER', 'STATUS', 'DATE'),
   items: ({ snapshot }) =>
-    snapshot.certifications.map(({ name, issuer, status, date }) => ({
-      name,
-      row: { name, issuer, status, date: date ?? '<none>' },
-      manifest: manifest('Certificate', name, { issuer, status, date }),
+    snapshot.certifications.map(({ id, name, issuer, status, date }) => ({
+      name: id,
+      row: { name: describeLink('certificate', id), title: name, issuer, status, date: date ?? '<none>' },
+      manifest: manifest('Certificate', id, { title: name, issuer, status, date }),
     })),
 };
 
@@ -138,12 +195,12 @@ const achievements: Resource = {
   plural: 'achievements',
   aliases: ['achievements', 'achievement', 'awards'],
   kind: 'Achievement',
-  columns: cols('NAME', 'ORG', 'DATE'),
+  columns: cols('NAME', 'TITLE', 'ORG', 'DATE'),
   items: ({ snapshot }) =>
-    snapshot.achievements.map(({ title, org, date, ...spec }) => ({
-      name: title,
-      row: { name: title, org: org ?? '<none>', date },
-      manifest: manifest('Achievement', title, { org, date, ...spec }),
+    snapshot.achievements.map(({ id, title, org, date, ...spec }) => ({
+      name: id,
+      row: { name: describeLink('achievement', id), title, org: org ?? '<none>', date },
+      manifest: manifest('Achievement', id, { title, org, date, ...spec }),
     })),
 };
 
@@ -209,7 +266,7 @@ const events: Resource = {
   },
 };
 
-const RESOURCES = [nodes, experience, pods, projects, certificates, achievements, events];
+const RESOURCES = [nodes, experience, pods, projects, componentStatuses, certificates, achievements, events];
 const NAMES = ['all', ...RESOURCES.map((resource) => resource.plural)];
 
 const find = (word: string): Resource | undefined =>
@@ -252,12 +309,18 @@ function all(ctx: DataContext): CommandResult {
     {
       title: 'certificates',
       run: 'kubectl get certificates',
-      entries: ctx.snapshot.certifications.map((cert) => ({ text: `  certificate/${cert.name}` })),
+      entries: ctx.snapshot.certifications.map((cert) => ({
+        text: `  certificate/${cert.id}`,
+        run: `kubectl describe certificate ${cert.id}`,
+      })),
     },
     {
       title: 'achievements',
       run: 'kubectl get achievements',
-      entries: ctx.snapshot.achievements.map((item) => ({ text: `  achievement/${item.title}` })),
+      entries: ctx.snapshot.achievements.map((item) => ({
+        text: `  achievement/${item.id}`,
+        run: `kubectl describe achievement ${item.id}`,
+      })),
     },
     {
       title: 'updates',
@@ -287,23 +350,30 @@ async function run(cmd: ParsedCommand, ctx: DataContext): Promise<CommandResult>
   const resource = find(type);
   if (!resource) return unknownType(type, NAMES, (match) => `kubectl get ${match}`);
 
-  const { n: namespace, o: output } = cmd.flags;
+  const { n: namespace, o: output, l: selector } = cmd.flags;
   if (namespace === true) return needsValue('n');
   if (output === true) return needsValue('o');
+  if (selector === true) return needsValue('l');
   if (output !== undefined && !FORMATS.includes(output)) {
     return error(
       `error: unable to match a printer suitable for the output format "${output}", allowed formats are: ${FORMATS.join(',')}`,
     );
   }
-  if (resource.namespaced && namespace !== 'projects') {
-    return { kind: 'lines', lines: [{ text: `No resources found in ${namespace ?? 'default'} namespace.` }] };
-  }
+  const scoped = resource.namespaces !== undefined;
+  const noResources: CommandResult = {
+    kind: 'lines',
+    lines: [
+      { text: scoped ? `No resources found in ${namespace ?? 'default'} namespace.` : 'No resources found' },
+    ],
+  };
+  if (scoped && (namespace === undefined || !resource.namespaces?.includes(namespace))) return noResources;
 
-  let items = resource.items(ctx);
+  let items = resource.items(ctx, namespace);
   if (name !== undefined) {
     const names = items.map((item) => item.name);
-    const scope = resource.namespaced ? ' -n projects' : '';
-    items = items.filter((item) => item.name === name);
+    const scope = scoped ? ` -n ${namespace ?? ''}` : '';
+    const lower = name.toLowerCase();
+    items = items.filter((item) => item.name === name || item.aliases?.includes(lower));
     if (items.length === 0) {
       return notFound(
         resource.plural,
@@ -312,6 +382,14 @@ async function run(cmd: ParsedCommand, ctx: DataContext): Promise<CommandResult>
         (match) => `kubectl get ${resource.plural} ${match}${scope}`,
       );
     }
+  }
+  let filter: { skill: string } | undefined;
+  if (selector !== undefined) {
+    const [key, value = ''] = selector.split('=');
+    const skill = value.toLowerCase();
+    items = key === 'skill' ? items.filter((item) => item.skills?.includes(skill)) : [];
+    if (items.length === 0) return noResources;
+    filter = { skill };
   }
 
   if (output === 'yaml') {
@@ -331,18 +409,26 @@ async function run(cmd: ParsedCommand, ctx: DataContext): Promise<CommandResult>
     caption: cmd.raw,
     columns: wide ? [...resource.columns, ...(resource.wide ?? [])] : resource.columns,
     rows: items.map((item) => (wide ? { ...item.row, ...item.wide } : item.row)),
+    ...(resource.warning === undefined ? {} : { warning: resource.warning }),
+    ...(filter === undefined ? {} : { filter }),
   };
 }
+
+/** Every skill a project used, for `-l skill=` completion. */
+export const skillNames = (ctx: DataContext): string[] =>
+  [...new Set(ctx.snapshot.projects.flatMap((project) => project.tech))].sort();
 
 export const get: Command = {
   verb: 'get',
   readOnly: true,
   needsData: true,
   run,
-  complete: (args, ctx) => {
+  complete: (args, ctx, namespace) => {
     if (args.length <= 1) return NAMES;
     const resource = find(args[0] ?? '');
     if (args.length !== 2 || !resource || !ctx.snapshot) return [];
-    return resource.items({ ...ctx, snapshot: ctx.snapshot }).map((item) => item.name);
+    return resource
+      .items({ ...ctx, snapshot: ctx.snapshot }, namespace)
+      .flatMap((item) => [...(item.aliases ?? []), item.name]);
   },
 };

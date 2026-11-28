@@ -19,7 +19,11 @@ const SECTIONS: Record<string, string> = {
   projects: 'plain/#projects',
   skills: 'plain/#skills',
   certificates: 'plain/#certifications',
+  certificate: 'plain/#certifications',
+  cert: 'plain/#certifications',
+  certs: 'plain/#certifications',
   achievements: 'plain/#awards',
+  achievement: 'plain/#awards',
   events: 'updates/',
   updates: 'updates/',
 };
@@ -27,8 +31,10 @@ const SECTIONS: Record<string, string> = {
 function pathFor(run: string): string {
   const parsed = parse(run);
   if (!parsed.ok) return 'plain/';
-  const { verb, args } = parsed.command;
+  const { verb, args, flags } = parsed.command;
   if (verb === 'apply') return 'plain/#contact';
+  // The control plane has no page of its own.
+  if (flags.n === 'kube-system') return 'plain/';
   const [type = '', name] = splitTypeName(args);
   if (verb === 'describe' && (type === 'pod' || type === 'pods' || type === 'po') && name) {
     return `projects/${name}/`;

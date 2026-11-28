@@ -116,10 +116,52 @@ describe('completions', () => {
 
   it('lists every candidate after a space', () => {
     expect(completions('kubectl top ', c)).toEqual(['kubectl top skills']);
-    expect(completions('kubectl describe ', c)).toEqual(['kubectl describe node', 'kubectl describe pod']);
+    expect(completions('kubectl describe ', c)).toEqual([
+      'kubectl describe node',
+      'kubectl describe pod',
+      'kubectl describe certificate',
+      'kubectl describe achievement',
+    ]);
   });
 
   it('completes names only once data is loaded', () => {
     expect(completions('kubectl describe pod a', ctx({ snapshot: undefined }))).toEqual([]);
+  });
+});
+
+describe('completions for the scene objects', () => {
+  it('completes short and long component names after -n kube-system', () => {
+    expect(completions('kubectl describe pod -n kube-system etc', ctx())).toEqual([
+      'kubectl describe pod -n kube-system etcd',
+      'kubectl describe pod -n kube-system etcd-control-plane',
+    ]);
+    expect(completions('kubectl get pods -n kube-system kube-s', ctx())).toEqual([
+      'kubectl get pods -n kube-system kube-scheduler',
+      'kubectl get pods -n kube-system kube-scheduler-control-plane',
+    ]);
+    expect(completions('kubectl get pods -n kube', ctx())).toEqual(['kubectl get pods -n kube-system']);
+  });
+
+  it('completes certificate and achievement ids, and describe types', () => {
+    expect(completions('kubectl describe certificate ck', ctx())).toEqual([
+      'kubectl describe certificate cka',
+      'kubectl describe certificate ckad',
+    ]);
+    expect(completions('kubectl describe achievement h', ctx())).toEqual([
+      'kubectl describe achievement hackathon-win',
+    ]);
+    expect(completions('kubectl describe ce', ctx())).toEqual(['kubectl describe certificate']);
+  });
+
+  it('completes skill names after -l skill=', () => {
+    expect(completions('kubectl get pods -n projects -l skill=k', ctx())).toEqual([
+      'kubectl get pods -n projects -l skill=Kafka',
+    ]);
+    expect(completions('kubectl get pods -l ', ctx())).toEqual([
+      'kubectl get pods -l skill=Astro',
+      'kubectl get pods -l skill=Go',
+      'kubectl get pods -l skill=Kafka',
+      'kubectl get pods -l skill=Probot',
+    ]);
   });
 });

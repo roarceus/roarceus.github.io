@@ -18,8 +18,12 @@ export interface Line {
 
 /** What the detail panel shows (design doc §5.3). */
 export interface Selection {
-  /** `contact` is the manifest form (`apply -f contact.yaml`); its name is `metadata.name`. */
-  kind: 'node' | 'pod' | 'contact';
+  /**
+   * `contact` is the manifest form (`apply -f contact.yaml`); its name is `metadata.name`. `component` is a
+   * control plane static pod, `certificate` and `achievement` use their ids, and `home` is the scene's home
+   * view (design doc stage-4 §5).
+   */
+  kind: 'node' | 'pod' | 'contact' | 'component' | 'certificate' | 'achievement' | 'home';
   name: string;
 }
 
@@ -29,7 +33,18 @@ export interface Column {
 }
 
 export type CommandResult =
-  | { kind: 'table'; caption: string; columns: Column[]; rows: Record<string, Cell>[] }
+  /**
+   * `warning` prints above the table (kubectl's stderr line); `filter` is a skill label selector the
+   * scene lights up (`get pods -l skill=go`).
+   */
+  | {
+      kind: 'table';
+      caption: string;
+      columns: Column[];
+      rows: Record<string, Cell>[];
+      warning?: string;
+      filter?: { skill: string };
+    }
   /** The detail panel shows `target`; `lines` echo in the terminal. */
   | { kind: 'detail'; target: Selection; lines: Line[] }
   | { kind: 'yaml'; text: string }
@@ -57,8 +72,8 @@ interface CommandBase {
   verb: string;
   /** On the `?run=` deep-link allowlist (design doc §5.6). */
   readOnly: boolean;
-  /** Candidates for the last of `args` (positionals after the verb), unfiltered. */
-  complete(args: string[], ctx: CommandContext): string[];
+  /** Candidates for the last of `args` (positionals after the verb), unfiltered; `namespace` is `-n`. */
+  complete(args: string[], ctx: CommandContext, namespace?: string): string[];
 }
 
 export type Command = CommandBase &

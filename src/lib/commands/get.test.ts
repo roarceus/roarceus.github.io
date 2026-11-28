@@ -165,10 +165,10 @@ describe('get pods', () => {
     expect(rows[1]).toMatchObject({ node: '<none>' });
   });
 
-  it('finds nothing outside the projects namespace', async () => {
+  it('finds nothing outside the projects and kube-system namespaces', async () => {
     expect(texts(await exec('kubectl get pods'))).toEqual(['No resources found in default namespace.']);
-    expect(texts(await exec('kubectl get pods -n kube-system'))).toEqual([
-      'No resources found in kube-system namespace.',
+    expect(texts(await exec('kubectl get pods -n kube-public'))).toEqual([
+      'No resources found in kube-public namespace.',
     ]);
   });
 
@@ -207,17 +207,14 @@ describe('get -o yaml', () => {
 describe('get certificates, achievements, events', () => {
   it('shows CKA and CKAD in progress', async () => {
     const result = await exec('kubectl get certificates');
-    expect(labels(result)).toEqual(['NAME', 'ISSUER', 'STATUS', 'DATE']);
-    expect(as(result, 'table').rows.slice(0, 2)).toEqual([
-      { name: 'CKA', issuer: 'CNCF', status: 'in-progress', date: '<none>' },
-      { name: 'CKAD', issuer: 'CNCF', status: 'in-progress', date: '<none>' },
+    expect(
+      as(result, 'table')
+        .rows.slice(0, 2)
+        .map(({ title, status }) => [title, status]),
+    ).toEqual([
+      ['CKA', 'in-progress'],
+      ['CKAD', 'in-progress'],
     ]);
-  });
-
-  it('lists achievements', async () => {
-    const result = await exec('kubectl get achievements');
-    expect(labels(result)).toEqual(['NAME', 'ORG', 'DATE']);
-    expect(as(result, 'table').rows).toEqual([{ name: 'Hackathon win', org: 'NEU', date: '2025-02' }]);
   });
 
   it('merges roles, projects, and updates into one timeline, newest first', async () => {
@@ -298,5 +295,110 @@ describe('get errors', () => {
       kind: 'error',
       message: 'error: the server doesn\'t have a resource type "secrets"',
     });
+  });
+});
+
+describe('get pods -n kube-system', () => {
+  it('lists the four control plane static pods, all Running', async () => {
+    const result = as(await exec('kubectl get pods -n kube-system'), 'table');
+    expect(result.rows.map((row) => [row.name, row.ready, row.status])).toEqual([
+      [
+        { text: 'etcd-control-plane', run: 'kubectl describe pod etcd-control-plane -n kube-system' },
+        '1/1',
+        'Running',
+      ],
+      [
+        {
+          text: 'kube-apiserver-control-plane',
+          run: 'kubectl describe pod kube-apiserver-control-plane -n kube-system',
+        },
+        '1/1',
+        'Running',
+      ],
+      [
+        {
+          text: 'kube-controller-manager-control-plane',
+          run: 'kubectl describe pod kube-controller-manager-control-plane -n kube-system',
+        },
+        '1/1',
+        'Running',
+      ],
+      [
+        {
+          text: 'kube-scheduler-control-plane',
+          run: 'kubectl describe pod kube-scheduler-control-plane -n kube-system',
+        },
+        '1/1',
+        'Running',
+      ],
+    ]);
+  });
+
+  it('finds one by its short name and prints names with -o name', async () => {
+    expect(as(await exec('kubectl get pods etcd -n kube-system'), 'table').rows).toHaveLength(1);
+    expect(texts(await exec('kubectl get pods -n kube-system -o name'))[0]).toBe('pod/etcd-control-plane');
+  });
+});
+
+describe('get componentstatuses', () => {
+  it.each(['kubectl get cs', 'kubectl get componentstatuses', 'kubectl get componentstatus'])(
+    '%s prints the deprecation warning, then healthy components',
+    async (input) => {
+      const result = as(await exec(input), 'table');
+      expect(result.warning).toBe('Warning: v1 ComponentStatus is deprecated in v1.19+');
+      expect(labels(result)).toEqual(['NAME', 'STATUS', 'MESSAGE', 'ERROR']);
+      expect(result.rows).toEqual([
+        { name: 'scheduler', status: 'Healthy', message: 'ok', error: '' },
+        { name: 'controller-manager', status: 'Healthy', message: 'ok', error: '' },
+        { name: 'etcd-0', status: 'Healthy', message: 'ok', error: '' },
+      ]);
+    },
+  );
+});
+
+describe('get certificates and achievements by id', () => {
+  it('names certificates by id, linked to describe', async () => {
+    const result = as(await exec('kubectl get certificates'), 'table');
+    expect(labels(result)).toEqual(['NAME', 'TITLE', 'ISSUER', 'STATUS', 'DATE']);
+    expect(result.rows[2]).toEqual({
+      name: { text: 'aws-saa', run: 'kubectl describe certificate aws-saa' },
+      title: 'AWS Solutions Architect',
+      issuer: 'AWS',
+      status: 'issued',
+      date: '2024-03',
+    });
+  });
+
+  it('names achievements by id, linked to describe', async () => {
+    const result = as(await exec('kubectl get achievements'), 'table');
+    expect(labels(result)).toEqual(['NAME', 'TITLE', 'ORG', 'DATE']);
+    expect(result.rows[0]).toEqual({
+      name: { text: 'hackathon-win', run: 'kubectl describe achievement hackathon-win' },
+      title: 'Hackathon win',
+      org: 'NEU',
+      date: '2025-02',
+    });
+  });
+});
+
+describe('get pods -l skill=', () => {
+  it('lists the pods that used the skill and sets the scene filter, ignoring case', async () => {
+    const result = as(await exec('kubectl get pods -l skill=KAFKA -n projects'), 'table');
+    expect(result.rows.map((row) => row.status)).toEqual(['Completed']);
+    expect(result.filter).toEqual({ skill: 'kafka' });
+  });
+
+  it('says no resources found for a skill nothing used, and sets no filter', async () => {
+    const result = await exec('kubectl get pods -l skill=cobol -n projects');
+    expect(texts(result)).toEqual(['No resources found in projects namespace.']);
+  });
+
+  it('matches no pods for another label key, and needs a value', async () => {
+    expect(texts(await exec('kubectl get pods -l app=web -n projects'))).toEqual([
+      'No resources found in projects namespace.',
+    ]);
+    expect(as(await exec('kubectl get pods -n projects -l'), 'error').message).toBe(
+      "error: flag needs an argument: 'l' in -l",
+    );
   });
 });

@@ -130,7 +130,7 @@ node mumbai` has content. The Stage 2 cards show live nodes only until Task 4.
 'kube-apiserver', description: string }` and the same for `etcd`, `kube-scheduler`,
   `kube-controller-manager`.
 
-- [ ] **Step 1: Write failing tests** (exact kubectl shapes):
+- [x] **Step 1: Write failing tests** (exact kubectl shapes):
   - `get nodes` lists `mumbai` with `Ready,SchedulingDisabled` and `personal` with ROLES `personal`; the
     header count line counts both.
   - `get pods -n kube-system` lists the four static pod names, all `Running`.
@@ -147,10 +147,14 @@ node mumbai` has content. The Stage 2 cards show live nodes only until Task 4.
   - Tab completes short and long component names after `-n kube-system`, certificate and achievement ids,
     and skill names after `-l skill=`.
   - `?run=` allowlist accepts all of these (read-only).
-- [ ] **Step 2: Run** `pnpm exec vitest run src/lib` and see them fail.
-- [ ] **Step 3: Implement** in the files above; copy in `kube-system.ts` describes only what exists now.
-- [ ] **Step 4: Run** `pnpm exec vitest run src/lib` and see them pass.
-- [ ] **Step 5: Commit** `feat(commands): add kube-system, cs, certificate, and skill selector commands`
+- [x] **Step 2: Run** `pnpm exec vitest run src/lib` and see them fail.
+- [x] **Step 3: Implement** in the files above; copy in `kube-system.ts` describes only what exists now.
+- [x] **Step 4: Run** `pnpm exec vitest run src/lib` and see them pass.
+- [x] **Step 5: Commit** `feat(commands): add kube-system, cs, certificate, and skill selector commands`
+
+> As built: `get certificates` and `get achievements` name rows by id (with a TITLE column) and link
+> to `describe`; the table result carries `warning` and `filter`; `describe node` shows degrees and
+> `Unschedulable: true` on cordoned eras; the panel shows nothing new for the new kinds until Task 4.
 
 ### Task 3: Layout model (#99)
 
