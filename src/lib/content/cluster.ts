@@ -48,9 +48,15 @@ export interface Pod {
 export interface ClusterNode {
   name: string;
   label: string;
-  role: ClusterExperience['type'];
+  role: ClusterExperience['type'] | 'personal';
+  /** An older era (`cluster: false`): shown faded, `SchedulingDisabled` (ADR 0005 §5). */
+  cordoned: boolean;
   pods: Pod[];
 }
+
+/** The built-in node for side projects (design doc stage-4 §7): a pod without a node can't run. */
+export const PERSONAL_NODE = 'personal';
+const PERSONAL_LABEL = 'Personal projects';
 
 export interface ExperienceRow {
   name: string;
@@ -78,10 +84,10 @@ const toPod = ({ id, data }: Entry<ClusterProject>): Pod => ({
 });
 
 /**
- * Nodes on the map, newest first. A node is on the map only if every entry that declares it keeps
- * `cluster: true`; its order comes from its newest entry. Its role is `education` when a degree
- * declares it (a TA role there still sits on it), otherwise the newest entry's type. Pods are the node's projects by
- * `order`; projects of off-map nodes are left out.
+ * Every node: live ones newest first, then the built-in `personal` node (when a project runs on it),
+ * then cordoned eras. A node is cordoned if any entry that declares it sets `cluster: false`; its order
+ * comes from its newest entry. Its role is `education` when a degree declares it (a TA role there still
+ * sits on it), otherwise the newest entry's type. Pods are the node's projects by `order`.
  */
 export function clusterNodes(
   experience: readonly Entry<ClusterExperience>[],
@@ -102,34 +108,53 @@ export function clusterNodes(
   const labels = nodeLabels(experience, education);
   const ordered = sortByOrder(projects);
 
-  const nodes: ClusterNode[] = [];
+  const podsOn = (node: string) => ordered.filter((project) => project.data.node === node).map(toPod);
+
+  const live: ClusterNode[] = [];
+  const cordoned: ClusterNode[] = [];
   const seen = new Set<string>();
   for (const { data } of sortByRecency(declared)) {
-    if (offMap.has(data.node) || seen.has(data.node)) continue;
+    if (seen.has(data.node)) continue;
     seen.add(data.node);
-    nodes.push({
+    const off = offMap.has(data.node);
+    (off ? cordoned : live).push({
       name: data.node,
       label: labels.get(data.node) ?? data.node,
       role: schools.has(data.node) ? 'education' : data.role,
-      pods: ordered.filter((project) => project.data.node === data.node).map(toPod),
+      cordoned: off,
+      pods: podsOn(data.node),
     });
   }
-  return nodes;
+  const personal = podsOn(PERSONAL_NODE);
+  if (personal.length > 0) {
+    live.push({
+      name: PERSONAL_NODE,
+      label: PERSONAL_LABEL,
+      role: 'personal',
+      cordoned: false,
+      pods: personal,
+    });
+  }
+  return [...live, ...cordoned];
 }
 
-/** Projects with no node (e.g. this site), by `order`. They are shown, never faked onto a node. */
+/** Pending projects with no node, by `order`: they wait by the scheduler (`Unschedulable`). */
 export function unscheduledPods(projects: readonly Entry<ClusterProject>[]): Pod[] {
   return sortByOrder(projects)
-    .filter((project) => project.data.node === undefined)
+    .filter((project) => project.data.node === undefined && project.data.status === 'pending')
     .map(toPod);
 }
+
+/** Names of the nodes that take part in the cluster now: not cordoned. */
+const liveNodes = (nodes: readonly ClusterNode[]) =>
+  new Set(nodes.filter((node) => !node.cordoned).map((node) => node.name));
 
 /** The role the detail panel opens on (SPEC §9): the newest work role on a node on the map. */
 export function preselectedRole<E extends Entry<ClusterExperience>>(
   experience: readonly E[],
   nodes: readonly ClusterNode[],
 ): E | undefined {
-  const onMap = new Set(nodes.map((node) => node.name));
+  const onMap = liveNodes(nodes);
   return sortByRecency(experience).find(({ data }) => data.type === 'work' && onMap.has(data.node));
 }
 
@@ -139,7 +164,7 @@ export function experienceRows(
   nodes: readonly ClusterNode[],
   now: Date,
 ): ExperienceRow[] {
-  const onMap = new Set(nodes.map((node) => node.name));
+  const onMap = liveNodes(nodes);
   return sortByRecency(experience)
     .filter(({ data }) => onMap.has(data.node))
     .map(({ id, data }) => ({

@@ -39,7 +39,7 @@ beforeEach(() => {
     projects: [
       { id: 'side', data: { node: 'old', featured: false, order: 2 } },
       { id: 'main', data: { node: 'new', featured: true, order: 1 }, body: 'About main.' },
-      { id: 'unscheduled', data: { featured: false, order: 3 } },
+      { id: 'unscheduled', data: { status: 'pending', featured: false, order: 3 } },
     ],
     skills: [
       { id: 'web', data: { order: 2 } },

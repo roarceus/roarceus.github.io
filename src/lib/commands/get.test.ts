@@ -11,6 +11,61 @@ import type { CommandResult } from './types';
 const labels = (result: CommandResult) => as(result, 'table').columns.map((column) => column.label);
 
 describe('get nodes', () => {
+  it('shows cordoned eras as SchedulingDisabled, aged from their school or projects', async () => {
+    const snapshot = {
+      ...SNAPSHOT,
+      nodes: [
+        ...SNAPSHOT.nodes,
+        {
+          name: 'personal',
+          label: 'Personal projects',
+          role: 'personal' as const,
+          cordoned: false,
+          pods: [{ slug: 'side', name: 'side', phase: 'Running' as const }],
+        },
+        {
+          name: 'mumbai',
+          label: 'University of Mumbai',
+          role: 'education' as const,
+          cordoned: true,
+          pods: [],
+        },
+      ],
+      education: [
+        ...SNAPSHOT.education,
+        {
+          name: 'mumbai',
+          school: 'University of Mumbai',
+          degree: 'BE',
+          field: 'CE',
+          node: 'mumbai',
+          start: '2016-08',
+          end: '2020-10',
+          highlights: [],
+        },
+      ],
+      projects: [
+        ...SNAPSHOT.projects,
+        {
+          slug: 'side',
+          name: 'side',
+          summary: 'A side project.',
+          phase: 'Running' as const,
+          node: 'personal',
+          tech: ['Go'],
+          start: '2026-01',
+          end: undefined,
+          repo: undefined,
+          demo: undefined,
+          story: [],
+        },
+      ],
+    };
+    const { rows } = as(await exec('kubectl get nodes', { snapshot }), 'table');
+    expect(rows.at(-2)).toMatchObject({ status: 'Ready', roles: 'personal', age: '329d' });
+    expect(rows.at(-1)).toMatchObject({ status: 'Ready,SchedulingDisabled', roles: 'education', age: '10y' });
+  });
+
   it('lists every node as Ready, with role, age, and the site version', async () => {
     const result = await exec('kubectl get nodes');
     const table = as(result, 'table');
@@ -21,7 +76,8 @@ describe('get nodes', () => {
         name: { text: 'northeastern', run: 'kubectl describe node northeastern' },
         status: 'Ready',
         roles: 'education',
-        age: kubectlAge('2026-01', NOW),
+        // As old as its oldest declarer: the degree (2024-01), not the TA role.
+        age: kubectlAge('2024-01', NOW),
         version: 'v0.4.0',
       },
       {
@@ -191,7 +247,7 @@ describe('ages from a clock behind the content', () => {
     const { rows } = as(await exec('kubectl get events', { now }), 'table');
     expect(rows[0]).toMatchObject({ 'last-seen': '0d' });
     expect(
-      as(await exec('kubectl get nodes', { now: new Date('2025-01-01T00:00:00Z') }), 'table').rows[0],
+      as(await exec('kubectl get nodes', { now: new Date('2023-06-01T00:00:00Z') }), 'table').rows[0],
     ).toMatchObject({
       age: '0d',
     });
@@ -211,6 +267,7 @@ describe('get all', () => {
 
   it('says how many more rows a long section has', async () => {
     const extra = Array.from({ length: 5 }, (_, i) => ({
+      id: `c${String(i)}`,
       name: `C${String(i)}`,
       issuer: 'X',
       status: 'issued' as const,

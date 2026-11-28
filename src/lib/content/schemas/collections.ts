@@ -97,6 +97,8 @@ export const achievementSchema = z.object({
   date: yearMonth,
   description: text,
   link: linkUrl.optional(),
+  /** The node it was earned on; when absent, matched from `org` (design doc stage-4 §7). */
+  node: nodeName.optional(),
 });
 
 export const updateSchema = z.object({
@@ -104,6 +106,10 @@ export const updateSchema = z.object({
   /** YAML parses an unquoted `2025-01-22` to a Date; a quoted ISO string is accepted too. */
   date: z.union([z.date(), z.iso.date().transform((value) => new Date(value))]),
   tags: z.array(slug).default([]),
+  /** The cluster node it relates to (its pulse in the scene, design doc stage-4 §7). */
+  node: nodeName.optional(),
+  /** The project it relates to (the pod's Events). */
+  project: slug.optional(),
   summary: text,
   draft: z.boolean().default(false),
 });

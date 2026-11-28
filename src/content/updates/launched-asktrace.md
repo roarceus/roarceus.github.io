@@ -2,6 +2,7 @@
 title: 'Launched askTRACE'
 date: 2025-04-26
 tags: [projects, kubernetes]
+project: asktrace
 summary: 'Shipped askTRACE, AI insights from course evaluation data.'
 ---
 

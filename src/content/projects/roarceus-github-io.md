@@ -2,6 +2,7 @@
 name: This portfolio
 tagline: 'This site: my career as a Kubernetes cluster you can explore with kubectl or a click.'
 status: running
+node: personal
 tech: [Astro, React, TypeScript, Tailwind CSS, GitHub Actions, Playwright, Vitest]
 links:
   repo: https://github.com/roarceus/roarceus.github.io

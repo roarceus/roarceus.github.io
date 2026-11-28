@@ -1,5 +1,7 @@
 import { createHash } from 'node:crypto';
 
+import { plainParagraphs } from '@/lib/markdown/plain-text';
+
 import {
   clusterNodes,
   podPhase,
@@ -25,12 +27,13 @@ import type { z } from 'astro/zod';
 
 /**
  * The compact copy of the content the terminal loads in the browser (design doc stage-3 §5.1): only
- * the fields commands need, no Markdown bodies. Built at build time and served as
+ * the fields commands and the scene need. Project write-ups ship as plain-text lines (the Secret's story,
+ * stage-4 §7); no other body ships. Built at build time and served as
  * `cluster.<hash>.json`, so new HTML never pairs with stale data. Nothing here depends on the clock,
  * so equal content always gives the same hash; ages are computed in the browser.
  */
 
-export const SNAPSHOT_VERSION = 1;
+export const SNAPSHOT_VERSION = 2;
 const UPDATES = 10;
 
 export interface SnapshotInput {
@@ -69,6 +72,19 @@ interface SnapshotProject {
   end: string | undefined;
   repo: string | undefined;
   demo: string | undefined;
+  /** The write-up as plain-text lines (a `- ` line per list item). */
+  story: string[];
+}
+
+interface SnapshotSchool {
+  name: string;
+  school: string;
+  degree: string;
+  field: string;
+  node: string;
+  start: string;
+  end: string;
+  highlights: string[];
 }
 
 export interface ClusterSnapshot {
@@ -86,32 +102,49 @@ export interface ClusterSnapshot {
   unscheduled: Pod[];
   /** Node of the pre-selected role (SPEC §9). */
   selected: string | undefined;
-  /** Roles on the map, newest first. */
+  /** Roles on the map (cordoned eras included), newest first. */
   experience: SnapshotRole[];
+  /** Degrees on the map (cordoned eras included), newest first. */
+  education: SnapshotSchool[];
   /** Projects on the map or unscheduled, by `order`. */
   projects: SnapshotProject[];
   skills: { category: string; items: { name: string; level?: number | undefined }[] }[];
   certifications: {
+    id: string;
     name: string;
     issuer: string;
     status: 'issued' | 'in-progress';
     date: string | undefined;
   }[];
   achievements: {
+    id: string;
     title: string;
     org: string | undefined;
+    /** Where it was earned: the `node` field, else the node whose org or school matches `org`. */
+    node: string | undefined;
     date: string;
     summary: string;
     link: string | undefined;
   }[];
-  /** The newest published updates. */
-  updates: { slug: string; title: string; date: string; summary: string }[];
+  /** The newest published updates; `node` falls back to the related project's node. */
+  updates: {
+    slug: string;
+    title: string;
+    date: string;
+    summary: string;
+    node: string | undefined;
+    project: string | undefined;
+  }[];
 }
 
 export function buildSnapshot(input: SnapshotInput): ClusterSnapshot {
   const nodes = clusterNodes(input.experience, input.education, input.projects);
   const onMap = new Set(nodes.map((node) => node.name));
   const { name, title, location, tagline, links, resume } = input.profile;
+  const nodeOfOrg = new Map<string, string>();
+  for (const { data } of input.experience) nodeOfOrg.set(data.org, data.node);
+  for (const { data } of input.education) if (data.node !== undefined) nodeOfOrg.set(data.school, data.node);
+  const nodeOfProject = new Map(input.projects.map(({ id, data }) => [id, data.node]));
 
   return {
     version: SNAPSHOT_VERSION,
@@ -134,9 +167,25 @@ export function buildSnapshot(input: SnapshotInput): ClusterSnapshot {
         tech: data.tech,
         highlights: data.highlights.map((highlight) => highlight.text),
       })),
+    education: sortByRecency(input.education).flatMap(({ id, data }) =>
+      data.node !== undefined && onMap.has(data.node)
+        ? [
+            {
+              name: id,
+              school: data.school,
+              degree: data.degree,
+              field: data.field,
+              node: data.node,
+              start: data.start,
+              end: data.end,
+              highlights: data.highlights,
+            },
+          ]
+        : [],
+    ),
     projects: sortByOrder(input.projects)
       .filter(({ data }) => data.node === undefined || onMap.has(data.node))
-      .map(({ id, data }) => ({
+      .map(({ id, data, body }) => ({
         slug: id,
         name: data.name,
         summary: data.tagline,
@@ -147,17 +196,21 @@ export function buildSnapshot(input: SnapshotInput): ClusterSnapshot {
         end: data.end,
         repo: data.links.repo,
         demo: data.links.demo,
+        story: plainParagraphs(body),
       })),
     skills: sortByOrder(input.skills).map(({ data }) => ({ category: data.category, items: data.items })),
-    certifications: sortByDateDesc(input.certifications).map(({ data }) => ({
+    certifications: sortByDateDesc(input.certifications).map(({ id, data }) => ({
+      id,
       name: data.name,
       issuer: data.issuer,
       status: data.status,
       date: data.date,
     })),
-    achievements: sortByDateDesc(input.achievements).map(({ data }) => ({
+    achievements: sortByDateDesc(input.achievements).map(({ id, data }) => ({
+      id,
       title: data.title,
       org: data.org,
+      node: data.node ?? (data.org === undefined ? undefined : nodeOfOrg.get(data.org)),
       date: data.date,
       summary: data.description,
       link: data.link,
@@ -169,6 +222,8 @@ export function buildSnapshot(input: SnapshotInput): ClusterSnapshot {
         title: data.title,
         date: data.date.toISOString().slice(0, 10),
         summary: data.summary,
+        node: data.node ?? (data.project === undefined ? undefined : nodeOfProject.get(data.project)),
+        project: data.project,
       })),
   };
 }

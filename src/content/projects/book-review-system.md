@@ -2,6 +2,7 @@
 name: Book Review System
 tagline: Python web app to find, rate, and review books, with Goodreads integration.
 status: completed
+node: mumbai
 tech: [Python, MySQL, Heroku]
 links:
   repo: https://github.com/roarceus/book-reviews-system-cloud-computing

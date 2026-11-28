@@ -51,12 +51,17 @@ const nodes: Resource = {
   columns: cols('NAME', 'STATUS', 'ROLES', 'AGE', 'VERSION'),
   items: ({ snapshot, now, build }) =>
     snapshot.nodes.map((node) => {
-      const starts = snapshot.experience.filter((role) => role.node === node.name).map((role) => role.start);
+      const on = (entry: { node: string | undefined }) => entry.node === node.name;
+      const declared = [...snapshot.experience.filter(on), ...snapshot.education.filter(on)];
+      // The personal node has no role or degree: it is as old as its oldest project.
+      const starts = (declared.length > 0 ? declared : snapshot.projects.filter(on)).flatMap(
+        (entry) => entry.start ?? [],
+      );
       return {
         name: node.name,
         row: {
           name: describeLink('node', node.name),
-          status: 'Ready',
+          status: node.cordoned ? 'Ready,SchedulingDisabled' : 'Ready',
           roles: node.role,
           age: age(starts.sort()[0], now),
           version: `v${build.version}`,

@@ -2,6 +2,7 @@
 title: 'Launched my first personal website'
 date: 2025-01-22
 tags: [projects]
+project: roarceus-github-io
 summary: 'My first portfolio site went live.'
 ---
 
