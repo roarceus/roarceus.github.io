@@ -57,7 +57,8 @@ checks each sub-stage branch before its PR is marked ready.
 
 ## Sub-stage 4a: data, commands, layout, 2D map
 
-Two PRs if it passes about 500 lines: 4a-1 (Tasks 1 and 2), 4a-2 (Tasks 3 to 5).
+Split by size (about 500 lines each): 4a-1 is Task 1 alone (it came to about 480 lines), 4a-2 is Task 2,
+and 4a-3 is Tasks 3 to 5.
 
 ### Task 1: Content model for the scene (#97)
 
@@ -79,7 +80,7 @@ Two PRs if it passes about 500 lines: 4a-1 (Tasks 1 and 2), 4a-2 (Tasks 3 to 5).
 - Produces: `SNAPSHOT_VERSION = 2`; snapshot `projects[].story: string[]` (plain-text paragraphs of the
   body), `achievements[].id` and `.node`, `certifications[].id`, `updates[].node` and `.project`.
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
   - `clusterNodes` keeps `mumbai` with `cordoned: true` after live nodes; live nodes `cordoned: false`.
   - A project with `node: personal` creates the `personal` node (`role: 'personal'`); no project, no node.
   - `unscheduledPods` returns only `pending` projects.
@@ -91,15 +92,24 @@ Two PRs if it passes about 500 lines: 4a-1 (Tasks 1 and 2), 4a-2 (Tasks 3 to 5).
   - Ids: certification `id` from the field, else the slug of its name; achievement `id` is the slug of
     its title (`Labs Intern Award` to `labs-intern-award`); duplicate ids fail integrity.
   - Snapshot: `story` has no Markdown markup or HTML; version 2; gzipped size under 30720 bytes.
-- [ ] **Step 2: Run** `pnpm exec vitest run src/lib/content` and see them fail.
-- [ ] **Step 3: Implement** the schema fields, `clusterNodes`/`unscheduledPods` changes, integrity rule,
+- [x] **Step 2: Run** `pnpm exec vitest run src/lib/content` and see them fail.
+- [x] **Step 3: Implement** the schema fields, `clusterNodes`/`unscheduledPods` changes, integrity rule,
       and snapshot fields. Story paragraphs: split the body on blank lines, strip Markdown syntax to text.
-- [ ] **Step 4: Content:** set `node`/`project` on the seven linked updates (design §7, including
+- [x] **Step 4: Content:** set `node`/`project` on the seven linked updates (design §7, including
       `launched-personal-website` to `roarceus-github-io`); set `node: personal` on `roarceus-github-io`
       and `meeting-notes-react`, and `node: mumbai` on `book-review-system`.
-- [ ] **Step 5: Run** `pnpm exec vitest run src/lib/content` and see them pass; fix any existing test that
+- [x] **Step 5: Run** `pnpm exec vitest run src/lib/content` and see them pass; fix any existing test that
       expected cordoned nodes to be dropped (map callers filter `cordoned` until Task 4).
-- [ ] **Step 6: Commit** `feat(content): add cordoned and personal nodes and scene links`
+- [x] **Step 6: Commit** `feat(content): add cordoned and personal nodes and scene links`
+
+> As built (PR 4a-1): achievements and certifications already have `id`s in their YAML, so we use those
+> instead of slugs from titles. The snapshot also carries `education` (schools on the map), so `describe
+node mumbai` has content. The Stage 2 cards show live nodes only until Task 4.
+> From review: integrity also reserves the `personal` name, rejects a running project on a cordoned era, a
+> link to `personal` when nothing runs there, and an achievement `org` that matches two nodes; `get nodes`
+> shows cordoned eras as `Ready,SchedulingDisabled`, aged from their oldest role, degree, or project. Left
+> for Task 2: `describe node` shows schools (`mumbai` has no role today). Left for Task 4: selecting a
+> cordoned node highlights it on the map.
 
 ### Task 2: Commands for the new objects (#98)
 

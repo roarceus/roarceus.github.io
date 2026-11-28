@@ -136,7 +136,7 @@ test('preloads the hashed cluster snapshot @dashboard', async ({ page, request }
   expect(response.status()).toBe(200);
   expect(response.headers()['content-type']).toContain('application/json');
   const snapshot = (await response.json()) as { version: number; nodes: unknown[] };
-  expect(snapshot.version).toBe(1);
+  expect(snapshot.version).toBe(2);
   expect(snapshot.nodes.length).toBeGreaterThan(0);
 });
 

@@ -26,6 +26,13 @@ describe('plainParagraphs', () => {
     ]);
   });
 
+  it('drops fenced code blocks, blank lines and comments included', () => {
+    expect(plainParagraphs('Before.\n\n```ts\n# not a heading\n\nconst a = 1;\n```\n\nAfter.')).toEqual([
+      'Before.',
+      'After.',
+    ]);
+  });
+
   it('keeps underscores inside words and returns nothing for an empty body', () => {
     expect(plainParagraphs('snake_case_name stays.')).toEqual(['snake_case_name stays.']);
     expect(plainParagraphs(undefined)).toEqual([]);

@@ -5,6 +5,8 @@
  */
 
 const LIST_ITEM = /^\s*(?:[-*+]|\d+[.)])\s+/;
+// A fenced code block, closed or running to the end: code isn't part of the story.
+const FENCE = /^[ \t]*(`{3,}|~{3,})[^\n]*\n[\s\S]*?(?:^[ \t]*\1[ \t]*$|(?![\s\S]))/gm;
 const IMAGE = /!\[[^\]]*\]\([^)]*\)/g;
 const LINK = /\[([^\]]*)\]\([^)]*\)/g;
 const HTML_TAG = /<[^>]+>/g;
@@ -26,7 +28,7 @@ function inline(text: string): string {
 export function plainParagraphs(markdown: string | undefined): string[] {
   if (markdown === undefined) return [];
   const lines: string[] = [];
-  for (const block of markdown.split(/\n\s*\n/)) {
+  for (const block of markdown.replace(FENCE, '').split(/\n\s*\n/)) {
     let paragraph: string[] = [];
     const flush = () => {
       const text = inline(paragraph.join(' '));
