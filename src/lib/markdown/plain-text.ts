@@ -15,14 +15,18 @@ const CODE = /`([^`]*)`/g;
 const EMPHASIS = /(^|[\s(])([*_]{1,3})(\S(?:.*?\S)?)\2(?=[\s.,;:!?)]|$)/g;
 
 function inline(text: string): string {
-  return text
-    .replace(IMAGE, '')
-    .replace(LINK, '$1')
-    .replace(HTML_TAG, '')
-    .replace(CODE, '$1')
-    .replace(EMPHASIS, '$1$3')
-    .replace(/\s+/g, ' ')
-    .trim();
+  return (
+    text
+      .replace(IMAGE, '')
+      .replace(LINK, '$1')
+      .replace(HTML_TAG, '')
+      // One pass can leave a tag behind (`<<b>b>`); text never needs angle brackets, so none survive.
+      .replace(/[<>]/g, '')
+      .replace(CODE, '$1')
+      .replace(EMPHASIS, '$1$3')
+      .replace(/\s+/g, ' ')
+      .trim()
+  );
 }
 
 export function plainParagraphs(markdown: string | undefined): string[] {

@@ -26,6 +26,12 @@ describe('plainParagraphs', () => {
     ]);
   });
 
+  it('leaves no angle brackets behind, even from nested or broken tags', () => {
+    const [line] = plainParagraphs('Hi <<script>script>alert(1)<</script>/script> and <img src=x onerror=y');
+    expect(line).not.toMatch(/[<>]/);
+    expect(line).toMatch(/^Hi .*alert\(1\).* and /);
+  });
+
   it('drops fenced code blocks, blank lines and comments included', () => {
     expect(plainParagraphs('Before.\n\n```ts\n# not a heading\n\nconst a = 1;\n```\n\nAfter.')).toEqual([
       'Before.',
