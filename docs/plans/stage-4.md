@@ -11,6 +11,9 @@ else, in five sub-stage PRs (4a to 4e), shipping v0.5.0 behind flags.
 (2D) and a plain three.js scene in a thin React island (3D, lazy). Commands stay the only way state changes
 (`runCommand` to stores); one adapter is the only bridge from the stores to three.js objects.
 
+**Execution:** native (chosen 2026-11-27): implemented in-session task by task, then one fresh reviewer
+checks each sub-stage branch before its PR is marked ready.
+
 **Tech Stack:** Astro 7, React 19 islands, nanostores, TypeScript 6, Tailwind 4 tokens, three `0.187.0`
 (npm, pinned), Vitest 5, Playwright 1.65 + axe.
 
