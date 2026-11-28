@@ -32,7 +32,7 @@ describe('loadSnapshot', () => {
   it.each([
     ['a rejected fetch', () => Promise.reject(new Error('offline'))],
     ['a 404', respond({}, 404)],
-    ['another version', respond({ ...SNAPSHOT, version: 2 })],
+    ['the old version', respond({ ...SNAPSHOT, version: 1 })],
     ['a missing list', respond({ ...SNAPSHOT, projects: undefined })],
     ['invalid JSON', () => Promise.resolve(new Response('<html>'))],
     ['null', respond(null)],

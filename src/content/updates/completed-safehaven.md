@@ -2,6 +2,7 @@
 title: 'Completed SafeHaven'
 date: 2024-04-22
 tags: [projects]
+project: safehaven
 summary: 'Shipped SafeHaven, a MERN refugee assistance portal.'
 ---
 

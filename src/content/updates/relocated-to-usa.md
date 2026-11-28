@@ -2,6 +2,7 @@
 title: "Moved to the US for my Master's"
 date: 2023-12-29
 tags: [life, northeastern]
+node: northeastern
 summary: "Moved to Boston to start my Master's."
 ---
 

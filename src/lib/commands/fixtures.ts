@@ -4,7 +4,7 @@ import type { CommandContext, DataContext } from './types';
 
 /** One snapshot shaped like the real content, shared by every command test. */
 export const SNAPSHOT: ClusterSnapshot = {
-  version: 1,
+  version: 2,
   build: { version: '0.4.0', commit: 'abc1234' },
   profile: {
     name: 'Sohan Patil',
@@ -23,12 +23,14 @@ export const SNAPSHOT: ClusterSnapshot = {
       name: 'northeastern',
       label: 'Northeastern University',
       role: 'education',
+      cordoned: false,
       pods: [{ slug: 'asktrace', name: 'askTRACE', phase: 'Completed' }],
     },
     {
       name: 'mastercontrol',
       label: 'MasterControl',
       role: 'work',
+      cordoned: false,
       pods: [{ slug: 'deployment-gating-bot', name: 'deployment-gating-bot', phase: 'Completed' }],
     },
   ],
@@ -60,6 +62,18 @@ export const SNAPSHOT: ClusterSnapshot = {
       highlights: ['Shipped a bot.', 'Cut deploy time.'],
     },
   ],
+  education: [
+    {
+      name: 'northeastern',
+      school: 'Northeastern University',
+      degree: 'Master of Science',
+      field: 'Information Systems',
+      node: 'northeastern',
+      start: '2024-01',
+      end: '2026-04',
+      highlights: [],
+    },
+  ],
   projects: [
     {
       slug: 'asktrace',
@@ -72,6 +86,7 @@ export const SNAPSHOT: ClusterSnapshot = {
       end: '2025-04',
       repo: 'https://github.com/trace-survey-analysis',
       demo: undefined,
+      story: [],
     },
     {
       slug: 'roarceus-github-io',
@@ -84,6 +99,7 @@ export const SNAPSHOT: ClusterSnapshot = {
       end: undefined,
       repo: 'https://github.com/roarceus/roarceus.github.io',
       demo: undefined,
+      story: [],
     },
     {
       slug: 'deployment-gating-bot',
@@ -96,6 +112,7 @@ export const SNAPSHOT: ClusterSnapshot = {
       end: '2025-12',
       repo: undefined,
       demo: undefined,
+      story: [],
     },
   ],
   skills: [
@@ -109,16 +126,38 @@ export const SNAPSHOT: ClusterSnapshot = {
     { category: 'Tools', items: [{ name: 'Git' }] },
   ],
   certifications: [
-    { name: 'CKA', issuer: 'CNCF', status: 'in-progress', date: undefined },
-    { name: 'CKAD', issuer: 'CNCF', status: 'in-progress', date: undefined },
-    { name: 'AWS Solutions Architect', issuer: 'AWS', status: 'issued', date: '2024-03' },
+    { id: 'cka', name: 'CKA', issuer: 'CNCF', status: 'in-progress', date: undefined },
+    { id: 'ckad', name: 'CKAD', issuer: 'CNCF', status: 'in-progress', date: undefined },
+    { id: 'aws-saa', name: 'AWS Solutions Architect', issuer: 'AWS', status: 'issued', date: '2024-03' },
   ],
   achievements: [
-    { title: 'Hackathon win', org: 'NEU', date: '2025-02', summary: 'Won it.', link: undefined },
+    {
+      id: 'hackathon-win',
+      title: 'Hackathon win',
+      org: 'NEU',
+      node: undefined,
+      date: '2025-02',
+      summary: 'Won it.',
+      link: undefined,
+    },
   ],
   updates: [
-    { slug: 'stage-3', title: 'Terminal online', date: '2026-11-20', summary: 'Type commands.' },
-    { slug: 'stage-2', title: 'Dashboard', date: '2026-10-01', summary: 'A cluster view.' },
+    {
+      slug: 'stage-3',
+      title: 'Terminal online',
+      date: '2026-11-20',
+      summary: 'Type commands.',
+      node: undefined,
+      project: undefined,
+    },
+    {
+      slug: 'stage-2',
+      title: 'Dashboard',
+      date: '2026-10-01',
+      summary: 'A cluster view.',
+      node: undefined,
+      project: undefined,
+    },
   ],
 };
 

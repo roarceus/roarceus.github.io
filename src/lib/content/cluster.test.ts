@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  PERSONAL_NODE,
   clusterNodes,
   experienceRows,
   podPhase,
@@ -78,7 +79,9 @@ const project = (id: string, data: Partial<ClusterProject>): Entry<ClusterProjec
 
 const PROJECTS: Entry<ClusterProject>[] = [
   project('asktrace', { name: 'askTRACE', node: 'northeastern', order: 1 }),
-  project('roarceus-github-io', { name: 'This portfolio', status: 'running', order: 2 }),
+  project('roarceus-github-io', { name: 'This portfolio', status: 'running', node: 'personal', order: 2 }),
+  project('meeting-notes', { name: 'Meeting notes', node: 'personal', order: 5 }),
+  project('next-idea', { name: 'Next idea', status: 'pending', order: 11 }),
   project('deployment-gating-bot', { name: 'Deployment gating bot', node: 'mastercontrol', order: 4 }),
   project('safehaven', { name: 'SafeHaven', node: 'northeastern', order: 3 }),
   project('credit-management-system', { node: 'sparks-foundation', order: 9 }),
@@ -98,8 +101,36 @@ describe('podPhase', () => {
 describe('clusterNodes', () => {
   const nodes = clusterNodes(EXPERIENCE, EDUCATION, PROJECTS);
 
-  it('shows only nodes on the map, newest first', () => {
-    expect(nodes.map((node) => node.name)).toEqual(['northeastern', 'mastercontrol', 'capgemini']);
+  it('lists live nodes newest first, then the personal node, then cordoned eras', () => {
+    expect(nodes.map((node) => node.name)).toEqual([
+      'northeastern',
+      'mastercontrol',
+      'capgemini',
+      'personal',
+      'mumbai',
+      'sparks-foundation',
+    ]);
+    expect(nodes.filter((node) => node.cordoned).map((node) => node.name)).toEqual([
+      'mumbai',
+      'sparks-foundation',
+    ]);
+  });
+
+  it('adds the built-in personal node only when a project runs on it', () => {
+    expect(nodes.find((node) => node.name === PERSONAL_NODE)).toEqual({
+      name: 'personal',
+      label: 'Personal projects',
+      role: 'personal',
+      cordoned: false,
+      pods: [
+        { slug: 'roarceus-github-io', name: 'This portfolio', phase: 'Running' },
+        { slug: 'meeting-notes', name: 'Meeting notes', phase: 'Completed' },
+      ],
+    });
+    const noPersonal = PROJECTS.filter((p) => p.data.node !== PERSONAL_NODE);
+    expect(clusterNodes(EXPERIENCE, EDUCATION, noPersonal).map((node) => node.name)).not.toContain(
+      'personal',
+    );
   });
 
   it('labels each node by its organization and role, listing a shared node once', () => {
@@ -134,18 +165,23 @@ describe('clusterNodes', () => {
     expect(nodes[2]).toMatchObject({ name: 'capgemini', pods: [] });
   });
 
-  it('leaves projects of off-map nodes off the map', () => {
-    const slugs = nodes.flatMap((node) => node.pods.map((pod) => pod.slug));
-    expect(slugs).not.toContain('credit-management-system');
-    expect(slugs).not.toContain('analog-clock');
+  it('keeps the projects of cordoned eras on their node', () => {
+    expect(nodes.find((node) => node.name === 'mumbai')?.pods.map((pod) => pod.slug)).toEqual([
+      'analog-clock',
+    ]);
+    expect(nodes.find((node) => node.name === 'sparks-foundation')?.pods.map((pod) => pod.slug)).toEqual([
+      'credit-management-system',
+    ]);
   });
 
-  it('keeps a node off the map if any of its entries opts out', () => {
+  it('cordons a node if any of its entries opts out', () => {
     const mixed = [
       ...EXPERIENCE,
       work('capgemini-2', { node: 'capgemini', start: '2019-01', end: '2019-06', cluster: false }),
     ];
-    expect(clusterNodes(mixed, EDUCATION, PROJECTS).map((node) => node.name)).not.toContain('capgemini');
+    expect(clusterNodes(mixed, EDUCATION, PROJECTS).find((node) => node.name === 'capgemini')?.cordoned).toBe(
+      true,
+    );
   });
 
   it('ignores a degree that declares no node', () => {
@@ -153,11 +189,11 @@ describe('clusterNodes', () => {
       ...EDUCATION,
       { id: 'online', data: { school: 'Online', start: '2026-01', end: 'present', cluster: true } },
     ];
-    expect(clusterNodes(EXPERIENCE, noNode, PROJECTS).map((node) => node.name)).toEqual([
-      'northeastern',
-      'mastercontrol',
-      'capgemini',
-    ]);
+    expect(
+      clusterNodes(EXPERIENCE, noNode, PROJECTS)
+        .filter((node) => !node.cordoned && node.role !== 'personal')
+        .map((node) => node.name),
+    ).toEqual(['northeastern', 'mastercontrol', 'capgemini']);
   });
 
   it('treats only an explicit cluster: false as off the map', () => {
@@ -166,12 +202,11 @@ describe('clusterNodes', () => {
       id,
       data: { ...data, cluster: undefined },
     }));
-    expect(clusterNodes(legacy, [], PROJECTS).map((node) => node.name)).toEqual([
-      'northeastern',
-      'mastercontrol',
-      'capgemini',
-      'sparks-foundation',
-    ]);
+    expect(
+      clusterNodes(legacy, [], PROJECTS)
+        .filter((node) => !node.cordoned)
+        .map((node) => node.name),
+    ).toEqual(['northeastern', 'mastercontrol', 'capgemini', 'sparks-foundation', 'personal']);
   });
 
   it('puts an ongoing role first', () => {
@@ -184,10 +219,9 @@ describe('clusterNodes', () => {
 });
 
 describe('unscheduledPods', () => {
-  it('lists projects with no node, never faking one onto a node', () => {
-    expect(unscheduledPods(PROJECTS)).toEqual([
-      { slug: 'roarceus-github-io', name: 'This portfolio', phase: 'Running' },
-    ]);
+  it('lists only pending projects with no node: a pod with no node cannot be running', () => {
+    const floating = [...PROJECTS, project('floating', { status: 'completed', order: 12 })];
+    expect(unscheduledPods(floating)).toEqual([{ slug: 'next-idea', name: 'Next idea', phase: 'Pending' }]);
   });
 });
 

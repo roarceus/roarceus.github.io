@@ -47,11 +47,28 @@ const input = (): SnapshotInput => ({
       },
     },
   ],
-  education: [],
+  education: [
+    {
+      id: 'mumbai',
+      data: {
+        school: 'University of Mumbai',
+        degree: 'Bachelor of Engineering',
+        field: 'Computer Engineering',
+        location: 'Mumbai',
+        start: '2016-08',
+        end: '2020-10',
+        highlights: ['Best Final Year Project'],
+        node: 'mumbai',
+        cluster: false,
+      },
+    },
+  ],
   projects: [
     {
       id: 'deployment-gating-bot',
-      body: '# Heading\n\nLong body that must not ship.',
+      body:
+        '# How it works\n\nIt gates **risky** deploys with [Probot](https://probot.github.io).\n\n' +
+        '- Checks `main` labels.\n- Posts a _status_.\n',
       data: {
         name: 'deployment-gating-bot',
         tagline: 'Gates deploys.',
@@ -72,6 +89,7 @@ const input = (): SnapshotInput => ({
         name: 'roarceus.github.io',
         tagline: 'This site.',
         status: 'running',
+        node: 'personal',
         tech: ['Astro'],
         links: { repo: 'https://github.com/roarceus/roarceus.github.io' },
         highlights: [],
@@ -96,7 +114,17 @@ const input = (): SnapshotInput => ({
   ],
   skills: [{ id: 'cloud', data: { category: 'Cloud', order: 1, items: [{ name: 'AWS', level: 4 }] } }],
   certifications: [{ id: 'cka', data: { name: 'CKA', issuer: 'CNCF', status: 'in-progress' } }],
-  achievements: [{ id: 'award', data: { title: 'Award', date: '2024-05', description: 'Won it.' } }],
+  achievements: [
+    {
+      id: 'labs-award',
+      data: { title: 'Award', org: 'MasterControl', date: '2024-05', description: 'Won it.' },
+    },
+    { id: 'old-prize', data: { title: 'Prize', org: 'Elsewhere', date: '2019-05', description: 'Won.' } },
+    {
+      id: 'school-prize',
+      data: { title: 'Fest', org: 'Elsewhere', node: 'mumbai', date: '2018-05', description: 'Won.' },
+    },
+  ],
   updates: Array.from({ length: 12 }, (_, i) => ({
     id: `update-${String(i)}`,
     body: '## Post body',
@@ -104,6 +132,7 @@ const input = (): SnapshotInput => ({
       title: `Update ${String(i)}`,
       date: new Date(Date.UTC(2026, 0, i + 1)),
       tags: [],
+      ...(i === 10 ? { project: 'roarceus-github-io' } : i === 9 ? { node: 'mastercontrol' } : {}),
       summary: `Summary ${String(i)}`,
       draft: i === 11,
     },
@@ -115,7 +144,7 @@ describe('buildSnapshot', () => {
 
   it('carries the version, build, and profile basics', () => {
     expect(snapshot.version).toBe(SNAPSHOT_VERSION);
-    expect(SNAPSHOT_VERSION).toBe(1);
+    expect(SNAPSHOT_VERSION).toBe(2);
     expect(snapshot.build).toEqual({ version: '0.4.0', commit: 'abc1234' });
     expect(snapshot.profile).toEqual({
       name: 'Sohan Patil',
@@ -127,20 +156,45 @@ describe('buildSnapshot', () => {
     });
   });
 
-  it('ships no Markdown bodies', () => {
-    const json = JSON.stringify(snapshot);
-    expect(json).not.toContain('must not ship');
-    expect(json).not.toContain('Post body');
+  it('ships project stories as plain text, and no update bodies', () => {
+    expect(snapshot.projects[0]?.story).toEqual([
+      'How it works',
+      'It gates risky deploys with Probot.',
+      '- Checks main labels.',
+      '- Posts a status.',
+    ]);
+    expect(snapshot.projects[1]?.story).toEqual([]);
+    const stories = JSON.stringify(snapshot.projects.map((project) => project.story));
+    expect(stories).not.toMatch(/[*_`#]|\]\(/);
+    expect(JSON.stringify(snapshot)).not.toContain('Post body');
   });
 
-  it('keeps off-map eras and their projects out', () => {
-    expect(snapshot.nodes.map((node) => node.name)).toEqual(['mastercontrol']);
-    expect(snapshot.experience.map((role) => role.name)).toEqual(['mastercontrol']);
+  it('keeps cordoned eras, their roles, schools, and projects, marked cordoned', () => {
+    expect(snapshot.nodes.map((node) => [node.name, node.cordoned])).toEqual([
+      ['mastercontrol', false],
+      ['personal', false],
+      ['mumbai', true],
+      ['sparks-foundation', true],
+    ]);
+    expect(snapshot.experience.map((role) => role.name)).toEqual(['mastercontrol', 'sparks']);
+    expect(snapshot.education).toEqual([
+      {
+        name: 'mumbai',
+        school: 'University of Mumbai',
+        degree: 'Bachelor of Engineering',
+        field: 'Computer Engineering',
+        node: 'mumbai',
+        start: '2016-08',
+        end: '2020-10',
+        highlights: ['Best Final Year Project'],
+      },
+    ]);
     expect(snapshot.projects.map((project) => project.slug)).toEqual([
       'deployment-gating-bot',
       'roarceus-github-io',
+      'old-thing',
     ]);
-    expect(snapshot.unscheduled.map((pod) => pod.slug)).toEqual(['roarceus-github-io']);
+    expect(snapshot.unscheduled).toEqual([]);
     expect(snapshot.selected).toBe('mastercontrol');
   });
 
@@ -162,12 +216,13 @@ describe('buildSnapshot', () => {
       name: 'roarceus.github.io',
       summary: 'This site.',
       phase: 'Running',
-      node: undefined,
+      node: 'personal',
       tech: ['Astro'],
       start: undefined,
       end: undefined,
       repo: 'https://github.com/roarceus/roarceus.github.io',
       demo: undefined,
+      story: [],
     });
   });
 
@@ -178,17 +233,31 @@ describe('buildSnapshot', () => {
       title: 'Update 10',
       date: '2026-01-11',
       summary: 'Summary 10',
+      node: 'personal',
+      project: 'roarceus-github-io',
     });
+    expect(snapshot.updates[1]).toMatchObject({ node: 'mastercontrol', project: undefined });
+    expect(snapshot.updates[2]).toMatchObject({ node: undefined, project: undefined });
     expect(snapshot.updates.some((update) => update.slug === 'update-11')).toBe(false);
   });
 
   it('carries skills, certifications, and achievements', () => {
     expect(snapshot.skills).toEqual([{ category: 'Cloud', items: [{ name: 'AWS', level: 4 }] }]);
     expect(snapshot.certifications).toEqual([
-      { name: 'CKA', issuer: 'CNCF', status: 'in-progress', date: undefined },
+      { id: 'cka', name: 'CKA', issuer: 'CNCF', status: 'in-progress', date: undefined },
     ]);
     expect(snapshot.achievements).toEqual([
-      { title: 'Award', org: undefined, date: '2024-05', summary: 'Won it.', link: undefined },
+      {
+        id: 'labs-award',
+        title: 'Award',
+        org: 'MasterControl',
+        node: 'mastercontrol',
+        date: '2024-05',
+        summary: 'Won it.',
+        link: undefined,
+      },
+      expect.objectContaining({ id: 'old-prize', node: undefined }),
+      expect.objectContaining({ id: 'school-prize', node: 'mumbai' }),
     ]);
   });
 });

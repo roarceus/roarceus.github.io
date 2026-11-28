@@ -49,7 +49,8 @@ test.describe('cluster dashboard @dashboard', () => {
     expect(count).toBeGreaterThan(0);
     await expect(stage.getByText(`${String(count)}/${String(count)} nodes ready`)).toBeVisible();
     await expect(stage.locator('[data-node="mastercontrol"]')).toHaveAttribute('aria-current', 'true');
-    await expect(stage.getByText('unscheduled', { exact: true })).toBeVisible();
+    // Side projects run on the personal node; only pending projects are unscheduled (stage-4 §7).
+    await expect(stage.locator('[data-node="personal"]')).toBeVisible();
   });
 
   test('opens the details on the most recent work role', async ({ page }) => {

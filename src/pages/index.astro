@@ -29,7 +29,9 @@ import { url } from '@/lib/utils/url';
 const dashboard = isEnabled('clusterDashboard');
 const { data: profile } = await getProfile();
 const cluster = dashboard ? await getCluster() : undefined;
-const onMap = new Set(cluster?.nodes.map((node) => node.name));
+// The Stage 2 cards show live nodes; cordoned eras join the map in Stage 4 (the 2D map, Task 4).
+const liveNodes = cluster?.nodes.filter((node) => !node.cordoned) ?? [];
+const onMap = new Set(liveNodes.map((node) => node.name));
 // The terminal's data file, content-hashed (stage-3 design §5.1); preloaded so the first command
 // doesn't wait on it.
 const terminal = dashboard
@@ -121,7 +123,7 @@ const roles = dashboard ? (await getExperience()).filter(({ data }) => onMap.has
           </p>
         </div>
         <ClusterStage
-          nodes={cluster.nodes}
+          nodes={liveNodes}
           unscheduled={cluster.unscheduled}
           selected={cluster.selected?.data.node}
         />

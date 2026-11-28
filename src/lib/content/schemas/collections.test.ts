@@ -195,6 +195,12 @@ describe('achievementSchema', () => {
   it('requires a date', () => {
     expect(achievementSchema.safeParse({ title: 'x', description: 'y' }).success).toBe(false);
   });
+
+  it('takes an optional node that must be a node name', () => {
+    const award = { title: 'Fest', date: '2018-05', description: 'Won.' };
+    expect(achievementSchema.parse({ ...award, node: 'mumbai' }).node).toBe('mumbai');
+    expect(achievementSchema.safeParse({ ...award, node: 'Not A Node' }).success).toBe(false);
+  });
 });
 
 describe('updateSchema', () => {
@@ -202,6 +208,14 @@ describe('updateSchema', () => {
 
   it('defaults tags and draft', () => {
     expect(updateSchema.parse(update)).toMatchObject({ tags: [], draft: false });
+  });
+
+  it('takes an optional related node and project as slugs', () => {
+    expect(updateSchema.parse({ ...update, node: 'northeastern', project: 'asktrace' })).toMatchObject({
+      node: 'northeastern',
+      project: 'asktrace',
+    });
+    expect(updateSchema.safeParse({ ...update, project: 'Not A Slug' }).success).toBe(false);
   });
 
   it('accepts an ISO date string', () => {

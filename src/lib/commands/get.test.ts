@@ -211,6 +211,7 @@ describe('get all', () => {
 
   it('says how many more rows a long section has', async () => {
     const extra = Array.from({ length: 5 }, (_, i) => ({
+      id: `c${String(i)}`,
       name: `C${String(i)}`,
       issuer: 'X',
       status: 'issued' as const,

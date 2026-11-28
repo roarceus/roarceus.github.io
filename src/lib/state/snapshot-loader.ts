@@ -14,11 +14,12 @@ type SnapshotState =
 export const $snapshot = map<SnapshotState>({ status: 'idle' });
 
 /** Typed against the snapshot, so bumping SNAPSHOT_VERSION fails typecheck here until this follows. */
-const VERSION: ClusterSnapshot['version'] = 1;
+const VERSION: ClusterSnapshot['version'] = 2;
 const LISTS = [
   'nodes',
   'unscheduled',
   'experience',
+  'education',
   'projects',
   'skills',
   'certifications',
