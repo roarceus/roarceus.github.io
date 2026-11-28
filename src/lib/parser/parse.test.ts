@@ -39,7 +39,8 @@ describe('parse', () => {
       args: ['pods'],
       flags: { 'all-namespaces': true },
     });
-    expect(ok('kubectl get pods --selector app=web').flags).toEqual({ selector: 'app=web' });
+    expect(ok('kubectl get pods --sort-by name').flags).toEqual({ 'sort-by': 'name' });
+    expect(ok('kubectl get pods --selector app=web').flags).toEqual({ l: 'app=web' });
   });
 
   it('gives -f a value only when one follows', () => {

@@ -59,3 +59,16 @@ describe('runHref', () => {
     expect(readRunParam(href.slice(href.indexOf('?')))).toBe(input);
   });
 });
+
+describe('readRunParam (scene commands)', () => {
+  it.each([
+    'kubectl get pods -n kube-system',
+    'kubectl describe pod etcd -n kube-system',
+    'kubectl get cs',
+    'kubectl describe certificate cka',
+    'kubectl describe achievement hackathon-win',
+    'kubectl get pods -l skill=terraform -n projects',
+  ])('allows %s', (input) => {
+    expect(readRunParam(`?${new URLSearchParams({ run: input }).toString()}`)).toBe(input);
+  });
+});

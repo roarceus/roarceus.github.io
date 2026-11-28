@@ -2,6 +2,7 @@ import { execute } from '@/lib/commands/run';
 import type { CommandContext, CommandResult } from '@/lib/commands/types';
 import { parse } from '@/lib/parser/parse';
 
+import { $sceneFilter } from './scene';
 import { $selection } from './selection';
 import { $snapshot, snapshotSettled } from './snapshot-loader';
 import { $terminal, MAX_ENTRIES, summarize, type Entry, type RunSource } from './terminal';
@@ -24,6 +25,7 @@ let nextId = 1;
 export function clearTerminal(): void {
   $terminal.setKey('entries', []);
   $terminal.setKey('announcement', '');
+  $sceneFilter.set(undefined);
   const { data } = $snapshot.get();
   $selection.set(data?.selected === undefined ? undefined : { kind: 'node', name: data.selected });
 }
@@ -69,7 +71,11 @@ export async function runCommand(input: string, source: RunSource): Promise<void
     clearTerminal();
     return;
   }
-  if (result.kind === 'detail') $selection.set(result.target);
+  if (result.kind === 'detail') {
+    $selection.set(result.target);
+    $sceneFilter.set(undefined);
+  }
+  if (result.kind === 'table' && result.filter) $sceneFilter.set(result.filter);
 
   const entry: Entry = { id: nextId++, input: trimmed, source, result };
   append(entry);

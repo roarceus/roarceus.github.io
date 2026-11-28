@@ -35,7 +35,8 @@ export type PanelView =
     };
 
 export function panelView(snapshot: ClusterSnapshot, selection: Selection): PanelView | undefined {
-  if (selection.kind === 'contact') return undefined;
+  // The contact form has its own view; the scene's new kinds get theirs with the 2D map (Task 4).
+  if (selection.kind !== 'node' && selection.kind !== 'pod') return undefined;
   const run = `kubectl describe ${selection.kind} ${selection.name}`;
   if (selection.kind === 'node') {
     const node = snapshot.nodes.find((n) => n.name === selection.name);

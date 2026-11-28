@@ -11,9 +11,10 @@ The dashboard stays behind `clusterDashboard`, and the scene will sit behind `cl
 
 - **Done in 4a:** Task 1, the content model (#97): cordoned eras stay on the map, a built-in `personal` node
   for side projects, only pending projects unscheduled, update and achievement links, snapshot v2 with
-  project stories (6.5 KB gzipped).
-- **Next in 4a:** Task 2 (commands, #98), Task 3 (layout model, #99), Task 4 (2D map, #100), Task 5 (docs,
-  #101). The Stage 2 cards show live nodes only until the 2D map replaces them.
+  project stories (6.5 KB gzipped). Task 2, the commands (#98): the control plane in `kube-system`,
+  `get cs`, `describe certificate|achievement`, Pending pods as `Unschedulable`, and the
+  `get pods -l skill=` filter (`$sceneFilter`).
+- **Next in 4a:** Task 3 (layout model, #99), Task 4 (2D map, #100), Task 5 (docs, #101). The Stage 2 cards show live nodes only until the 2D map replaces them.
 
 ## Stage 3 in short
 

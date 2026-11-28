@@ -2,6 +2,8 @@ import type { ParsedCommand } from '@/lib/parser/parse';
 
 import { CONTACT_FILE } from './apply';
 import { error, errorWithMatch } from './format';
+import { skillNames } from './get';
+import { KUBE_SYSTEM } from './kube-system';
 import { PROGRAM_ONLY, registry } from './registry';
 
 import type { Command, CommandContext, CommandResult } from './types';
@@ -38,8 +40,10 @@ export async function execute(cmd: ParsedCommand, ctx: CommandContext): Promise<
 
 const PROGRAMS = ['kubectl', 'clear', 'help'];
 const FLAG_VALUES: Record<string, string[]> = {
-  '-n': ['projects'],
-  '--namespace': ['projects'],
+  '-n': ['projects', KUBE_SYSTEM],
+  '--namespace': ['projects', KUBE_SYSTEM],
+  '-l': [],
+  '--selector': [],
   '-o': ['wide', 'yaml', 'name'],
   '--output': ['wide', 'yaml', 'name'],
 };
@@ -54,12 +58,19 @@ function candidates(parts: string[], ctx: CommandContext): string[] {
 
   const previous = parts[parts.length - 2] ?? '';
   if (command.verb === 'apply' && (previous === '-f' || previous === '--filename')) return [CONTACT_FILE];
+  if (previous === '-l' || previous === '--selector') {
+    return ctx.snapshot
+      ? skillNames({ ...ctx, snapshot: ctx.snapshot }).map((skill) => `skill=${skill}`)
+      : [];
+  }
   const flagValues = FLAG_VALUES[previous];
   if (flagValues) return flagValues;
   const word = rest[rest.length - 1] ?? '';
   if (word.startsWith('-')) return [];
   const positional = rest.filter((token, i) => !token.startsWith('-') && !FLAG_VALUES[rest[i - 1] ?? '']);
-  return command.complete(positional, ctx);
+  const flag = rest.findIndex((token) => token === '-n' || token === '--namespace');
+  const namespace = flag === -1 ? undefined : rest[flag + 1];
+  return command.complete(positional, ctx, namespace);
 }
 
 /** Whole-line completions for Tab: the input with its last word completed, one entry per match. */

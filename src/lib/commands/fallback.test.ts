@@ -24,3 +24,15 @@ describe('plainHref', () => {
     expect(plainHref(run, '/pr-preview/pr-9/')).toBe(href);
   });
 });
+
+describe('plainHref (scene commands)', () => {
+  it.each([
+    ['kubectl describe pod etcd -n kube-system', '/plain/'],
+    ['kubectl describe pod etcd', '/plain/'],
+    ['kubectl describe certificate cka', '/plain/#certifications'],
+    ['kubectl describe achievement hackathon-win', '/plain/#awards'],
+    ['kubectl get pods -l skill=go -n projects', '/plain/#projects'],
+  ])('%s links to %s', (run, href) => {
+    expect(plainHref(run, '/')).toBe(href);
+  });
+});

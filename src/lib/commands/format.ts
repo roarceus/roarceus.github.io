@@ -8,7 +8,7 @@ const LABEL_WIDTH = 14;
 
 /** A `describe` field: the label and colon padded to a fixed column, like kubectl. */
 export const field = (label: string, value: string, extra: Omit<Line, 'text'> = {}): Line => ({
-  text: `${`${label}:`.padEnd(LABEL_WIDTH)}${value}`,
+  text: `${`${label}:`.padEnd(Math.max(LABEL_WIDTH, label.length + 2))}${value}`,
   ...extra,
 });
 
