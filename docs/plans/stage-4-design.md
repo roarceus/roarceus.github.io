@@ -195,6 +195,8 @@ scene picks / keyboard list -> runCommand (never the stores or three objects dir
 - With `clusterDashboard` on, the no-JS `/` shows the server-rendered map instead of the cards; production
   (flag off) is unchanged.
 - Fits its box on the one-screen layout (scales, never scrolls).
+- From the Stage 3 review (#81): pod names are the most prominent text, with a short tech hint under
+  each; status pills are quieter; nodes are sized to their pods.
 
 ## 9. The 3D scene (4b to 4d)
 
