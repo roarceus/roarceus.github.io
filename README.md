@@ -24,7 +24,9 @@ screen and nothing scrolls: long output and long details page like `less`
 ([ADR 0005](docs/adr/0005-3d-cluster-one-screen.md)). The dashboard stays behind the `clusterDashboard`
 flag, on in PR previews and off in production, until the 3D cluster (Stage 4) makes it whole. Direction:
 [ADR 0002](docs/adr/0002-design-direction-tool-and-game.md), the UI is the tool, the cluster is the game
-([design](docs/plans/stage-3-design.md), [plan](docs/plans/stage-3.md)). Progress:
+([design](docs/plans/stage-3-design.md), [plan](docs/plans/stage-3.md)). Next, Stage 4: a 3D cluster
+built from our concept, with a 2D map for everyone else ([design](docs/plans/stage-4-design.md),
+[plan](docs/plans/stage-4.md)). Progress:
 [`docs/STATUS.md`](docs/STATUS.md) · [project board](https://github.com/users/roarceus/projects/1) ·
 [changelog](CHANGELOG.md) (from v0.1.0).
 
