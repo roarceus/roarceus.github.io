@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/roarceus/roarceus.github.io/compare/v0.4.0...v0.5.0) (2026-11-28)
+
+
+### Features
+
+* **content:** add cordoned and personal nodes and scene links ([#111](https://github.com/roarceus/roarceus.github.io/issues/111)) ([b18e37f](https://github.com/roarceus/roarceus.github.io/commit/b18e37f8e2f7405e2795e34fad6f0aaa0e33445d))
+
 ## [0.4.0](https://github.com/roarceus/roarceus.github.io/compare/v0.3.0...v0.4.0) (2026-11-27)
 
 
