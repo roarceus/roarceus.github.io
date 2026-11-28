@@ -2,6 +2,7 @@ import { parse } from '@/lib/parser/parse';
 import { joinBase } from '@/lib/utils/url';
 
 import { splitTypeName } from './format';
+import { findComponent } from './kube-system';
 
 /**
  * Where a clickable command links without JavaScript (design doc stage-3 §5.4): chips, table names, and
@@ -37,6 +38,7 @@ function pathFor(run: string): string {
   if (flags.n === 'kube-system') return 'plain/';
   const [type = '', name] = splitTypeName(args);
   if (verb === 'describe' && (type === 'pod' || type === 'pods' || type === 'po') && name) {
+    if (findComponent(name)) return 'plain/';
     return `projects/${name}/`;
   }
   return SECTIONS[type.toLowerCase()] ?? 'plain/';

@@ -174,8 +174,8 @@ describe('describe pod (pending)', () => {
       '  Type           Status  Reason',
       '  PodScheduled   False   Unschedulable',
       'Events:',
-      '  Type     Reason            From               Message',
-      "  Warning  FailedScheduling  default-scheduler  0/3 nodes are available: 1 node(s) were unschedulable, 2 node(s) didn't match Pod's node affinity/selector.",
+      '  Type     Reason            Age        From               Message',
+      "  Warning  FailedScheduling  <unknown>  default-scheduler  0/3 nodes are available: 1 node(s) were unschedulable, 2 node(s) didn't match Pod's node affinity/selector.",
     ]);
   });
 });

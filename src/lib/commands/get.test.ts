@@ -350,7 +350,7 @@ describe('get componentstatuses', () => {
       expect(result.rows).toEqual([
         { name: 'scheduler', status: 'Healthy', message: 'ok', error: '' },
         { name: 'controller-manager', status: 'Healthy', message: 'ok', error: '' },
-        { name: 'etcd-0', status: 'Healthy', message: 'ok', error: '' },
+        { name: 'etcd-0', status: 'Healthy', message: '{"health":"true","reason":""}', error: '' },
       ]);
     },
   );
@@ -390,6 +390,7 @@ describe('get pods -l skill=', () => {
 
   it('says no resources found for a skill nothing used, and sets no filter', async () => {
     const result = await exec('kubectl get pods -l skill=cobol -n projects');
+    expect(result.kind).toBe('lines');
     expect(texts(result)).toEqual(['No resources found in projects namespace.']);
   });
 
@@ -400,5 +401,31 @@ describe('get pods -l skill=', () => {
     expect(as(await exec('kubectl get pods -n projects -l'), 'error').message).toBe(
       "error: flag needs an argument: 'l' in -l",
     );
+  });
+});
+
+describe('get review fixes', () => {
+  it('reads --selector like -l, and splits the selector on the first = only', async () => {
+    const long = as(await exec('kubectl get pods --selector skill=go -n projects'), 'table');
+    expect(long.filter).toEqual({ skill: 'go' });
+    expect(as(await exec('kubectl get pods -l skill=go -n projects'), 'table').rows).toHaveLength(1);
+    expect((await exec('kubectl get pods -l skill== -n projects')).kind).toBe('lines');
+  });
+
+  it('finds a component by any case of its name', async () => {
+    expect(as(await exec('kubectl get pods ETCD-Control-Plane -n kube-system'), 'table').rows).toHaveLength(
+      1,
+    );
+    expect(as(await exec('kubectl get pods Etcd -n kube-system'), 'table').rows).toHaveLength(1);
+  });
+
+  it('prints the etcd health message the way kubectl does', async () => {
+    const { rows } = as(await exec('kubectl get cs'), 'table');
+    expect(rows[2]).toEqual({
+      name: 'etcd-0',
+      status: 'Healthy',
+      message: '{"health":"true","reason":""}',
+      error: '',
+    });
   });
 });

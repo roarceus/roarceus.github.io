@@ -166,14 +166,14 @@ const componentStatuses: Resource = {
   columns: cols('NAME', 'STATUS', 'MESSAGE', 'ERROR'),
   warning: CS_WARNING,
   items: () =>
-    COMPONENT_STATUSES.map((name) => ({
+    COMPONENT_STATUSES.map(({ name, message }) => ({
       name,
-      row: { name, status: 'Healthy', message: 'ok', error: '' },
+      row: { name, status: 'Healthy', message, error: '' },
       manifest: {
         apiVersion: 'v1',
         kind: 'ComponentStatus',
         metadata: { name },
-        conditions: [{ type: 'Healthy', status: 'True', message: 'ok' }],
+        conditions: [{ type: 'Healthy', status: 'True', message }],
       },
     })),
 };
@@ -373,7 +373,11 @@ async function run(cmd: ParsedCommand, ctx: DataContext): Promise<CommandResult>
     const names = items.map((item) => item.name);
     const scope = scoped ? ` -n ${namespace ?? ''}` : '';
     const lower = name.toLowerCase();
-    items = items.filter((item) => item.name === name || item.aliases?.includes(lower));
+    // Components match in any case, by static pod or short name (as `describe` does).
+    items = items.filter(
+      (item) =>
+        item.name === name || (item.aliases !== undefined && [item.name, ...item.aliases].includes(lower)),
+    );
     if (items.length === 0) {
       return notFound(
         resource.plural,
@@ -385,8 +389,9 @@ async function run(cmd: ParsedCommand, ctx: DataContext): Promise<CommandResult>
   }
   let filter: { skill: string } | undefined;
   if (selector !== undefined) {
-    const [key, value = ''] = selector.split('=');
-    const skill = value.toLowerCase();
+    const eq = selector.indexOf('=');
+    const key = eq === -1 ? selector : selector.slice(0, eq);
+    const skill = eq === -1 ? '' : selector.slice(eq + 1).toLowerCase();
     items = key === 'skill' ? items.filter((item) => item.skills?.includes(skill)) : [];
     if (items.length === 0) return noResources;
     filter = { skill };

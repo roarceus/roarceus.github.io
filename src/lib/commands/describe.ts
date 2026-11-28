@@ -113,9 +113,9 @@ function unschedulable({ snapshot }: DataContext): Line[] {
     { text: '  Type           Status  Reason' },
     { text: '  PodScheduled   False   Unschedulable' },
     { text: 'Events:' },
-    { text: '  Type     Reason            From               Message' },
+    { text: '  Type     Reason            Age        From               Message' },
     {
-      text: `  Warning  FailedScheduling  default-scheduler  0/${String(total)} nodes are available: ${reasons.join(', ')}.`,
+      text: `  Warning  FailedScheduling  <unknown>  default-scheduler  0/${String(total)} nodes are available: ${reasons.join(', ')}.`,
     },
   ];
 }

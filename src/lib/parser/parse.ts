@@ -25,6 +25,8 @@ const ALIASES: Record<string, string> = {
   namespace: 'n',
   o: 'o',
   output: 'o',
+  l: 'l',
+  selector: 'l',
   f: 'f',
   filename: 'f',
   follow: 'f',

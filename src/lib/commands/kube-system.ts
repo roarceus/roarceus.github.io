@@ -43,5 +43,9 @@ export function findComponent(name: string): Component | undefined {
 }
 
 /** `get componentstatuses` rows: kubectl still prints these, after its deprecation warning. */
-export const COMPONENT_STATUSES = ['scheduler', 'controller-manager', 'etcd-0'];
+export const COMPONENT_STATUSES = [
+  { name: 'scheduler', message: 'ok' },
+  { name: 'controller-manager', message: 'ok' },
+  { name: 'etcd-0', message: '{"health":"true","reason":""}' },
+];
 export const CS_WARNING = 'Warning: v1 ComponentStatus is deprecated in v1.19+';
